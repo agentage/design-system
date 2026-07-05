@@ -1,0 +1,117 @@
+name: Deploy
+
+# Build -> smoke (against the built image) -> deploy to BOTH dev and prod in
+# parallel. The image is env-agnostic (static SPA; Traefik routes by host), so one
+# build ships to both; each environment supplies its own SSH host/key + SITE_FQDN.
+# Runs only on push to master / manual dispatch; each deploy is gated on its
+# protected Environment AND the DEPLOY_ENABLED repo variable.
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ds
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE: ghcr.io/agentage/design-system/showcase
+
+jobs:
+  build:
+    name: 🏗️ Build image
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: runner
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+          build-args: |
+            COMMIT_SHA=${{ github.sha }}
+          cache-from: type=gha,scope=ds-showcase
+          cache-to: type=gha,mode=max,scope=ds-showcase
+
+  smoke:
+    name: 🔎 Smoke (built image)
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Serve image and check it renders
+        run: |
+          docker run -d --name ds -p 8080:8080 "${IMAGE}:${GITHUB_SHA}"
+          for i in $(seq 1 30); do
+            [ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/)" = "200" ] && break
+            sleep 1
+          done
+          curl -fsS http://localhost:8080/ | grep -q "Agentage Design System" \
+            || { echo "::error::showcase did not render"; docker logs ds; exit 1; }
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+
+  deploy:
+    name: 🚀 Deploy (${{ matrix.environment }})
+    needs: smoke
+    if: vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: ${{ matrix.environment }}
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [development, production]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-ssh
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.SSH_HOST }}
+      - name: Render compose
+        env:
+          SITE_FQDN: ${{ vars.SITE_FQDN }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          envsubst '${SITE_FQDN} ${IMAGE_TAG}' < docker-compose.yml > docker-compose.deploy.yml
+          if grep -E '\$\{(SITE_FQDN|IMAGE_TAG)' docker-compose.deploy.yml; then
+            echo "::error::unresolved variable in docker-compose.deploy.yml"; exit 1
+          fi
+      - name: Copy compose to host
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /opt/agentage/ds"
+          scp docker-compose.deploy.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/agentage/ds/docker-compose.yml
+      - name: Login to GHCR on host
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker login ghcr.io -u ${{ github.actor }} --password-stdin"
+      - name: Deploy stack
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /opt/agentage/ds && docker stack deploy -c docker-compose.yml agentage-ds --with-registry-auth"
+      - name: Wait + live smoke
+        env:
+          SITE_FQDN: ${{ vars.SITE_FQDN }}
+        run: |
+          for i in $(seq 1 40); do
+            curl -fsS "https://${SITE_FQDN}/" 2>/dev/null | grep -q "Agentage Design System" && { ok=1; break; }
+            sleep 5
+          done
+          echo "Smoke: https://${SITE_FQDN}/"
+          [ -n "${ok:-}" ] || { echo "::error::${SITE_FQDN} never served the showcase"; exit 1; }

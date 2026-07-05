@@ -32,6 +32,7 @@
     "dev": "vite --config dev/vite.config.ts",
     "dev:build": "vite build --watch",
     "build": "tsc --noEmit && vite build",
+    "build:showcase": "vite build --config dev/vite.config.ts",
     "type-check": "tsc --noEmit",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",

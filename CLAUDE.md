@@ -12,12 +12,18 @@ Single source of truth for the Agentage design system (OKLCH tokens + React comp
 ## Build / verify
 
 - `npm run build` — `tsc --noEmit` + Vite lib build (ES + rolled-up `.d.ts` via vite-plugin-dts).
+- `npm run build:showcase` — Vite static build of the `dev/` playground → `dist-showcase/` (deployed to ds.agentage.io).
 - `npm run verify` — type-check + lint + format:check + test + build (CI runs this on PR + push).
-- Exports: `.` (JS), `./theme.css`, `./primitives.css`. `files` ships `dist` + `src/{styles,components,lib}`.
+- Exports: `.` (JS), `./theme.css`, `./primitives.css`. `files` ships `dist` + `src/styles`.
 
 ## Publish
 
 - npm, public, `--provenance`. Release-gated via `.github/workflows/publish.yml`: bump `package.json` version in a `chore(release): vX` commit (or `workflow_dispatch`). Needs `NPM_TOKEN` secret.
+
+## Deploy (showcase → ds.agentage.io)
+
+- The `dev/` showcase deploys as its own Swarm stack (`agentage-ds`) behind Traefik, dev + prod, mirroring `agentage/landing`. Dockerfile builds the static SPA → nginx-unprivileged; `docker-compose.yml` carries the Traefik labels; `.github/workflows/deploy.yml` builds → smokes → deploys on push to master.
+- Gated on `vars.DEPLOY_ENABLED == 'true'` + the `development`/`production` environments. Each env sets `vars.SITE_FQDN` (`dev.ds.agentage.io` / `ds.agentage.io`); needs `SSH_PRIVATE_KEY` / `SSH_HOST` / `SSH_USER` secrets + DNS for the hosts.
 
 ## Conventions
 
