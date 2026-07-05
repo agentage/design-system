@@ -19,9 +19,7 @@
   },
   "files": [
     "dist",
-    "src/styles",
-    "src/components",
-    "src/lib"
+    "src/styles"
   ],
   "publishConfig": {
     "access": "public"
