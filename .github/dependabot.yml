@@ -30,3 +30,18 @@ updates:
       all-actions:
         patterns:
           - '*'
+
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: friday
+      time: '18:00'
+      timezone: Europe/Prague
+    assignees:
+      - vreshch
+    open-pull-requests-limit: 5
+    groups:
+      all-docker:
+        patterns:
+          - '*'
