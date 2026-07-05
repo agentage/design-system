@@ -1,0 +1,100 @@
+/* ============================================================================
+ * Agentage Design System — Base Styles
+ *
+ * Global resets, defaults, and opinionated base styles.
+ * Consumers opt in by importing theme.css.
+ * ============================================================================ */
+
+/* In @layer base so it's the DEFAULT border color (Tailwind v4 convention) but
+ * loses to border-color utilities. Unlayered, it beat every `border-*` utility. */
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  min-height: 100vh;
+  line-height: var(--leading-normal);
+}
+
+/* Headings — consistent tight tracking to match the design language. */
+h1,
+h2,
+h3 {
+  letter-spacing: -0.02em;
+}
+
+h4,
+h5,
+h6 {
+  letter-spacing: -0.015em;
+}
+
+/* Prevent text selection in UI chrome */
+button,
+[role='button'],
+nav,
+aside {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Pointer cursor for interactive elements */
+button:not(:disabled),
+[role='button']:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-muted-foreground);
+  border-radius: var(--radius-md);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* Keyframe animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

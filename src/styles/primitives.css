@@ -1,0 +1,143 @@
+/* ============================================================================
+ * Agentage Design System — Primitive Color Scales (OKLCH)
+ *
+ * Perceptually uniform color ramps. Theme-independent.
+ * Each scale has 11 stops (50–950) calibrated to match existing hex values.
+ *
+ * OKLCH format: oklch(Lightness Chroma Hue)
+ *   L = 0–1 (perceived lightness)
+ *   C = 0–0.4 (saturation)
+ *   H = 0–360° (hue angle)
+ * ============================================================================ */
+
+@theme {
+  /* Gold — Brand primary. Hue ~72° (warm amber-gold) */
+  --color-gold-50: oklch(0.98 0.02 85);
+  --color-gold-100: oklch(0.95 0.05 82);
+  --color-gold-200: oklch(0.88 0.09 78);
+  --color-gold-300: oklch(0.83 0.13 75);
+  --color-gold-400: oklch(0.78 0.155 72);
+  --color-gold-500: oklch(0.735 0.152 68);
+  --color-gold-600: oklch(0.65 0.14 64);
+  --color-gold-700: oklch(0.55 0.12 58);
+  --color-gold-800: oklch(0.45 0.1 52);
+  --color-gold-900: oklch(0.35 0.08 46);
+  --color-gold-950: oklch(0.25 0.06 40);
+
+  /* Neutral — Blue-tinted grays. Hue ~277° (signature Agentage feel) */
+  --color-neutral-50: oklch(0.97 0.003 277);
+  --color-neutral-100: oklch(0.96 0.005 277);
+  --color-neutral-200: oklch(0.92 0.006 277);
+  --color-neutral-300: oklch(0.87 0.008 275);
+  --color-neutral-400: oklch(0.555 0.014 256);
+  --color-neutral-500: oklch(0.45 0.016 265);
+  --color-neutral-600: oklch(0.237 0.017 277);
+  --color-neutral-700: oklch(0.17 0.018 277);
+  --color-neutral-800: oklch(0.13 0.015 277);
+  --color-neutral-900: oklch(0.085 0.013 277);
+  --color-neutral-950: oklch(0.06 0.01 277);
+
+  /* Red — Destructive/Error. Hue ~25° */
+  --color-red-50: oklch(0.97 0.02 25);
+  --color-red-100: oklch(0.94 0.04 25);
+  --color-red-200: oklch(0.88 0.08 25);
+  --color-red-300: oklch(0.8 0.14 25);
+  --color-red-400: oklch(0.72 0.18 25);
+  --color-red-500: oklch(0.628 0.208 25.6);
+  --color-red-600: oklch(0.55 0.2 24);
+  --color-red-700: oklch(0.47 0.17 23);
+  --color-red-800: oklch(0.39 0.14 22);
+  --color-red-900: oklch(0.31 0.1 21);
+  --color-red-950: oklch(0.22 0.07 20);
+
+  /* Green — Success. Hue ~149° */
+  --color-green-50: oklch(0.97 0.02 149);
+  --color-green-100: oklch(0.94 0.04 149);
+  --color-green-200: oklch(0.88 0.08 149);
+  --color-green-300: oklch(0.82 0.13 149);
+  --color-green-400: oklch(0.76 0.17 149);
+  --color-green-500: oklch(0.723 0.191 149.6);
+  --color-green-600: oklch(0.627 0.185 149);
+  --color-green-700: oklch(0.53 0.16 149);
+  --color-green-800: oklch(0.44 0.13 149);
+  --color-green-900: oklch(0.35 0.1 149);
+  --color-green-950: oklch(0.25 0.07 149);
+
+  /* Blue — Info. Hue ~259° */
+  --color-blue-50: oklch(0.97 0.02 259);
+  --color-blue-100: oklch(0.94 0.04 259);
+  --color-blue-200: oklch(0.88 0.08 259);
+  --color-blue-300: oklch(0.78 0.13 259);
+  --color-blue-400: oklch(0.7 0.17 259);
+  --color-blue-500: oklch(0.623 0.19 259.1);
+  --color-blue-600: oklch(0.548 0.22 262);
+  --color-blue-700: oklch(0.47 0.19 262);
+  --color-blue-800: oklch(0.39 0.16 262);
+  --color-blue-900: oklch(0.31 0.12 262);
+  --color-blue-950: oklch(0.22 0.08 262);
+
+  /* Orange — Warning. Hue ~48° */
+  --color-orange-50: oklch(0.97 0.02 48);
+  --color-orange-100: oklch(0.94 0.05 48);
+  --color-orange-200: oklch(0.88 0.09 48);
+  --color-orange-300: oklch(0.82 0.14 48);
+  --color-orange-400: oklch(0.76 0.17 48);
+  --color-orange-500: oklch(0.705 0.191 47.7);
+  --color-orange-600: oklch(0.62 0.19 43);
+  --color-orange-700: oklch(0.53 0.16 40);
+  --color-orange-800: oklch(0.44 0.13 38);
+  --color-orange-900: oklch(0.35 0.1 36);
+  --color-orange-950: oklch(0.25 0.07 34);
+
+  /* Violet — Decorative. Hue ~290° */
+  --color-violet-50: oklch(0.97 0.02 290);
+  --color-violet-100: oklch(0.94 0.04 290);
+  --color-violet-200: oklch(0.88 0.08 290);
+  --color-violet-300: oklch(0.78 0.14 290);
+  --color-violet-400: oklch(0.68 0.18 290);
+  --color-violet-500: oklch(0.55 0.2 290);
+  --color-violet-600: oklch(0.47 0.18 290);
+  --color-violet-700: oklch(0.39 0.15 290);
+  --color-violet-800: oklch(0.31 0.12 290);
+  --color-violet-900: oklch(0.24 0.09 290);
+  --color-violet-950: oklch(0.17 0.06 290);
+
+  /* Cyan — Decorative. Hue ~200° */
+  --color-cyan-50: oklch(0.97 0.02 200);
+  --color-cyan-100: oklch(0.94 0.04 200);
+  --color-cyan-200: oklch(0.88 0.07 200);
+  --color-cyan-300: oklch(0.82 0.1 200);
+  --color-cyan-400: oklch(0.76 0.12 200);
+  --color-cyan-500: oklch(0.68 0.12 200);
+  --color-cyan-600: oklch(0.58 0.11 200);
+  --color-cyan-700: oklch(0.48 0.09 200);
+  --color-cyan-800: oklch(0.39 0.07 200);
+  --color-cyan-900: oklch(0.31 0.05 200);
+  --color-cyan-950: oklch(0.22 0.04 200);
+
+  /* Rose — Decorative. Hue ~10° */
+  --color-rose-50: oklch(0.97 0.02 10);
+  --color-rose-100: oklch(0.94 0.04 10);
+  --color-rose-200: oklch(0.88 0.08 10);
+  --color-rose-300: oklch(0.8 0.14 10);
+  --color-rose-400: oklch(0.7 0.18 10);
+  --color-rose-500: oklch(0.6 0.18 10);
+  --color-rose-600: oklch(0.52 0.16 10);
+  --color-rose-700: oklch(0.44 0.14 10);
+  --color-rose-800: oklch(0.36 0.11 10);
+  --color-rose-900: oklch(0.28 0.08 10);
+  --color-rose-950: oklch(0.2 0.06 10);
+
+  /* Amber — Decorative. Hue ~75° (warmer than gold) */
+  --color-amber-50: oklch(0.97 0.03 75);
+  --color-amber-100: oklch(0.94 0.06 75);
+  --color-amber-200: oklch(0.88 0.1 75);
+  --color-amber-300: oklch(0.82 0.14 75);
+  --color-amber-400: oklch(0.76 0.15 75);
+  --color-amber-500: oklch(0.68 0.15 75);
+  --color-amber-600: oklch(0.6 0.14 72);
+  --color-amber-700: oklch(0.5 0.12 68);
+  --color-amber-800: oklch(0.42 0.1 64);
+  --color-amber-900: oklch(0.34 0.08 60);
+  --color-amber-950: oklch(0.24 0.06 56);
+}

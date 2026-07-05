@@ -1,0 +1,10 @@
+/* Agentage Design System — Theme Entry Point */
+
+/* Primitive OKLCH color scales — theme-independent */
+@import './primitives.css';
+
+/* Semantic tokens, typography, shadows, animation — theme-dependent */
+@import './tokens.css';
+
+/* Base element styles — resets, scrollbar, body defaults */
+@import './base.css';
