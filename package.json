@@ -1,6 +1,6 @@
 {
   "name": "@agentage/design-system",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Agentage design system — OKLCH design tokens + React component library.",
   "type": "module",
   "license": "UNLICENSED",
