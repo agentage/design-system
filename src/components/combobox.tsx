@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { cn } from '../lib/utils';
 
 export interface ComboboxOption {
@@ -62,6 +62,7 @@ export const Combobox = ({
   const [search, setSearch] = useState('');
   const ref = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listId = useId();
 
   const selectedOption = options.find((o) => o.value === value);
   const filtered = options.filter((o) => o.label.toLowerCase().includes(search.toLowerCase()));
@@ -95,6 +96,9 @@ export const Combobox = ({
         type="button"
         disabled={disabled}
         onClick={() => setOpen(!open)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={open ? listId : undefined}
         className={cn(
           'flex h-9 w-full items-center justify-between rounded-md border border-border bg-muted/30 px-3 text-sm transition-colors',
           'focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20',
@@ -115,10 +119,15 @@ export const Combobox = ({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={searchPlaceholder}
+              aria-label={searchPlaceholder}
               className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
           </div>
-          <div className="max-h-[200px] overflow-y-auto border-t border-border p-1">
+          <div
+            id={listId}
+            role="listbox"
+            className="max-h-[200px] overflow-y-auto border-t border-border p-1"
+          >
             {filtered.length === 0 ? (
               <div className="py-4 text-center text-sm text-muted-foreground">{emptyMessage}</div>
             ) : (
@@ -126,6 +135,8 @@ export const Combobox = ({
                 <button
                   key={option.value}
                   type="button"
+                  role="option"
+                  aria-selected={option.value === value}
                   onClick={() => {
                     onValueChange?.(option.value);
                     setOpen(false);
