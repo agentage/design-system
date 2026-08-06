@@ -91,7 +91,7 @@ describe('AlertDialog class parity', () => {
       />
     );
     expect(confirmClass()).toBe(
-      `${CONFIRM_BASE} bg-destructive text-on-solid hover:bg-destructive/90`
+      `${CONFIRM_BASE} bg-destructive-solid text-on-solid hover:bg-destructive-solid/90`
     );
   });
 

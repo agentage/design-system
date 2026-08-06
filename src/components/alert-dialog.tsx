@@ -17,7 +17,7 @@ export const alertDialogConfirmVariants = cva(
     variants: {
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive: 'bg-destructive text-on-solid hover:bg-destructive/90',
+        destructive: 'bg-destructive-solid text-on-solid hover:bg-destructive-solid/90',
       },
     },
     defaultVariants: {

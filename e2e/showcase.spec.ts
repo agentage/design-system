@@ -18,13 +18,7 @@ const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
  * Documented axe exclusions. Each entry needs a reason; keep the list empty
  * unless a rule genuinely misfires on the showcase (not on the components).
  */
-const EXCLUDED_RULES: { id: string; reason: string }[] = [
-  {
-    id: 'color-contrast',
-    reason:
-      'Token-level: --color-muted-foreground (L 0.555) lands just under 4.5:1 on --color-background in both themes. Changing it repaints every surface, so it is tracked as its own token pass rather than gated here.',
-  },
-];
+const EXCLUDED_RULES: { id: string; reason: string }[] = [];
 
 const gotoPage = async (page: Page, name: string): Promise<void> => {
   await page.goto('/');
