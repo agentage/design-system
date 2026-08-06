@@ -11,7 +11,7 @@ export const dataTableHeadVariants = cva('', {
   variants: {
     density: {
       default: '',
-      compact: 'h-auto py-2.5 whitespace-nowrap',
+      compact: 'h-auto py-2 whitespace-nowrap',
     },
     align: ALIGN,
   },
@@ -25,7 +25,7 @@ export const dataTableCellVariants = cva('', {
   variants: {
     density: {
       default: '',
-      compact: 'px-4 py-3',
+      compact: 'px-4 py-2',
     },
     align: ALIGN,
     nowrap: {

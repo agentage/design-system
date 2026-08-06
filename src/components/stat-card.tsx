@@ -32,11 +32,12 @@ export interface StatCardTrend {
 }
 
 export const statCardVariants = cva(
-  'rounded-lg border border-border bg-sidebar p-5 transition-[transform,box-shadow,border-color] duration-[140ms] hover:-translate-y-[3px] hover:border-muted-foreground hover:shadow-md',
+  // Hover affordance is border+shadow only - cards must not move (user rule: no position change on hover).
+  'rounded-lg border border-border bg-sidebar p-5 transition-[box-shadow,border-color] duration-[140ms] hover:border-muted-foreground hover:shadow-md',
   {
     variants: {
       pressable: {
-        true: 'w-full cursor-pointer text-left active:translate-y-0 active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        true: 'w-full cursor-pointer text-left active:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         false: '',
       },
     },
