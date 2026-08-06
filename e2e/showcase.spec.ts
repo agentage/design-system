@@ -59,6 +59,24 @@ test.describe('showcase visuals', () => {
     await expect(section(page, 'Entity List')).toHaveScreenshot('entity-list.png');
   });
 
+  test('data table compact', async ({ page }) => {
+    await gotoPage(page, 'Data Display');
+    const table = section(page, 'Data Table');
+    await table.getByRole('radio', { name: 'Compact', exact: true }).click();
+    await table.getByRole('button', { name: 'Agents' }).click();
+    await expect(table).toHaveScreenshot('data-table-compact.png');
+  });
+
+  test('context menu open', async ({ page }) => {
+    await gotoPage(page, 'Feedback');
+    await section(page, 'Context Menu')
+      .getByRole('button', { name: 'roadmap.md' })
+      .click({ button: 'right' });
+    const menu = page.locator('[data-slot="context-menu-content"]');
+    await expect(menu).toBeVisible();
+    await expect(menu).toHaveScreenshot('context-menu-open.png');
+  });
+
   test('command palette open', async ({ page }) => {
     await gotoPage(page, 'Feedback');
     await page.getByRole('button', { name: /Open Command/ }).click();

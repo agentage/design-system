@@ -34,6 +34,11 @@ import {
   CommandGroup,
   CommandItem,
   CommandSeparator,
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuLabel,
+  ContextMenuSeparator,
+  DataTable,
   DatePicker,
   DropdownMenu,
   DropdownMenuItem,
@@ -770,6 +775,7 @@ const FoundationsPage = () => (
 
 /* ═══════════════════ DATA DISPLAY ═══════════════════ */
 const DataDisplayPage = () => {
+  const [density, setDensity] = useState<'default' | 'compact'>('default');
   const [pageNum, setPageNum] = useState(1);
   const [filter, setFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -1067,6 +1073,69 @@ const DataDisplayPage = () => {
             )}
           </TableBody>
         </Table>
+      </S>
+
+      <S title="Data Table">
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-muted-foreground">Density</span>
+          <ToggleGroup
+            value={density}
+            onChange={setDensity}
+            options={[
+              { value: 'default', label: 'Default' },
+              { value: 'compact', label: 'Compact' },
+            ]}
+            columns={2}
+            className="max-w-[16rem]"
+          />
+        </div>
+        <DataTable
+          data={MACHINES}
+          density={density}
+          defaultSort={{ key: 'name', direction: 'asc' }}
+          rowKey={(m) => m.name}
+          columns={[
+            {
+              key: 'name',
+              header: 'Name',
+              sortable: true,
+              nowrap: true,
+              cell: (m) => <span className="font-medium">{m.name}</span>,
+            },
+            {
+              key: 'platform',
+              header: 'Platform',
+              cell: (m) => (
+                <span className="font-mono text-xs text-muted-foreground">
+                  {m.platform}/{m.arch}
+                </span>
+              ),
+            },
+            {
+              key: 'status',
+              header: 'Status',
+              sortable: true,
+              cell: (m) => <StatusDot variant={m.status} label={m.status} />,
+            },
+            { key: 'agents', header: 'Agents', sortable: true, align: 'right' },
+            { key: 'last_seen', header: 'Last Seen', sortable: true, nowrap: true },
+          ]}
+          rowActions={(m) => (
+            <DropdownMenu
+              trigger={
+                <IconButton icon={<EditIcon />} onClick={() => {}} title={`Actions ${m.name}`} />
+              }
+              side="top"
+            >
+              <DropdownMenuLabel>{m.name}</DropdownMenuLabel>
+              <DropdownMenuItem>View details</DropdownMenuItem>
+              <DropdownMenuItem>View agents</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant="destructive">Deregister</DropdownMenuItem>
+            </DropdownMenu>
+          )}
+          empty={<EmptyState title="No machines" description="Connect one to get started." />}
+        />
       </S>
 
       <S title="Runs Table">
@@ -1529,6 +1598,33 @@ const FeedbackPage = () => {
           <DropdownMenuSeparator />
           <DropdownMenuItem variant="destructive">Cancel run</DropdownMenuItem>
         </DropdownMenu>
+      </S>
+
+      <S title="Context Menu">
+        <p className="text-sm text-muted-foreground">
+          Right-click a file — or focus one and press <Kbd>Shift</Kbd> + <Kbd>F10</Kbd>.
+        </p>
+        <EntityList className="max-w-md">
+          {['README.md', 'roadmap.md', 'notes/standup.md'].map((file) => (
+            <ContextMenu
+              key={file}
+              trigger={
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-foreground transition-colors duration-[140ms] hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                >
+                  {file}
+                </button>
+              }
+            >
+              <ContextMenuLabel>{file}</ContextMenuLabel>
+              <ContextMenuItem>Rename</ContextMenuItem>
+              <ContextMenuItem>Copy path</ContextMenuItem>
+              <ContextMenuSeparator />
+              <ContextMenuItem variant="destructive">Delete</ContextMenuItem>
+            </ContextMenu>
+          ))}
+        </EntityList>
       </S>
 
       <S title="Popover">

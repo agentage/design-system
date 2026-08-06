@@ -110,9 +110,25 @@
       "types": "./dist/components/command.variants.d.ts",
       "import": "./dist/components/command.variants.js"
     },
+    "./context-menu": {
+      "types": "./dist/components/context-menu.d.ts",
+      "import": "./dist/components/context-menu.js"
+    },
     "./copy-button": {
       "types": "./dist/components/copy-button.d.ts",
       "import": "./dist/components/copy-button.js"
+    },
+    "./data-table": {
+      "types": "./dist/components/data-table.d.ts",
+      "import": "./dist/components/data-table.js"
+    },
+    "./data-table.parts": {
+      "types": "./dist/components/data-table.parts.d.ts",
+      "import": "./dist/components/data-table.parts.js"
+    },
+    "./data-table.variants": {
+      "types": "./dist/components/data-table.variants.d.ts",
+      "import": "./dist/components/data-table.variants.js"
     },
     "./date-picker": {
       "types": "./dist/components/date-picker.d.ts",
@@ -209,6 +225,14 @@
     "./markdown": {
       "types": "./dist/components/markdown.d.ts",
       "import": "./dist/components/markdown.js"
+    },
+    "./menu.parts": {
+      "types": "./dist/components/menu.parts.d.ts",
+      "import": "./dist/components/menu.parts.js"
+    },
+    "./menu.variants": {
+      "types": "./dist/components/menu.variants.d.ts",
+      "import": "./dist/components/menu.variants.js"
     },
     "./modal": {
       "types": "./dist/components/modal.d.ts",
@@ -317,6 +341,10 @@
     "./table": {
       "types": "./dist/components/table.d.ts",
       "import": "./dist/components/table.js"
+    },
+    "./table-sort": {
+      "types": "./dist/lib/table-sort.d.ts",
+      "import": "./dist/lib/table-sort.js"
     },
     "./tabs": {
       "types": "./dist/components/tabs.d.ts",
