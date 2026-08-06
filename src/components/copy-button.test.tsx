@@ -17,12 +17,14 @@ beforeEach(() => {
 describe('CopyButton', () => {
   it('announces the copied state through a polite live region', async () => {
     render(<CopyButton text="npm i" />);
-    const live = screen.getByText('Copy');
-    expect(live.getAttribute('aria-live')).toBe('polite');
+    const live = screen.getByText('Copy').closest('[aria-live]');
+    expect(live?.getAttribute('aria-live')).toBe('polite');
 
     await userEvent.click(screen.getByRole('button'));
     await waitFor(() =>
-      expect(screen.getByText('Copied').getAttribute('aria-live')).toBe('polite')
+      expect(screen.getByText('Copied').closest('[aria-live]')?.getAttribute('aria-live')).toBe(
+        'polite'
+      )
     );
     expect(writeText).toHaveBeenCalledWith('npm i');
   });
@@ -91,5 +93,21 @@ describe('CopyButton fallbacks', () => {
       expect(screen.getByText('Copied')).toBeTruthy();
     });
     expect(document.querySelectorAll('textarea').length).toBe(0);
+  });
+
+  it('always renders all labels in one grid cell so width stays stable', async () => {
+    writeText.mockResolvedValueOnce(undefined);
+    render(<CopyButton text="npm i" />);
+    const spans = screen.getByRole('button').querySelectorAll('.col-start-1.row-start-1');
+    expect(spans.length).toBe(3);
+    expect([...spans].map((s) => s.textContent)).toEqual(['Copy', 'Copied', 'Failed']);
+    expect(spans[0].className).not.toContain('invisible');
+    await userEvent.click(screen.getByRole('button'));
+    await waitFor(() => {
+      expect(spans[0].className).toContain('invisible');
+      expect(spans[1].className).not.toContain('invisible');
+    });
+    expect(spans[1].getAttribute('aria-hidden')).toBeNull();
+    expect(spans[2].className).toContain('invisible');
   });
 });
