@@ -20,6 +20,19 @@ Components (tree-shakeable ES module):
 import { Button, Card, Alert } from '@agentage/design-system';
 ```
 
+### React Server Components
+
+Every interactive component ships `'use client'` as the first line of its emitted module, and the build
+preserves one output file per source module — so the barrel above is safe to import from a React Server
+Component: only the components you actually use that need the client runtime cross the boundary.
+
+Per-component subpaths are also exported, for consumers that want to keep the RSC graph explicit:
+
+```tsx
+import { Card } from '@agentage/design-system/card'; // server component
+import { Tabs } from '@agentage/design-system/tabs'; // 'use client'
+```
+
 Design tokens (OKLCH color scales + semantic tokens) as CSS — import once at your app root:
 
 ```css
@@ -36,7 +49,7 @@ npm run dev      # component showcase (Vite) on :5174
 npm run verify   # type-check + lint + format + test + build
 ```
 
-- `src/components` — the components (barrel-exported from `src/index.ts`)
+- `src/components` — the components (barrel-exported from `src/index.ts`; add `'use client'` as line 1 to any component that uses client-only React — state, effects, refs, context, DOM APIs)
 - `src/styles` — the OKLCH token + base-style CSS
 - `src/lib` — `cn` and helpers
 - `dev/` — the Vite showcase playground

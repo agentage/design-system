@@ -4,17 +4,24 @@ Single source of truth for the Agentage design system (OKLCH tokens + React comp
 
 ## Layout
 
-- `src/components` — React components, barrel-exported from `src/index.ts`.
+- `src/components` — React components, barrel-exported from `src/index.ts`. Interactive ones carry `'use client'` as line 1.
 - `src/styles` — OKLCH CSS: `primitives.css` (raw scales) → `tokens.css` (semantic) → `base.css` (resets), composed by `theme.css`.
 - `src/lib` — `cn` + helpers.
 - `dev/` — Vite showcase playground (`npm run dev`, :5174). Not published, not linted.
 
 ## Build / verify
 
-- `npm run build` — `tsc --noEmit` + Vite lib build (ES + rolled-up `.d.ts` via vite-plugin-dts).
+- `npm run build` — `tsc --noEmit` + Vite lib build. Output is **one file per source module** (`rollupOptions.output.preserveModules`), each with its own `.d.ts` beside it (vite-plugin-dts, no `rollupTypes`). Runtime `dependencies` are external so their own client boundaries survive.
 - `npm run build:showcase` — Vite static build of the `dev/` playground → `dist-showcase/` (deployed to ds.agentage.io).
-- `npm run verify` — type-check + lint + format:check + test + build (CI runs this on PR + push).
-- Exports: `.` (JS), `./theme.css`, `./primitives.css`. `files` ships `dist` + `src/styles`.
+- `npm run verify` — type-check + lint + format:check + exports:check + test + build (CI runs this on PR + push).
+- Exports: `.` (barrel), `./<component>` per module, `./theme.css`, `./primitives.css`, `./styles/*.css`, `./package.json`. `files` ships `dist` + `src/styles`.
+- The exports map is generated — `npm run exports:generate` after adding/renaming a component; `exports:check` fails `verify` when it drifts.
+
+## RSC contract
+
+- Any component using client-only React (state, effects, refs, context, portals, DOM/browser APIs) MUST start with `'use client';`. `useId` / `useMemo` / `useCallback` / `forwardRef` / `memo` exist in React's server build, so they alone do not require the directive.
+- Rolldown (Vite 8) preserves module-level directives under `preserveModules` — no extra plugin needed. Keep `'use client'` as **line 1**.
+- Invariant: no server-safe module may transitively import a client module. `dist/components/card.js` → `dist/lib/utils.js` and nothing else.
 
 ## Publish
 
