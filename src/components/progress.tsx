@@ -1,7 +1,31 @@
 import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
-export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
+export const progressVariants = cva('h-full rounded-full transition-all duration-300', {
+  variants: {
+    variant: {
+      default: 'bg-primary',
+      success: 'bg-success',
+      warning: 'bg-warning',
+      destructive: 'bg-destructive',
+      info: 'bg-info',
+    },
+    indeterminate: {
+      true: 'w-full animate-pulse',
+      false: '',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    indeterminate: false,
+  },
+});
+
+export interface ProgressProps
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
+    Omit<VariantProps<typeof progressVariants>, 'indeterminate'> {
   value?: number;
   max?: number;
   variant?: 'default' | 'success' | 'warning' | 'destructive' | 'info';
@@ -10,14 +34,6 @@ export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Unknown progress: omits `aria-valuenow` and renders an animated full-width bar. */
   indeterminate?: boolean;
 }
-
-const variantClasses = {
-  default: 'bg-primary',
-  success: 'bg-success',
-  warning: 'bg-warning',
-  destructive: 'bg-destructive',
-  info: 'bg-info',
-};
 
 export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
   (
@@ -49,11 +65,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
         {...props}
       >
         <div
-          className={cn(
-            'h-full rounded-full transition-all duration-300',
-            variantClasses[variant],
-            indeterminate && 'w-full animate-pulse'
-          )}
+          className={cn(progressVariants({ variant, indeterminate }))}
           style={indeterminate ? undefined : { width: `${String(percentage)}%` }}
         />
       </div>

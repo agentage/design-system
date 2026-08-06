@@ -86,3 +86,29 @@ describe('Popover', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('Popover surface props', () => {
+  it('merges className last and spreads props onto the content', () => {
+    render(
+      <Popover
+        trigger={<span>t</span>}
+        content="c"
+        isOpen
+        onClose={vi.fn()}
+        className="mt-4"
+        id="pop"
+        data-testid="pop"
+      />
+    );
+    const content = document.body.querySelector('[data-slot="popover-content"]');
+    expect(content?.className).toBe(
+      'z-[var(--z-overlay,50)] min-w-[300px] rounded-lg border border-border bg-popover p-4 shadow-lg mt-4'
+    );
+    expect(content?.id).toBe('pop');
+  });
+
+  it('accepts the canonical start/end align aliases', () => {
+    render(<Popover trigger={<span>t</span>} content="c" isOpen onClose={vi.fn()} align="end" />);
+    expect(document.body.querySelector('[data-slot="popover-content"]')).not.toBeNull();
+  });
+});

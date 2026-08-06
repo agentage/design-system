@@ -1,5 +1,29 @@
 import * as React from 'react';
+import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
+
+export const docSidebarItemVariants = cva(
+  [
+    'block rounded-md px-2 py-1 text-sm transition-colors',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+  ],
+  {
+    variants: {
+      indented: {
+        true: 'border-l border-border',
+        false: '',
+      },
+      active: {
+        true: 'bg-primary/10 font-medium text-primary',
+        false: 'text-foreground/70 hover:bg-accent hover:text-foreground',
+      },
+    },
+    defaultVariants: {
+      indented: false,
+      active: false,
+    },
+  }
+);
 
 export interface DocSidebarProps extends React.HTMLAttributes<HTMLElement> {
   width?: string;
@@ -48,15 +72,7 @@ export const DocSidebarItem = React.forwardRef<HTMLAnchorElement, DocSidebarItem
   ({ active, depth = 0, className, style, children, ...props }, ref) => (
     <a
       ref={ref}
-      className={cn(
-        'block rounded-md px-2 py-1 text-sm transition-colors',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-        depth > 0 && 'border-l border-border',
-        active
-          ? 'bg-primary/10 font-medium text-primary'
-          : 'text-foreground/70 hover:bg-accent hover:text-foreground',
-        className
-      )}
+      className={cn(docSidebarItemVariants({ indented: depth > 0, active: !!active }), className)}
       style={depth > 0 ? { ...style, paddingLeft: `${0.5 + depth * 0.75}rem` } : style}
       data-slot="doc-sidebar-item"
       aria-current={active ? 'page' : undefined}

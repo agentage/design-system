@@ -1,7 +1,34 @@
 import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
-export interface TopBarProps extends React.HTMLAttributes<HTMLElement> {
+export const topBarVariants = cva('border-b border-border bg-background/95 backdrop-blur', {
+  variants: {
+    sticky: {
+      true: 'sticky top-0 z-[var(--z-sticky,40)]',
+      false: '',
+    },
+  },
+  defaultVariants: {
+    sticky: false,
+  },
+});
+
+// Empty cva base keeps the width class ahead of the layout classes, so the merged string is unchanged.
+const topBarInnerVariants = cva('', {
+  variants: {
+    contained: {
+      true: 'mx-auto max-w-6xl',
+      false: 'w-full',
+    },
+  },
+  defaultVariants: {
+    contained: true,
+  },
+});
+
+export interface TopBarProps
+  extends React.HTMLAttributes<HTMLElement>, VariantProps<typeof topBarVariants> {
   sticky?: boolean;
   contained?: boolean;
 }
@@ -10,20 +37,11 @@ export const TopBar = React.forwardRef<HTMLElement, TopBarProps>(
   ({ className, sticky, contained = true, children, ...props }, ref) => (
     <header
       ref={ref}
-      className={cn(
-        'border-b border-border bg-background/95 backdrop-blur',
-        sticky && 'sticky top-0 z-[var(--z-sticky,40)]',
-        className
-      )}
+      className={cn(topBarVariants({ sticky: !!sticky }), className)}
       data-slot="top-bar"
       {...props}
     >
-      <div
-        className={cn(
-          contained ? 'mx-auto max-w-6xl' : 'w-full',
-          'flex h-14 items-center gap-6 px-6'
-        )}
-      >
+      <div className={cn(topBarInnerVariants({ contained }), 'flex h-14 items-center gap-6 px-6')}>
         {children}
       </div>
     </header>
@@ -59,7 +77,28 @@ export const TopBarNav = React.forwardRef<HTMLElement, React.HTMLAttributes<HTML
 );
 TopBarNav.displayName = 'TopBarNav';
 
-export interface TopBarNavItemProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+export const topBarNavItemVariants = cva(
+  [
+    'rounded-md px-3 py-1.5 text-sm transition-colors',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+  ],
+  {
+    variants: {
+      active: {
+        true: 'bg-accent text-foreground',
+        false: 'text-foreground/70 hover:bg-accent/50 hover:text-foreground',
+      },
+    },
+    defaultVariants: {
+      active: false,
+    },
+  }
+);
+
+export interface TopBarNavItemProps
+  extends
+    React.AnchorHTMLAttributes<HTMLAnchorElement>,
+    VariantProps<typeof topBarNavItemVariants> {
   active?: boolean;
 }
 
@@ -67,14 +106,7 @@ export const TopBarNavItem = React.forwardRef<HTMLAnchorElement, TopBarNavItemPr
   ({ className, active, children, ...props }, ref) => (
     <a
       ref={ref}
-      className={cn(
-        'rounded-md px-3 py-1.5 text-sm transition-colors',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-        active
-          ? 'bg-accent text-foreground'
-          : 'text-foreground/70 hover:bg-accent/50 hover:text-foreground',
-        className
-      )}
+      className={cn(topBarNavItemVariants({ active: !!active }), className)}
       data-slot="top-bar-nav-item"
       aria-current={active ? 'page' : undefined}
       {...props}

@@ -2,15 +2,16 @@
 
 import * as React from 'react';
 import { cn } from '../lib/utils';
+import type { TabsVariant } from './tabs.variants';
+import { tabsContentVariants, tabsListVariants, tabsTriggerVariants } from './tabs.variants';
 
-export type TabsVariant = 'default' | 'underline';
+export type { TabsVariant };
 
-export interface TabsProps {
+export interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
   defaultValue?: string;
   value?: string;
   onValueChange?: (value: string) => void;
   variant?: TabsVariant;
-  className?: string;
   children: React.ReactNode;
 }
 
@@ -35,6 +36,7 @@ export const Tabs = ({
   variant = 'default',
   className,
   children,
+  ...props
 }: TabsProps): React.JSX.Element => {
   const [internalValue, setInternalValue] = React.useState(defaultValue);
   const instanceId = React.useId();
@@ -47,7 +49,7 @@ export const Tabs = ({
 
   return (
     <TabsContext.Provider value={{ value, onValueChange: handleValueChange, instanceId, variant }}>
-      <div className={cn('flex flex-col', className)} data-slot="tabs">
+      <div className={cn('flex flex-col', className)} data-slot="tabs" {...props}>
         {children}
       </div>
     </TabsContext.Provider>
@@ -65,12 +67,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
     return (
       <div
         ref={ref}
-        className={cn(
-          variant === 'underline'
-            ? 'flex items-center gap-4 border-b border-border'
-            : 'inline-flex items-center gap-1 rounded-lg bg-muted p-1',
-          className
-        )}
+        className={cn(tabsListVariants({ variant }), className)}
         role="tablist"
         data-slot="tabs-list"
         {...props}
@@ -82,45 +79,43 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 );
 TabsList.displayName = 'TabsList';
 
-export interface TabsTriggerProps {
+export interface TabsTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   value: string;
-  className?: string;
   children: React.ReactNode;
-  disabled?: boolean;
 }
 
+const NAV_KEYS: Record<string, (index: number, count: number) => number> = {
+  ArrowRight: (i, n) => (i + 1) % n,
+  ArrowLeft: (i, n) => (i - 1 + n) % n,
+  Home: () => 0,
+  End: (_i, n) => n - 1,
+};
+
 export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
-  ({ value: triggerValue, className, children, disabled = false }, ref) => {
+  (
+    { value: triggerValue, className, children, disabled = false, onKeyDown, onClick, ...props },
+    ref
+  ) => {
     const { value, onValueChange, instanceId, variant } = React.useContext(TabsContext);
     const isActive = value === triggerValue;
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
+      onKeyDown?.(e);
+      const move = NAV_KEYS[e.key];
       const tablist = e.currentTarget.closest('[role="tablist"]');
-      if (!tablist) return;
+      if (e.defaultPrevented || !move || !tablist) return;
 
       const tabs = Array.from(
         tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]:not(:disabled)')
       );
-      const currentIndex = tabs.indexOf(e.currentTarget);
+      const next = tabs[move(tabs.indexOf(e.currentTarget), tabs.length)];
+      if (!next) return;
 
-      let nextIndex = -1;
-      if (e.key === 'ArrowRight') {
-        nextIndex = (currentIndex + 1) % tabs.length;
-      } else if (e.key === 'ArrowLeft') {
-        nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
-      } else if (e.key === 'Home') {
-        nextIndex = 0;
-      } else if (e.key === 'End') {
-        nextIndex = tabs.length - 1;
-      }
-
-      if (nextIndex >= 0) {
-        e.preventDefault();
-        tabs[nextIndex].focus();
-        const nextValue = tabs[nextIndex].getAttribute('data-value');
-        if (nextValue) {
-          onValueChange(nextValue);
-        }
+      e.preventDefault();
+      next.focus();
+      const nextValue = next.getAttribute('data-value');
+      if (nextValue) {
+        onValueChange(nextValue);
       }
     };
 
@@ -134,26 +129,14 @@ export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>
         data-value={triggerValue}
         tabIndex={isActive ? 0 : -1}
         disabled={disabled}
-        onClick={() => {
+        onClick={(e) => {
+          onClick?.(e);
           onValueChange(triggerValue);
         }}
         onKeyDown={handleKeyDown}
         data-slot="tabs-trigger"
-        className={cn(
-          variant === 'underline'
-            ? '-mb-px inline-flex items-center justify-center gap-2 whitespace-nowrap border-b-2 px-1 pb-2.5 pt-1 text-sm font-medium transition-all'
-            : 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-          'disabled:pointer-events-none disabled:opacity-50',
-          variant === 'underline'
-            ? isActive
-              ? 'border-foreground text-foreground'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-            : isActive
-              ? 'bg-background text-foreground shadow-sm'
-              : 'text-muted-foreground hover:text-foreground',
-          className
-        )}
+        className={cn(tabsTriggerVariants({ variant, active: isActive }), className)}
+        {...props}
       >
         {children}
       </button>
@@ -162,14 +145,13 @@ export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>
 );
 TabsTrigger.displayName = 'TabsTrigger';
 
-export interface TabsContentProps {
+export interface TabsContentProps extends React.HTMLAttributes<HTMLDivElement> {
   value: string;
-  className?: string;
   children: React.ReactNode;
 }
 
 export const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
-  ({ value: contentValue, className, children }, ref) => {
+  ({ value: contentValue, className, children, ...props }, ref) => {
     const { value, instanceId } = React.useContext(TabsContext);
 
     if (value !== contentValue) {
@@ -184,10 +166,8 @@ export const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
         aria-labelledby={`${instanceId}-trigger-${contentValue}`}
         tabIndex={0}
         data-slot="tabs-content"
-        className={cn(
-          'mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-          className
-        )}
+        className={cn(tabsContentVariants(), className)}
+        {...props}
       >
         {children}
       </div>

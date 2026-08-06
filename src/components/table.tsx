@@ -1,5 +1,22 @@
 import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
+
+const TABLE_HEAD_BASE =
+  'h-10 bg-card px-4 text-left align-middle text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground [&:has([role=checkbox])]:pr-0';
+
+// Empty cva base keeps the pin classes ahead of TABLE_HEAD_BASE, so the merged string is unchanged.
+export const tableHeadVariants = cva('', {
+  variants: {
+    sticky: {
+      true: 'sticky top-0 z-10',
+      false: '',
+    },
+  },
+  defaultVariants: {
+    sticky: true,
+  },
+});
 
 export const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
@@ -70,7 +87,8 @@ export const TableRow = React.forwardRef<
 ));
 TableRow.displayName = 'TableRow';
 
-export interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
+export interface TableHeadProps
+  extends React.ThHTMLAttributes<HTMLTableCellElement>, VariantProps<typeof tableHeadVariants> {
   /** Pin the header cell while the table body scrolls. */
   sticky?: boolean;
 }
@@ -80,11 +98,7 @@ export const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
     <th
       ref={ref}
       scope="col"
-      className={cn(
-        sticky && 'sticky top-0 z-10',
-        'h-10 bg-card px-4 text-left align-middle text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground [&:has([role=checkbox])]:pr-0',
-        className
-      )}
+      className={cn(tableHeadVariants({ sticky }), TABLE_HEAD_BASE, className)}
       data-slot="table-head"
       {...props}
     />

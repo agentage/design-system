@@ -57,3 +57,25 @@ describe('FormField', () => {
     expect(screen.getByPlaceholderText('Role').id).toBe('custom');
   });
 });
+
+describe('FormField class strings', () => {
+  it('keeps the root class string byte-identical', () => {
+    const { container } = render(
+      <FormField label="Name" className="mt-4">
+        <Input placeholder="Name" />
+      </FormField>
+    );
+    expect((container.querySelector('[data-slot="form-field"]') as HTMLElement).className).toBe(
+      'space-y-1.5 mt-4'
+    );
+  });
+
+  it('spreads unknown props onto the root', () => {
+    render(
+      <FormField label="Name" data-testid="ff">
+        <Input placeholder="Name" />
+      </FormField>
+    );
+    expect(screen.getByTestId('ff').getAttribute('data-slot')).toBe('form-field');
+  });
+});

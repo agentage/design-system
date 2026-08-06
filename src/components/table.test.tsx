@@ -49,3 +49,30 @@ describe('Table', () => {
     expect(head.className).toContain('bg-card');
   });
 });
+
+describe('tableHeadVariants', () => {
+  const BASE =
+    'h-10 bg-card px-4 text-left align-middle text-[11px] font-medium uppercase tracking-[0.04em] text-muted-foreground [&:has([role=checkbox])]:pr-0';
+
+  it('renders the exact class string with and without the pin', () => {
+    const { unmount } = setup();
+    expect(screen.getByRole('columnheader').className).toBe(`sticky top-0 z-10 ${BASE}`);
+    unmount();
+
+    setup({ sticky: false });
+    expect(screen.getByRole('columnheader').className).toBe(BASE);
+  });
+
+  it('merges className last', () => {
+    render(
+      <table>
+        <tbody>
+          <tr>
+            <TableHead className="w-10">N</TableHead>
+          </tr>
+        </tbody>
+      </table>
+    );
+    expect(screen.getByRole('columnheader').className).toBe(`sticky top-0 z-10 ${BASE} w-10`);
+  });
+});

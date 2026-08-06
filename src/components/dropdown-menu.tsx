@@ -1,6 +1,7 @@
 'use client';
 
 import { Slot } from '@radix-ui/react-slot';
+import { type VariantProps } from 'class-variance-authority';
 import {
   createContext,
   isValidElement,
@@ -16,12 +17,11 @@ import { createPortal } from 'react-dom';
 import { useAnchorPosition } from '../lib/use-anchor-position';
 import { useMounted } from '../lib/use-mounted';
 import { cn } from '../lib/utils';
+import { dropdownMenuContentVariants, dropdownMenuItemVariants } from './dropdown-menu.variants';
 
-interface DropdownMenuContextValue {
-  close: () => void;
-}
+export { dropdownMenuContentVariants, dropdownMenuItemVariants } from './dropdown-menu.variants';
 
-const DropdownMenuContext = createContext<DropdownMenuContextValue>({ close: () => {} });
+const DropdownMenuContext = createContext<{ close: () => void }>({ close: () => {} });
 
 const ITEM_SELECTOR = '[role="menuitem"]:not(:disabled)';
 
@@ -35,12 +35,11 @@ const focusItem = (menu: HTMLElement | null, index: number): void => {
 const isInteractive = (element: React.ReactElement): boolean =>
   typeof element.type !== 'string' || element.type === 'button' || element.type === 'a';
 
-export interface DropdownMenuProps {
+export interface DropdownMenuProps extends React.HTMLAttributes<HTMLDivElement> {
   trigger: ReactNode;
   children: ReactNode;
   align?: 'start' | 'center' | 'end';
   side?: 'bottom' | 'top';
-  className?: string;
 }
 
 export const DropdownMenu = ({
@@ -49,6 +48,7 @@ export const DropdownMenu = ({
   align = 'end',
   side = 'bottom',
   className,
+  ...props
 }: DropdownMenuProps): React.JSX.Element => {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -143,10 +143,9 @@ export const DropdownMenu = ({
               tabIndex={-1}
               onKeyDown={handleMenuKeyDown}
               style={{ position: 'fixed', top, left }}
-              className={cn(
-                'z-[var(--z-dropdown,100)] min-w-[180px] rounded-md border border-border bg-popover p-1 shadow-md',
-                className
-              )}
+              className={cn(dropdownMenuContentVariants(), className)}
+              data-slot="dropdown-menu-content"
+              {...props}
             >
               {children}
             </div>,
@@ -157,14 +156,16 @@ export const DropdownMenu = ({
   );
 };
 
-export interface DropdownMenuItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'destructive';
+export interface DropdownMenuItemProps
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof dropdownMenuItemVariants> {
   closeOnClick?: boolean;
 }
 
 export const DropdownMenuItem = ({
   className,
-  variant = 'default',
+  variant,
   closeOnClick = true,
   onClick,
   ...props
@@ -182,29 +183,28 @@ export const DropdownMenuItem = ({
       role="menuitem"
       tabIndex={-1}
       onClick={handleClick}
-      className={cn(
-        'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm cursor-pointer transition-colors',
-        'focus:outline-none focus:bg-accent focus:text-accent-foreground',
-        variant === 'destructive'
-          ? 'text-destructive hover:bg-destructive/10'
-          : 'text-popover-foreground hover:bg-accent hover:text-accent-foreground',
-        className
-      )}
+      className={cn(dropdownMenuItemVariants({ variant }), className)}
       data-slot="dropdown-menu-item"
       {...props}
     />
   );
 };
 
-export const DropdownMenuSeparator = ({ className }: { className?: string }): React.JSX.Element => (
+export type DropdownMenuSeparatorProps = React.HTMLAttributes<HTMLDivElement>;
+
+export const DropdownMenuSeparator = ({
+  className,
+  ...props
+}: DropdownMenuSeparatorProps): React.JSX.Element => (
   <div
     className={cn('-mx-1 my-1 h-px bg-border', className)}
     role="separator"
     data-slot="dropdown-menu-separator"
+    {...props}
   />
 );
 
-export interface DropdownMenuLabelProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type DropdownMenuLabelProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const DropdownMenuLabel = ({
   className,

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { cn } from '../lib/utils';
 
-export interface EntityListProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type EntityListProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const EntityList = React.forwardRef<HTMLDivElement, EntityListProps>(
   ({ className, ...props }, ref) => (

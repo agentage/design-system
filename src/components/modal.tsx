@@ -2,28 +2,41 @@
 
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { useFocusTrap } from '../lib/use-focus-trap';
 import { useMounted } from '../lib/use-mounted';
 import { useScrollLock } from '../lib/use-scroll-lock';
 import { cn } from '../lib/utils';
 
-export interface ModalProps {
+export const modalVariants = cva(
+  'relative z-10 w-full rounded-lg border border-border bg-background shadow-lg outline-none',
+  {
+    variants: {
+      size: {
+        sm: 'max-w-sm',
+        md: 'max-w-md',
+        lg: 'max-w-lg',
+      },
+    },
+    defaultVariants: {
+      size: 'md',
+    },
+  }
+);
+
+export interface ModalProps
+  extends
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onClose' | 'title'>,
+    VariantProps<typeof modalVariants> {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
   description?: string;
   children: ReactNode;
-  size?: 'sm' | 'md' | 'lg';
   showCloseButton?: boolean;
   closeOnOverlayClick?: boolean;
   closeOnEscape?: boolean;
 }
-
-const sizeClasses = {
-  sm: 'max-w-sm',
-  md: 'max-w-md',
-  lg: 'max-w-lg',
-};
 
 const CloseIcon = (): React.JSX.Element => (
   <svg
@@ -47,10 +60,12 @@ export const Modal = ({
   title,
   description,
   children,
-  size = 'md',
+  size,
   showCloseButton = true,
   closeOnOverlayClick = true,
   closeOnEscape = true,
+  className,
+  ...props
 }: ModalProps): React.JSX.Element | null => {
   const modalRef = useRef<HTMLDivElement>(null);
   const mounted = useMounted();
@@ -93,17 +108,16 @@ export const Modal = ({
     >
       <div
         aria-hidden="true"
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 bg-overlay backdrop-blur-sm"
         onClick={handleOverlayClick}
       />
 
       <div
         ref={modalRef}
         tabIndex={-1}
-        className={cn(
-          'relative z-10 w-full rounded-lg border border-border bg-background shadow-lg outline-none',
-          sizeClasses[size]
-        )}
+        className={cn(modalVariants({ size }), className)}
+        data-slot="modal-content"
+        {...props}
       >
         {(title != null || showCloseButton) && (
           <div className="flex items-start justify-between border-b border-border p-4">
@@ -142,18 +156,22 @@ export const Modal = ({
   );
 };
 
-export interface ModalFooterProps {
+export interface ModalFooterProps extends React.HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
-  className?: string;
 }
 
-export const ModalFooter = ({ children, className }: ModalFooterProps): React.JSX.Element => (
+export const ModalFooter = ({
+  children,
+  className,
+  ...props
+}: ModalFooterProps): React.JSX.Element => (
   <div
     data-slot="modal-footer"
     className={cn(
       'flex items-center justify-end gap-2 border-t border-border -mx-4 -mb-4 mt-4 px-4 py-3 bg-muted/30 rounded-b-lg',
       className
     )}
+    {...props}
   >
     {children}
   </div>

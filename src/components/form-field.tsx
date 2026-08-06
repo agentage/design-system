@@ -1,14 +1,12 @@
 import { Children, cloneElement, forwardRef, isValidElement, useId } from 'react';
 import { cn } from '../lib/utils';
 
-export interface FormFieldProps {
+export interface FormFieldProps extends React.HTMLAttributes<HTMLDivElement> {
   label: string;
   error?: string;
   hint?: string;
   required?: boolean;
   children: React.ReactNode;
-  className?: string;
-  id?: string;
 }
 
 type ControlProps = {
@@ -19,7 +17,7 @@ type ControlProps = {
 };
 
 export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
-  ({ label, error, hint, required, children, className, id: providedId }, ref) => {
+  ({ label, error, hint, required, children, className, id: providedId, ...props }, ref) => {
     const generatedId = useId();
     const fieldId = providedId ?? generatedId;
     const errorId = `${fieldId}-error`;
@@ -40,7 +38,7 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
     });
 
     return (
-      <div ref={ref} className={cn('space-y-1.5', className)} data-slot="form-field">
+      <div ref={ref} className={cn('space-y-1.5', className)} data-slot="form-field" {...props}>
         <label
           htmlFor={fieldId}
           className="block text-xs font-medium text-muted-foreground cursor-pointer"

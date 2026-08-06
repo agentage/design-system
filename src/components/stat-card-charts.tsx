@@ -4,10 +4,11 @@ import { cn } from '../lib/utils';
  * Inline mini-charts for StatCard (split out of stat-card-extensions.tsx).
  * ========================================================================= */
 
-export interface SparklineProps {
+export interface SparklineProps extends React.SVGAttributes<SVGSVGElement> {
   data: number[];
-  className?: string;
+  /** Tailwind stroke class for the line. */
   stroke?: string;
+  /** Tailwind fill class for the area under the line. */
   fill?: string;
   height?: number;
   /** Highlight the latest reading with a dot at the end of the line. */
@@ -27,6 +28,7 @@ export const Sparkline = ({
   showLastDot = false,
   showMinMax = false,
   chartLabel,
+  ...props
 }: SparklineProps): React.JSX.Element => {
   if (data.length < 2) return <div className={cn('h-8 w-full', className)} />;
   const w = 100;
@@ -55,6 +57,7 @@ export const Sparkline = ({
       data-slot="sparkline"
       role="img"
       aria-label={label}
+      {...props}
     >
       <path d={area} className={fill} />
       <polyline points={pts} fill="none" strokeWidth="1.5" className={stroke} />
@@ -89,9 +92,9 @@ export const Sparkline = ({
   );
 };
 
-export interface MiniBarsProps {
+export interface MiniBarsProps extends React.SVGAttributes<SVGSVGElement> {
   data: number[];
-  className?: string;
+  /** Tailwind fill class for the bars. */
   color?: string;
   height?: number;
   /** Overrides the accessible name derived from the data series. */
@@ -104,6 +107,7 @@ export const MiniBars = ({
   color = 'fill-primary',
   height = 32,
   chartLabel,
+  ...props
 }: MiniBarsProps): React.JSX.Element => {
   const max = Math.max(...data) || 1;
   const bw = 100 / data.length;
@@ -121,6 +125,7 @@ export const MiniBars = ({
       data-slot="mini-bars"
       role="img"
       aria-label={label}
+      {...props}
     >
       {data.map((v, i) => {
         const h = (v / max) * (height - 2);

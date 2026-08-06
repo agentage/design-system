@@ -1,6 +1,11 @@
 'use client';
 
 import * as React from 'react';
+import {
+  comboboxOptionIndicatorVariants,
+  comboboxOptionVariants,
+  comboboxTriggerVariants,
+} from './combobox.variants';
 import { nextListIndex } from '../lib/list-navigation';
 import { cn } from '../lib/utils';
 
@@ -10,7 +15,7 @@ export interface ComboboxOption {
   description?: string;
 }
 
-export interface ComboboxProps {
+export interface ComboboxProps extends React.HTMLAttributes<HTMLDivElement> {
   options: ComboboxOption[];
   value?: string;
   onValueChange?: (value: string) => void;
@@ -18,7 +23,7 @@ export interface ComboboxProps {
   searchPlaceholder?: string;
   emptyMessage?: string;
   disabled?: boolean;
-  className?: string;
+  error?: boolean;
 }
 
 const iconProps = {
@@ -43,7 +48,9 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
       searchPlaceholder = 'Search...',
       emptyMessage = 'No results found.',
       disabled = false,
+      error = false,
       className,
+      ...props
     },
     ref
   ) => {
@@ -96,7 +103,8 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
     };
 
     return (
-      <div ref={rootRef} className={cn('relative', className)} data-slot="combobox">
+      <div ref={rootRef} className={cn('relative', className)} data-slot="combobox" {...props}>
+        {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props -- the focusable trigger carries the field's invalid state */}
         <button
           ref={ref}
           type="button"
@@ -105,12 +113,8 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-controls={open ? listId : undefined}
-          className={cn(
-            'flex h-9 w-full items-center justify-between rounded-md border border-border bg-muted/30 px-3 text-sm transition-colors',
-            'focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20',
-            disabled && 'opacity-50 cursor-not-allowed',
-            !selectedOption && 'text-muted-foreground'
-          )}
+          aria-invalid={error || undefined}
+          className={cn(comboboxTriggerVariants({ disabled, placeholder: !selectedOption, error }))}
         >
           <span className="truncate">{selectedOption?.label ?? placeholder}</span>
           <svg {...iconProps}>
@@ -161,17 +165,15 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
                       select(option);
                     }}
                     className={cn(
-                      'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors',
-                      'hover:bg-accent hover:text-accent-foreground',
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-                      index === activeIndex && 'bg-accent text-accent-foreground',
-                      option.value === value && 'bg-accent/50'
+                      comboboxOptionVariants({
+                        active: index === activeIndex,
+                        selected: option.value === value,
+                      })
                     )}
                   >
                     <span
                       className={cn(
-                        'size-4 shrink-0',
-                        option.value === value ? 'opacity-100' : 'opacity-0'
+                        comboboxOptionIndicatorVariants({ selected: option.value === value })
                       )}
                     >
                       <svg {...iconProps}>

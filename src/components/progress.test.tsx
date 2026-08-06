@@ -37,3 +37,33 @@ describe('Progress', () => {
     expect(fill.style.width).toBe('');
   });
 });
+
+describe('progressVariants', () => {
+  it('renders the exact indicator class string for every status', () => {
+    const base = 'h-full rounded-full transition-all duration-300';
+    const tokens = {
+      default: 'bg-primary',
+      success: 'bg-success',
+      warning: 'bg-warning',
+      destructive: 'bg-destructive',
+      info: 'bg-info',
+    } as const;
+
+    for (const [variant, token] of Object.entries(tokens)) {
+      const { unmount } = render(
+        <Progress value={30} variant={variant as keyof typeof tokens} label="p" />
+      );
+      const fill = screen.getByRole('progressbar').firstElementChild as HTMLElement;
+      expect(fill.className).toBe(`${base} ${token}`);
+      unmount();
+    }
+  });
+
+  it('appends the indeterminate classes after the status token', () => {
+    render(<Progress indeterminate variant="success" label="p" />);
+    const fill = screen.getByRole('progressbar').firstElementChild as HTMLElement;
+    expect(fill.className).toBe(
+      'h-full rounded-full transition-all duration-300 bg-success w-full animate-pulse'
+    );
+  });
+});

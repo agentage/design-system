@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { AccordionContext, AccordionItemContext } from './accordion.context';
 import { cn } from '../lib/utils';
 
 const ChevronDown = ({ open }: { open: boolean }): React.JSX.Element => (
@@ -19,20 +20,9 @@ const ChevronDown = ({ open }: { open: boolean }): React.JSX.Element => (
   </svg>
 );
 
-interface AccordionContextValue {
-  openItems: string[];
-  toggle: (value: string) => void;
-}
-
-const AccordionContext = React.createContext<AccordionContextValue>({
-  openItems: [],
-  toggle: () => {},
-});
-
-export interface AccordionProps {
+export interface AccordionProps extends React.HTMLAttributes<HTMLDivElement> {
   type?: 'single' | 'multiple';
   defaultValue?: string[];
-  className?: string;
   children: React.ReactNode;
 }
 
@@ -41,6 +31,7 @@ export const Accordion = ({
   defaultValue = [],
   className,
   children,
+  ...props
 }: AccordionProps): React.JSX.Element => {
   const [openItems, setOpenItems] = React.useState<string[]>(defaultValue);
 
@@ -59,39 +50,25 @@ export const Accordion = ({
 
   return (
     <AccordionContext.Provider value={{ openItems, toggle }}>
-      <div className={cn('divide-y divide-border', className)} data-slot="accordion">
+      <div className={cn('divide-y divide-border', className)} data-slot="accordion" {...props}>
         {children}
       </div>
     </AccordionContext.Provider>
   );
 };
 
-export interface AccordionItemProps {
+export interface AccordionItemProps extends React.HTMLAttributes<HTMLDivElement> {
   value: string;
   children: React.ReactNode;
-  className?: string;
   disabled?: boolean;
 }
-
-interface AccordionItemContextValue {
-  value: string;
-  triggerId: string;
-  contentId: string;
-  disabled: boolean;
-}
-
-const AccordionItemContext = React.createContext<AccordionItemContextValue>({
-  value: '',
-  triggerId: '',
-  contentId: '',
-  disabled: false,
-});
 
 export const AccordionItem = ({
   value,
   children,
   className,
   disabled = false,
+  ...props
 }: AccordionItemProps): React.JSX.Element => {
   const { openItems } = React.useContext(AccordionContext);
   const isOpen = openItems.includes(value);
@@ -106,7 +83,12 @@ export const AccordionItem = ({
         contentId: `${instanceId}-content`,
       }}
     >
-      <div className={className} data-state={isOpen ? 'open' : 'closed'} data-slot="accordion-item">
+      <div
+        className={className}
+        data-state={isOpen ? 'open' : 'closed'}
+        data-slot="accordion-item"
+        {...props}
+      >
         {children}
       </div>
     </AccordionItemContext.Provider>
@@ -129,7 +111,7 @@ const moveFocus = (trigger: HTMLButtonElement, key: string): void => {
   else if (key === 'End') all[all.length - 1].focus();
 };
 
-export interface AccordionTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+export type AccordionTriggerProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 export const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerProps>(
   ({ className, children, disabled, onKeyDown, ...props }, ref) => {
@@ -171,7 +153,7 @@ export const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTri
 );
 AccordionTrigger.displayName = 'AccordionTrigger';
 
-export interface AccordionContentProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type AccordionContentProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>(
   ({ className, children, ...props }, ref) => {

@@ -122,3 +122,56 @@ describe('FilterBar and FilterResults', () => {
     expect(results.current?.getAttribute('data-slot')).toBe('filter-results');
   });
 });
+
+// Frozen pre-CVA output of the isActive / value ternaries.
+const OPTION_BASE =
+  'flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50';
+const SEARCH_BASE =
+  'w-full rounded-lg border border-border bg-background py-2 pl-9 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors';
+const CLEAR_BASE =
+  'flex items-center gap-1 rounded-md px-2 py-1.5 self-end text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50';
+
+const parityOptions = [
+  { value: 'a', label: 'A' },
+  { value: 'b', label: 'B' },
+];
+
+describe('filter bar class parity', () => {
+  it('renders the option buttons byte-identically', () => {
+    const { container } = render(
+      <FilterButtonGroup options={parityOptions} value="a" onChange={vi.fn()} />
+    );
+    const buttons = container.querySelectorAll('button');
+    expect(buttons[0].className).toBe(`${OPTION_BASE} bg-background text-foreground shadow-sm`);
+    expect(buttons[1].className).toBe(`${OPTION_BASE} text-muted-foreground hover:text-foreground`);
+  });
+
+  it('renders the sort buttons with the same option classes', () => {
+    const { container } = render(
+      <FilterSort options={parityOptions} value="a" order="asc" onChange={vi.fn()} />
+    );
+    const buttons = container.querySelectorAll('button');
+    expect(buttons[0].className).toBe(`${OPTION_BASE} bg-background text-foreground shadow-sm`);
+    expect(buttons[1].className).toBe(`${OPTION_BASE} text-muted-foreground hover:text-foreground`);
+  });
+
+  it('swaps the search input padding on the query byte-identically', () => {
+    const empty = render(<FilterSearch value="" onChange={vi.fn()} />);
+    expect(empty.container.querySelector('input')?.className).toBe(`${SEARCH_BASE} pr-3`);
+    empty.unmount();
+    const filled = render(<FilterSearch value="q" onChange={vi.fn()} />);
+    expect(filled.container.querySelector('input')?.className).toBe(`${SEARCH_BASE} pr-8`);
+  });
+
+  it('renders the clear button in both states byte-identically', () => {
+    const on = render(<FilterClear active onClear={vi.fn()} className="mt-4" />);
+    expect(on.container.querySelector('button')?.className).toBe(
+      `${CLEAR_BASE} text-muted-foreground hover:text-foreground cursor-pointer mt-4`
+    );
+    on.unmount();
+    const off = render(<FilterClear active={false} onClear={vi.fn()} />);
+    expect(off.container.querySelector('button')?.className).toBe(
+      `${CLEAR_BASE} text-transparent pointer-events-none`
+    );
+  });
+});

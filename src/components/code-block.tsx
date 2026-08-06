@@ -2,13 +2,34 @@
 
 import * as React from 'react';
 import { useState } from 'react';
+import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
-export interface CodeBlockProps {
+export const codeBlockCopyVariants = cva(
+  [
+    'absolute right-2 top-2 rounded-md p-1.5 transition-colors',
+    'text-muted-foreground hover:bg-accent hover:text-foreground',
+    'opacity-0 group-hover:opacity-100 focus:opacity-100',
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+  ],
+  {
+    variants: {
+      /** The language bar pushes the button below it. */
+      withHeader: {
+        true: 'top-10',
+        false: '',
+      },
+    },
+    defaultVariants: {
+      withHeader: false,
+    },
+  }
+);
+
+export interface CodeBlockProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   code: string;
   language?: string;
   showCopy?: boolean;
-  className?: string;
 }
 
 const CopyIcon = (): React.JSX.Element => (
@@ -43,7 +64,7 @@ const CheckIcon = (): React.JSX.Element => (
 );
 
 export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
-  ({ code, language, showCopy = true, className }, ref) => {
+  ({ code, language, showCopy = true, className, ...props }, ref) => {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async (): Promise<void> => {
@@ -57,6 +78,7 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
         ref={ref}
         className={cn('relative group rounded-lg border border-border bg-card', className)}
         data-slot="code-block"
+        {...props}
       >
         {language && (
           <div className="flex items-center justify-between border-b border-border px-4 py-2">
@@ -70,13 +92,7 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
           <button
             type="button"
             onClick={() => void handleCopy()}
-            className={cn(
-              'absolute right-2 top-2 rounded-md p-1.5 transition-colors',
-              'text-muted-foreground hover:bg-accent hover:text-foreground',
-              'opacity-0 group-hover:opacity-100 focus:opacity-100',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-              language && 'top-10'
-            )}
+            className={cn(codeBlockCopyVariants({ withHeader: !!language }))}
             aria-label={copied ? 'Copied' : 'Copy code'}
           >
             {copied ? <CheckIcon /> : <CopyIcon />}
@@ -88,7 +104,7 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
 );
 CodeBlock.displayName = 'CodeBlock';
 
-export interface InlineCodeProps extends React.HTMLAttributes<HTMLElement> {}
+export type InlineCodeProps = React.HTMLAttributes<HTMLElement>;
 
 export const InlineCode = React.forwardRef<HTMLElement, InlineCodeProps>(
   ({ className, ...props }, ref) => (

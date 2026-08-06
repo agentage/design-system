@@ -1,5 +1,18 @@
 import * as React from 'react';
+import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
+
+const footerInnerVariants = cva('', {
+  variants: {
+    contained: {
+      true: 'mx-auto max-w-6xl px-6 py-10',
+      false: 'px-6 py-10',
+    },
+  },
+  defaultVariants: {
+    contained: true,
+  },
+});
 
 export interface FooterProps extends React.HTMLAttributes<HTMLElement> {
   children?: React.ReactNode;
@@ -15,9 +28,7 @@ export const Footer = React.forwardRef<HTMLElement, FooterProps>(
       data-slot="footer"
       {...props}
     >
-      <div className={cn(contained ? 'mx-auto max-w-6xl px-6 py-10' : 'px-6 py-10')}>
-        {children}
-      </div>
+      <div className={cn(footerInnerVariants({ contained }))}>{children}</div>
     </footer>
   )
 );

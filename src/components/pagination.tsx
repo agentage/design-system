@@ -1,13 +1,33 @@
 'use client';
 
 import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
-export interface PaginationProps {
+export const paginationButtonVariants = cva(
+  [
+    'inline-flex size-8 items-center justify-center rounded-md text-sm transition-colors',
+    'hover:bg-accent hover:text-accent-foreground',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+    'disabled:pointer-events-none disabled:opacity-50',
+  ],
+  {
+    variants: {
+      active: {
+        true: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        false: '',
+      },
+    },
+    defaultVariants: {
+      active: false,
+    },
+  }
+);
+
+export interface PaginationProps extends React.HTMLAttributes<HTMLElement> {
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
-  className?: string;
   /** Accessible name for the navigation landmark. Defaults to "Pagination". */
   'aria-label'?: string;
 }
@@ -74,28 +94,24 @@ const ChevronsRight = (): React.JSX.Element => (
   </svg>
 );
 
-const PaginationButton = React.forwardRef<
-  HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ className, disabled, ...props }, ref) => (
-  <button
-    ref={ref}
-    type="button"
-    disabled={disabled}
-    className={cn(
-      'inline-flex size-8 items-center justify-center rounded-md text-sm transition-colors',
-      'hover:bg-accent hover:text-accent-foreground',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-      'disabled:pointer-events-none disabled:opacity-50',
-      className
-    )}
-    {...props}
-  />
-));
+type PaginationButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+  VariantProps<typeof paginationButtonVariants>;
+
+const PaginationButton = React.forwardRef<HTMLButtonElement, PaginationButtonProps>(
+  ({ className, disabled, active, ...props }, ref) => (
+    <button
+      ref={ref}
+      type="button"
+      disabled={disabled}
+      className={cn(paginationButtonVariants({ active }), className)}
+      {...props}
+    />
+  )
+);
 PaginationButton.displayName = 'PaginationButton';
 
 export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
-  ({ page, pageCount, onPageChange, className, 'aria-label': ariaLabel }, ref) => {
+  ({ page, pageCount, onPageChange, className, 'aria-label': ariaLabel, ...props }, ref) => {
     const canPrev = page > 1;
     const canNext = page < pageCount;
 
@@ -114,6 +130,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
         aria-label={ariaLabel ?? 'Pagination'}
         className={cn('flex items-center gap-1', className)}
         data-slot="pagination"
+        {...props}
       >
         <PaginationButton
           onClick={() => onPageChange(1)}
@@ -135,7 +152,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
             key={p}
             onClick={() => onPageChange(p)}
             aria-current={p === page ? 'page' : undefined}
-            className={cn(p === page && 'bg-primary text-primary-foreground hover:bg-primary/90')}
+            active={p === page}
           >
             {p}
           </PaginationButton>

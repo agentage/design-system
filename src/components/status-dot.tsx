@@ -12,6 +12,9 @@ export const statusDotVariants = cva('inline-block shrink-0 rounded-full', {
       warning: 'bg-warning',
       info: 'bg-info',
       pending: 'bg-muted-foreground animate-pulse',
+      default: 'bg-muted-foreground',
+      success: 'bg-success',
+      destructive: 'bg-destructive',
     },
     size: {
       sm: 'size-1.5',

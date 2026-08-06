@@ -7,12 +7,11 @@ import { useAnchorPosition, type AnchorSide } from '../lib/use-anchor-position';
 import { useMounted } from '../lib/use-mounted';
 import { cn } from '../lib/utils';
 
-export interface TooltipProps {
+export interface TooltipProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'content'> {
   content: ReactNode;
   children: React.ReactElement;
   side?: AnchorSide;
   delayMs?: number;
-  className?: string;
 }
 
 export const Tooltip = ({
@@ -21,6 +20,7 @@ export const Tooltip = ({
   side = 'top',
   delayMs = 300,
   className,
+  ...props
 }: TooltipProps): React.JSX.Element => {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLSpanElement>(null);
@@ -85,6 +85,7 @@ export const Tooltip = ({
               className
             )}
             data-slot="tooltip-content"
+            {...props}
           >
             {content}
           </div>,

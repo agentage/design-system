@@ -28,3 +28,31 @@ describe('Avatar', () => {
     expect(screen.getByRole('img').getAttribute('alt')).toBe('Ada');
   });
 });
+
+describe('avatarVariants', () => {
+  it('renders the exact class string for every size', () => {
+    const base =
+      'relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted text-muted-foreground font-medium';
+    const sizes = {
+      xs: 'size-6 text-2xs',
+      sm: 'size-8 text-xs',
+      md: 'size-10 text-sm',
+      lg: 'size-12 text-base',
+      xl: 'size-16 text-lg',
+      '2xl': 'size-20 text-xl',
+    } as const;
+
+    for (const [size, tail] of Object.entries(sizes)) {
+      const { container, unmount } = render(<Avatar size={size as keyof typeof sizes} name="A" />);
+      expect(container.querySelector('[data-slot="avatar"]')?.className).toBe(`${base} ${tail}`);
+      unmount();
+    }
+  });
+
+  it('merges className last and keeps the md default', () => {
+    const { container } = render(<Avatar name="A" className="ring-2" />);
+    expect(container.querySelector('[data-slot="avatar"]')?.className).toBe(
+      'relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted text-muted-foreground font-medium size-10 text-sm ring-2'
+    );
+  });
+});

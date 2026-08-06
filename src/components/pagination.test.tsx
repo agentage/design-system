@@ -28,3 +28,33 @@ describe('Pagination', () => {
     }
   });
 });
+
+describe('paginationButtonVariants', () => {
+  const BASE =
+    'inline-flex size-8 items-center justify-center rounded-md text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50';
+
+  it('renders the exact class string for idle and active page buttons', () => {
+    render(<Pagination page={2} pageCount={5} onPageChange={vi.fn()} />);
+    expect(screen.getByRole('button', { name: '3' }).className).toBe(BASE);
+    expect(screen.getByRole('button', { name: '2' }).className).toBe(
+      'inline-flex size-8 items-center justify-center rounded-md text-sm transition-colors hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90'
+    );
+  });
+
+  it('merges className last and spreads props on the nav root', () => {
+    render(
+      <Pagination
+        page={1}
+        pageCount={2}
+        onPageChange={vi.fn()}
+        className="mt-4"
+        id="pg"
+        data-x="p"
+      />
+    );
+    const nav = screen.getByRole('navigation');
+    expect(nav.className).toBe('flex items-center gap-1 mt-4');
+    expect(nav.id).toBe('pg');
+    expect(nav.dataset.x).toBe('p');
+  });
+});

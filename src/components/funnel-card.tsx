@@ -11,20 +11,19 @@ export interface FunnelStage {
   value: number;
 }
 
-export interface FunnelCardProps {
+export interface FunnelCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   stages: FunnelStage[];
   format?: (n: number) => string;
   description?: React.ReactNode;
-  className?: string;
 }
 
 export const FunnelCard = React.forwardRef<HTMLDivElement, FunnelCardProps>(
-  ({ title, stages, format, description, className }, ref) => {
+  ({ title, stages, format, description, className, ...props }, ref) => {
     const fmt = format ?? ((n: number) => n.toLocaleString());
     const max = stages[0]?.value || 1;
     return (
-      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="funnel-card">
+      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="funnel-card" {...props}>
         <div className={TITLE}>{title}</div>
         <div className="mt-3 space-y-1.5">
           {stages.map((s, i) => {
@@ -36,7 +35,7 @@ export const FunnelCard = React.forwardRef<HTMLDivElement, FunnelCardProps>(
             return (
               <div key={s.label}>
                 {conv && (
-                  <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+                  <div className="flex items-center gap-3 text-2xs text-muted-foreground">
                     <span className="w-2/5 shrink-0" />
                     <span>
                       <span aria-hidden="true">↓</span>

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { ToggleGroup, type ToggleOption } from './toggle-group';
+import { ToggleButton, ToggleGroup, type ToggleOption } from './toggle-group';
 
 const options: ToggleOption<'day' | 'week' | 'month'>[] = [
   { value: 'day', label: 'Day' },
@@ -92,5 +92,58 @@ describe('ToggleGroup', () => {
     const group = container.firstElementChild as HTMLElement;
     expect(group.className).not.toContain('grid-cols-');
     expect(group.style.gridTemplateColumns).toBe('repeat(7, minmax(0, 1fr))');
+  });
+});
+
+describe('ToggleGroup class strings', () => {
+  const two = [
+    { value: 'a', label: 'A' },
+    { value: 'b', label: 'B' },
+  ];
+
+  it('keeps the root class string byte-identical', () => {
+    render(<ToggleGroup value="a" onChange={() => {}} options={two} className="mt-4" />);
+    expect(screen.getByRole('radiogroup').className).toBe('grid gap-2 grid-cols-2 mt-4');
+  });
+
+  it('falls back to an inline grid template past six columns', () => {
+    const many = 'abcdefg'.split('').map((v) => ({ value: v, label: v.toUpperCase() }));
+    render(<ToggleGroup value="a" onChange={() => {}} options={many} />);
+    const root = screen.getByRole('radiogroup');
+    expect(root.className).toBe('grid gap-2');
+    expect(root.style.gridTemplateColumns).toBe('repeat(7, minmax(0, 1fr))');
+  });
+
+  it('keeps the selected and unselected button strings byte-identical', () => {
+    render(<ToggleGroup value="a" onChange={() => {}} options={two} />);
+    const buttons = screen.getAllByRole('radio');
+    expect(buttons[0].className).toBe(
+      'flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 bg-primary text-primary-foreground'
+    );
+    expect(buttons[1].className).toBe(
+      'flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 bg-muted/30 text-muted-foreground hover:bg-accent hover:text-foreground border border-border'
+    );
+  });
+
+  it('keeps the standalone vertical button string byte-identical', () => {
+    render(
+      <ToggleButton selected={false} onClick={() => {}} vertical className="mt-4">
+        X
+      </ToggleButton>
+    );
+    expect(screen.getByRole('radio').className).toBe(
+      'flex items-center justify-center rounded-md px-3 text-xs transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 bg-muted/30 text-muted-foreground hover:bg-accent hover:text-foreground border border-border flex-col gap-1 py-1.5 mt-4'
+    );
+  });
+
+  it('marks the group invalid and outlines the buttons on error', () => {
+    render(<ToggleGroup value="a" onChange={() => {}} options={two} error aria-label="View" />);
+    expect(screen.getByRole('radiogroup').getAttribute('aria-invalid')).toBe('true');
+    expect(screen.getAllByRole('radio')[0].className).toContain('border-destructive');
+  });
+
+  it('spreads unknown props onto the group', () => {
+    render(<ToggleGroup value="a" onChange={() => {}} options={two} data-testid="tg" />);
+    expect(screen.getByTestId('tg')).toBe(screen.getByRole('radiogroup'));
   });
 });

@@ -1,6 +1,6 @@
 import { cn } from '../lib/utils';
 
-export interface ProseProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type ProseProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const Prose = ({ className, ...props }: ProseProps): React.JSX.Element => (
   <div

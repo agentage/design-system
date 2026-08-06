@@ -7,7 +7,7 @@ import { CARD_BASE, TITLE } from './card-base';
  * Use when threshold/utilization matters (capacity, error rate, latency).
  * ========================================================================= */
 
-export interface GaugeCardProps {
+export interface GaugeCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   value: number;
   min?: number;
@@ -15,14 +15,24 @@ export interface GaugeCardProps {
   thresholds?: { warning: number; critical: number };
   format?: (n: number) => string;
   description?: React.ReactNode;
-  className?: string;
   /** Overrides the accessible name derived from title + value + range. */
   chartLabel?: string;
 }
 
 export const GaugeCard = React.forwardRef<HTMLDivElement, GaugeCardProps>(
   (
-    { title, value, min = 0, max = 100, thresholds, format, description, className, chartLabel },
+    {
+      title,
+      value,
+      min = 0,
+      max = 100,
+      thresholds,
+      format,
+      description,
+      className,
+      chartLabel,
+      ...props
+    },
     ref
   ) => {
     const fmt = format ?? ((n: number) => n.toLocaleString());
@@ -54,7 +64,7 @@ export const GaugeCard = React.forwardRef<HTMLDivElement, GaugeCardProps>(
         ]
       : [{ d: arc(-Math.PI, 0), c: 'var(--color-primary)' }];
     return (
-      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="gauge-card">
+      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="gauge-card" {...props}>
         <div className={TITLE}>{title}</div>
         <svg
           viewBox="0 0 120 70"

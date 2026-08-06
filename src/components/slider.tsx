@@ -1,9 +1,40 @@
 'use client';
 
 import { forwardRef, useCallback, useRef, useState } from 'react';
+import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
-export interface SliderProps {
+export const sliderVariants = cva(
+  [
+    'group relative flex h-5 w-full touch-none select-none items-center cursor-pointer',
+    'outline-none',
+  ],
+  {
+    variants: {
+      disabled: { true: 'opacity-50 cursor-not-allowed', false: '' },
+    },
+    defaultVariants: { disabled: false },
+  }
+);
+
+export const sliderThumbVariants = cva(
+  [
+    'pointer-events-none absolute size-4 rounded-full border-2 border-primary bg-foreground shadow-sm',
+    'group-focus-visible:ring-2 group-focus-visible:ring-ring/50 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background',
+  ],
+  {
+    variants: {
+      disabled: { true: '', false: 'group-hover:scale-110' },
+      error: { true: 'border-destructive', false: '' },
+    },
+    defaultVariants: { disabled: false, error: false },
+  }
+);
+
+type SliderOwnHandlers =
+  'onKeyDown' | 'onPointerDown' | 'onPointerMove' | 'onPointerUp' | 'onPointerCancel';
+
+export interface SliderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, SliderOwnHandlers> {
   value?: number;
   defaultValue?: number;
   min?: number;
@@ -11,8 +42,7 @@ export interface SliderProps {
   step?: number;
   onValueChange?: (value: number) => void;
   disabled?: boolean;
-  className?: string;
-  'aria-label'?: string;
+  error?: boolean;
 }
 
 export const Slider = forwardRef<HTMLDivElement, SliderProps>(
@@ -25,8 +55,9 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       step = 1,
       onValueChange,
       disabled = false,
+      error = false,
       className,
-      'aria-label': ariaLabel,
+      ...props
     },
     ref
   ) => {
@@ -102,22 +133,18 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
         aria-valuemin={min}
         aria-valuemax={max}
         aria-valuenow={value}
-        aria-label={ariaLabel}
         aria-disabled={disabled}
+        aria-invalid={error || undefined}
         aria-orientation="horizontal"
         tabIndex={disabled ? -1 : 0}
-        className={cn(
-          'group relative flex h-5 w-full touch-none select-none items-center cursor-pointer',
-          'outline-none',
-          disabled && 'opacity-50 cursor-not-allowed',
-          className
-        )}
+        className={cn(sliderVariants({ disabled, className }))}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
         onKeyDown={handleKeyDown}
         data-slot="slider"
+        {...props}
       >
         <div className="relative h-1.5 w-full rounded-full bg-muted">
           <div
@@ -128,11 +155,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
         <div
           aria-hidden="true"
           data-slot="slider-thumb"
-          className={cn(
-            'pointer-events-none absolute size-4 rounded-full border-2 border-primary bg-foreground shadow-sm',
-            'group-focus-visible:ring-2 group-focus-visible:ring-ring/50 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background',
-            !disabled && 'group-hover:scale-110'
-          )}
+          className={cn(sliderThumbVariants({ disabled, error }))}
           style={{ left: `calc(${String(percentage)}% - 8px)` }}
         />
       </div>

@@ -112,3 +112,59 @@ describe('RadioGroup', () => {
     expect(onValueChange).not.toHaveBeenCalled();
   });
 });
+
+describe('RadioGroup class strings', () => {
+  const tree = (): void => {
+    render(
+      <RadioGroup value="a" className="mt-4">
+        <RadioGroupItem value="a">A</RadioGroupItem>
+        <RadioGroupItem value="b" disabled className="pl-2">
+          B
+        </RadioGroupItem>
+      </RadioGroup>
+    );
+  };
+
+  it('keeps the root class string byte-identical', () => {
+    tree();
+    expect(screen.getByRole('radiogroup').className).toBe('grid gap-2 mt-4');
+  });
+
+  it('keeps the selected indicator class string byte-identical', () => {
+    tree();
+    expect(screen.getAllByRole('radio')[0].className).toBe(
+      'flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 border-primary bg-primary'
+    );
+  });
+
+  it('keeps the disabled item label class string byte-identical', () => {
+    tree();
+    expect((screen.getAllByRole('radio')[1].parentElement as HTMLElement).className).toBe(
+      'flex items-center gap-2 text-sm opacity-50 cursor-not-allowed pl-2'
+    );
+  });
+
+  it('marks the group invalid and swaps the item border on error', () => {
+    render(
+      <RadioGroup value="a" error aria-label="Plan">
+        <RadioGroupItem value="a" error>
+          A
+        </RadioGroupItem>
+      </RadioGroup>
+    );
+    expect(screen.getByRole('radiogroup').getAttribute('aria-invalid')).toBe('true');
+    expect(screen.getByRole('radio').className).toContain('border-destructive');
+  });
+
+  it('spreads unknown props onto the group and the item button', () => {
+    render(
+      <RadioGroup value="a" data-testid="group" aria-label="Plan">
+        <RadioGroupItem value="a" data-testid="item">
+          A
+        </RadioGroupItem>
+      </RadioGroup>
+    );
+    expect(screen.getByTestId('group')).toBe(screen.getByRole('radiogroup'));
+    expect(screen.getByTestId('item')).toBe(screen.getByRole('radio'));
+  });
+});

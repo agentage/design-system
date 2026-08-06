@@ -2,9 +2,15 @@
 
 import * as React from 'react';
 import { cn } from '../lib/utils';
-import { SortAscIcon, SortDescIcon } from './filter-bar.parts';
+import { filterOptionVariants, SortAscIcon, SortDescIcon } from './filter-bar.parts';
 
-export { FilterClear, FilterSearch } from './filter-bar.parts';
+export {
+  FilterClear,
+  filterClearVariants,
+  FilterSearch,
+  filterOptionVariants,
+  filterSearchInputVariants,
+} from './filter-bar.parts';
 export type { FilterClearProps, FilterSearchProps } from './filter-bar.parts';
 
 /* ── Filter Button Group ── */
@@ -15,12 +21,14 @@ export interface FilterOption<T extends string> {
   icon?: React.ReactNode;
 }
 
-export interface FilterButtonGroupProps<T extends string> {
+export interface FilterButtonGroupProps<T extends string> extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  'onChange' | 'children'
+> {
   label?: string;
   options: FilterOption<T>[];
   value: T;
   onChange: (value: T) => void;
-  className?: string;
 }
 
 export const FilterButtonGroup = <T extends string>({
@@ -29,8 +37,9 @@ export const FilterButtonGroup = <T extends string>({
   value,
   onChange,
   className,
+  ...props
 }: FilterButtonGroupProps<T>): React.JSX.Element => (
-  <div className={cn('flex flex-col gap-1', className)} data-slot="filter-button-group">
+  <div className={cn('flex flex-col gap-1', className)} data-slot="filter-button-group" {...props}>
     {label && <span className="text-xs text-muted-foreground">{label}</span>}
     <div className="flex items-center rounded-lg border border-border bg-muted/30 p-1 h-[36px]">
       {options.map((option) => {
@@ -41,13 +50,7 @@ export const FilterButtonGroup = <T extends string>({
             type="button"
             onClick={() => onChange(option.value)}
             aria-pressed={isActive}
-            className={cn(
-              'flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all cursor-pointer',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-              isActive
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
+            className={cn(filterOptionVariants({ active: isActive }))}
           >
             {option.icon && <span className="[&_svg]:size-3">{option.icon}</span>}
             {option.label}
@@ -66,13 +69,15 @@ export interface SortOption<T extends string> {
   icon?: React.ReactNode;
 }
 
-export interface FilterSortProps<T extends string> {
+export interface FilterSortProps<T extends string> extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  'onChange' | 'children'
+> {
   label?: string;
   options: SortOption<T>[];
   value: T;
   order: 'asc' | 'desc';
   onChange: (value: T, order: 'asc' | 'desc') => void;
-  className?: string;
 }
 
 export const FilterSort = <T extends string>({
@@ -82,8 +87,9 @@ export const FilterSort = <T extends string>({
   order,
   onChange,
   className,
+  ...props
 }: FilterSortProps<T>): React.JSX.Element => (
-  <div className={cn('flex flex-col gap-1', className)} data-slot="filter-sort">
+  <div className={cn('flex flex-col gap-1', className)} data-slot="filter-sort" {...props}>
     {label && <span className="text-xs text-muted-foreground">{label}</span>}
     <div className="flex items-center rounded-lg border border-border bg-muted/30 p-1 h-[36px]">
       {options.map((option) => {
@@ -100,13 +106,7 @@ export const FilterSort = <T extends string>({
               }
             }}
             aria-pressed={isActive}
-            className={cn(
-              'flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all cursor-pointer',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-              isActive
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
+            className={cn(filterOptionVariants({ active: isActive }))}
           >
             {option.icon && <span className="[&_svg]:size-3">{option.icon}</span>}
             {option.label}
@@ -120,7 +120,7 @@ export const FilterSort = <T extends string>({
 
 /* ── Filter Bar Container ── */
 
-export interface FilterBarProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type FilterBarProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
   ({ className, children, ...props }, ref) => (
@@ -138,21 +138,21 @@ FilterBar.displayName = 'FilterBar';
 
 /* ── Filter Results Counter ── */
 
-export interface FilterResultsProps {
+export interface FilterResultsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   icon?: React.ReactNode;
   filtered: number;
   total: number;
   label?: string;
-  className?: string;
 }
 
 export const FilterResults = React.forwardRef<HTMLDivElement, FilterResultsProps>(
-  ({ icon, filtered, total, label = 'items', className }, ref) => (
+  ({ icon, filtered, total, label = 'items', className, ...props }, ref) => (
     <div
       ref={ref}
       className={cn('flex items-center gap-2 text-sm text-muted-foreground', className)}
       data-slot="filter-results"
       aria-live="polite"
+      {...props}
     >
       {icon && <span className="[&_svg]:size-3.5">{icon}</span>}
       {filtered < total ? (

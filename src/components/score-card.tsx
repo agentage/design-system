@@ -13,31 +13,30 @@ export interface ScoreBand {
   color: string;
 }
 
-export interface ScoreCardProps {
+export interface ScoreCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   score: number;
   max?: number;
   bands?: ScoreBand[];
   description?: React.ReactNode;
-  className?: string;
   /** Overrides the accessible name derived from title + score + band. */
   chartLabel?: string;
 }
 
 export const ScoreCard = React.forwardRef<HTMLDivElement, ScoreCardProps>(
-  ({ title, score, max = 100, bands, description, className, chartLabel }, ref) => {
+  ({ title, score, max = 100, bands, description, className, chartLabel, ...props }, ref) => {
     const current = bands?.find((b) => score >= b.from && score <= b.to);
     const pct = Math.max(0, Math.min(100, (score / Math.max(max, 1)) * 100));
     const band = current ? `, ${current.label}` : '';
     return (
-      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="score-card">
+      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="score-card" {...props}>
         <div className={TITLE}>{title}</div>
         <div className="mt-1 flex items-baseline gap-2">
           <div className="text-3xl font-semibold tabular-nums text-foreground">{score}</div>
           <div className="text-xs text-muted-foreground">/ {max}</div>
           {current && (
             <span
-              className="ml-auto rounded-full px-2 py-0.5 text-[10px] font-medium"
+              className="ml-auto rounded-full px-2 py-0.5 text-2xs font-medium"
               style={{
                 background: `color-mix(in oklch, ${current.color} 20%, transparent)`,
                 color: current.color,
@@ -73,7 +72,7 @@ export const ScoreCard = React.forwardRef<HTMLDivElement, ScoreCardProps>(
               style={{ left: `${pct}%`, transform: 'translate(-50%, -50%)' }}
             />
           </div>
-          <div className="mt-1 flex justify-between text-[10px] tabular-nums text-muted-foreground">
+          <div className="mt-1 flex justify-between text-2xs tabular-nums text-muted-foreground">
             <span>0</span>
             <span>{max}</span>
           </div>

@@ -79,3 +79,23 @@ describe('Accordion', () => {
     expect(screen.getByText('Body C')).toBeTruthy();
   });
 });
+
+describe('Accordion pass-through', () => {
+  it('spreads props on the root and item', () => {
+    const { container } = render(
+      <Accordion defaultValue={['a']} className="rounded" id="acc" data-x="r">
+        <AccordionItem value="a" className="px-2" data-x="i">
+          <AccordionTrigger>One</AccordionTrigger>
+          <AccordionContent>Body A</AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    );
+    const root = container.querySelector('[data-slot="accordion"]') as HTMLElement;
+    expect(root.className).toBe('divide-y divide-border rounded');
+    expect(root.id).toBe('acc');
+    expect(root.dataset.x).toBe('r');
+    expect((container.querySelector('[data-slot="accordion-item"]') as HTMLElement).dataset.x).toBe(
+      'i'
+    );
+  });
+});

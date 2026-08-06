@@ -1,14 +1,30 @@
 'use client';
 
 import * as React from 'react';
+import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
-export interface DatePickerProps {
+export const datePickerTriggerVariants = cva(
+  [
+    'flex h-9 w-full items-center gap-2 rounded-md border border-border bg-muted/30 px-3 text-sm cursor-pointer transition-colors',
+    'hover:border-ring focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20',
+  ],
+  {
+    variants: {
+      disabled: { true: 'opacity-50 cursor-not-allowed', false: '' },
+      placeholder: { true: 'text-muted-foreground', false: '' },
+      error: { true: 'border-destructive', false: '' },
+    },
+    defaultVariants: { disabled: false, placeholder: false, error: false },
+  }
+);
+
+export interface DatePickerProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: Date;
   onValueChange?: (date: Date) => void;
   placeholder?: string;
   disabled?: boolean;
-  className?: string;
+  error?: boolean;
 }
 
 const CalendarIcon = (): React.JSX.Element => (
@@ -33,7 +49,18 @@ const CalendarIcon = (): React.JSX.Element => (
 const toInputValue = (date: Date): string => date.toISOString().split('T')[0];
 
 export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
-  ({ value, onValueChange, placeholder = 'Pick a date', disabled = false, className }, ref) => {
+  (
+    {
+      value,
+      onValueChange,
+      placeholder = 'Pick a date',
+      disabled = false,
+      error = false,
+      className,
+      ...props
+    },
+    ref
+  ) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
     const [open, setOpen] = React.useState(false);
     const [internalValue, setInternalValue] = React.useState<string>(
@@ -69,7 +96,8 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
     };
 
     return (
-      <div className={cn('relative', className)} data-slot="date-picker">
+      <div className={cn('relative', className)} data-slot="date-picker" {...props}>
+        {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props -- the focusable trigger carries the field's invalid state */}
         <button
           ref={ref}
           type="button"
@@ -77,12 +105,8 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
           disabled={disabled}
           aria-haspopup="dialog"
           aria-expanded={open}
-          className={cn(
-            'flex h-9 w-full items-center gap-2 rounded-md border border-border bg-muted/30 px-3 text-sm cursor-pointer transition-colors',
-            'hover:border-ring focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20',
-            disabled && 'opacity-50 cursor-not-allowed',
-            !displayValue && 'text-muted-foreground'
-          )}
+          aria-invalid={error || undefined}
+          className={cn(datePickerTriggerVariants({ disabled, placeholder: !displayValue, error }))}
         >
           <CalendarIcon />
           <span className="flex-1 truncate text-left">{displayValue || placeholder}</span>

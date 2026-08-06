@@ -6,7 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { useMounted } from '../lib/use-mounted';
 import { cn } from '../lib/utils';
 
-const toastVariants = cva(
+export const toastVariants = cva(
   'pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-lg border p-4 shadow-lg transition-all',
   {
     variants: {

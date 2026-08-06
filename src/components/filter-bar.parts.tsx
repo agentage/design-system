@@ -2,6 +2,13 @@
 
 import * as React from 'react';
 import { cn } from '../lib/utils';
+import { filterClearVariants, filterSearchInputVariants } from './filter-bar.variants';
+
+export {
+  filterClearVariants,
+  filterOptionVariants,
+  filterSearchInputVariants,
+} from './filter-bar.variants';
 
 /* ── Icons ── */
 
@@ -77,15 +84,19 @@ export const SortDescIcon = (): React.JSX.Element => (
 
 /* ── Search Input ── */
 
-export interface FilterSearchProps {
+export interface FilterSearchProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'onChange' | 'value'
+> {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  /** Applied to the wrapper; the input receives the remaining props. */
   className?: string;
 }
 
 export const FilterSearch = React.forwardRef<HTMLInputElement, FilterSearchProps>(
-  ({ value, onChange, placeholder = 'Search...', className }, ref) => (
+  ({ value, onChange, placeholder = 'Search...', className, ...props }, ref) => (
     <div className={cn('relative flex-1 min-w-[200px]', className)} data-slot="filter-search">
       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
         <SearchIcon />
@@ -96,13 +107,8 @@ export const FilterSearch = React.forwardRef<HTMLInputElement, FilterSearchProps
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={cn(
-          'w-full rounded-lg border border-border bg-background py-2 pl-9 text-sm',
-          'placeholder:text-muted-foreground/60',
-          'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary',
-          'transition-colors',
-          value ? 'pr-8' : 'pr-3'
-        )}
+        className={cn(filterSearchInputVariants({ clearable: !!value }))}
+        {...props}
       />
       {value && (
         <button
@@ -124,28 +130,24 @@ FilterSearch.displayName = 'FilterSearch';
 
 /* ── Clear Filters Button ── */
 
-export interface FilterClearProps {
+export interface FilterClearProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'children'
+> {
   active: boolean;
   onClear: () => void;
-  className?: string;
 }
 
 export const FilterClear = React.forwardRef<HTMLButtonElement, FilterClearProps>(
-  ({ active, onClear, className }, ref) => (
+  ({ active, onClear, className, ...props }, ref) => (
     <button
       ref={ref}
       type="button"
       onClick={onClear}
       disabled={!active}
-      className={cn(
-        'flex items-center gap-1 rounded-md px-2 py-1.5 self-end text-sm transition-colors',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-        active
-          ? 'text-muted-foreground hover:text-foreground cursor-pointer'
-          : 'text-transparent pointer-events-none',
-        className
-      )}
+      className={cn(filterClearVariants({ active }), className)}
       data-slot="filter-clear"
+      {...props}
     >
       <ClearIcon />
       Clear filters

@@ -7,19 +7,21 @@ import { useFocusRestore } from '../lib/use-focus-restore';
 import { useMounted } from '../lib/use-mounted';
 import { cn } from '../lib/utils';
 
-export interface PopoverProps {
+export interface PopoverProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'content'> {
   trigger: ReactNode;
   content: ReactNode;
   isOpen: boolean;
   onClose: () => void;
-  align?: 'left' | 'right' | 'center';
-  className?: string;
+  /** `start`/`end` are the canonical names; `left`/`right` are kept as aliases. */
+  align?: 'left' | 'right' | 'center' | 'start' | 'end';
 }
 
 const alignMap: Record<NonNullable<PopoverProps['align']>, AnchorAlign> = {
   left: 'start',
   right: 'end',
   center: 'center',
+  start: 'start',
+  end: 'end',
 };
 
 export const Popover = ({
@@ -29,6 +31,7 @@ export const Popover = ({
   onClose,
   align = 'left',
   className,
+  ...props
 }: PopoverProps): React.JSX.Element => {
   const anchorRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -80,6 +83,7 @@ export const Popover = ({
               className
             )}
             data-slot="popover-content"
+            {...props}
           >
             {content}
           </div>,

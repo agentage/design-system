@@ -6,15 +6,15 @@ import { CARD_BASE, TITLE, DESC } from './card-base';
  * HeatmapCard — grid with intensity colors. Activity-by-day-hour, cohorts.
  * ========================================================================= */
 
-export interface HeatmapCardProps {
+export interface HeatmapCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   data: number[][];
   rowLabels?: string[];
   colLabels?: string[];
   max?: number;
+  /** CSS colour the cell intensity ramp is mixed from. */
   color?: string;
   description?: React.ReactNode;
-  className?: string;
   /** Overrides the screen-reader table caption (defaults to title). */
   chartLabel?: string;
 }
@@ -31,12 +31,13 @@ export const HeatmapCard = React.forwardRef<HTMLDivElement, HeatmapCardProps>(
       description,
       className,
       chartLabel,
+      ...props
     },
     ref
   ) => {
     const max = maxProp ?? (Math.max(...data.flat()) || 1);
     return (
-      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="heatmap-card">
+      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="heatmap-card" {...props}>
         <div className={TITLE}>{title}</div>
         <div className="mt-3 overflow-x-auto">
           <table className="border-separate" style={{ borderSpacing: 2 }}>
@@ -49,7 +50,7 @@ export const HeatmapCard = React.forwardRef<HTMLDivElement, HeatmapCardProps>(
                     <th
                       key={c}
                       scope="col"
-                      className="pb-1 text-[10px] font-normal text-muted-foreground"
+                      className="pb-1 text-2xs font-normal text-muted-foreground"
                     >
                       {c}
                     </th>
@@ -63,7 +64,7 @@ export const HeatmapCard = React.forwardRef<HTMLDivElement, HeatmapCardProps>(
                   {rowLabels && (
                     <th
                       scope="row"
-                      className="pr-2 text-right text-[10px] font-normal text-muted-foreground"
+                      className="pr-2 text-right text-2xs font-normal text-muted-foreground"
                     >
                       {rowLabels[i]}
                     </th>

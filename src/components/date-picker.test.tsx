@@ -76,3 +76,39 @@ describe('DatePicker', () => {
     expect(input.showPicker).not.toHaveBeenCalled();
   });
 });
+
+describe('DatePicker class strings', () => {
+  it('keeps the placeholder trigger class string byte-identical', () => {
+    render(<DatePicker />);
+    expect(screen.getByRole('button').className).toBe(
+      'flex h-9 w-full items-center gap-2 rounded-md border border-border bg-muted/30 px-3 text-sm cursor-pointer transition-colors hover:border-ring focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 text-muted-foreground'
+    );
+  });
+
+  it('keeps the filled + disabled trigger class string byte-identical', () => {
+    render(<DatePicker value={new Date('2026-01-02T00:00:00')} disabled className="mt-4" />);
+    expect(screen.getByRole('button').className).toBe(
+      'flex h-9 w-full items-center gap-2 rounded-md border border-border bg-muted/30 px-3 text-sm transition-colors hover:border-ring focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 opacity-50 cursor-not-allowed'
+    );
+  });
+
+  it('keeps the root class string byte-identical', () => {
+    const { container } = render(<DatePicker className="mt-4" />);
+    expect((container.querySelector('[data-slot="date-picker"]') as HTMLElement).className).toBe(
+      'relative mt-4'
+    );
+  });
+
+  it('marks the trigger invalid and swaps the resting border on error', () => {
+    render(<DatePicker error />);
+    const trigger = screen.getByRole('button');
+    expect(trigger.getAttribute('aria-invalid')).toBe('true');
+    expect(trigger.className).toContain('border-destructive');
+    expect(trigger.className).not.toContain('border-border');
+  });
+
+  it('spreads unknown props onto the root', () => {
+    render(<DatePicker data-testid="dp" />);
+    expect(screen.getByTestId('dp').getAttribute('data-slot')).toBe('date-picker');
+  });
+});

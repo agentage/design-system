@@ -57,3 +57,30 @@ describe('HoverCard', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 });
+
+describe('HoverCard surface props', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it('merges className last and spreads props onto the surface', () => {
+    render(
+      <HoverCard
+        trigger={<button type="button">Trigger</button>}
+        openDelay={100}
+        className="mt-4"
+        data-testid="hc"
+      >
+        Body
+      </HoverCard>
+    );
+    fireEvent.pointerOver(screen.getByRole('button', { name: 'Trigger' }), {
+      pointerType: 'mouse',
+    });
+    tick(100);
+    const surface = document.body.querySelector('[data-slot="hover-card-content"]');
+    expect(surface?.className).toBe(
+      'z-[var(--z-overlay,50)] w-64 rounded-lg border border-border bg-popover p-4 shadow-md mt-4'
+    );
+    expect(surface?.getAttribute('data-testid')).toBe('hc');
+  });
+});

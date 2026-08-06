@@ -36,3 +36,40 @@ describe('StatusDot', () => {
     expect((root(container).firstElementChild as HTMLElement).className).not.toContain('mt-4');
   });
 });
+
+describe('statusDotVariants', () => {
+  it('covers the canonical status vocabulary alongside the presence names', () => {
+    const tokens = {
+      default: 'bg-muted-foreground',
+      success: 'bg-success',
+      warning: 'bg-warning',
+      destructive: 'bg-destructive',
+      info: 'bg-info',
+      online: 'bg-success',
+      offline: 'bg-muted-foreground',
+      working: 'bg-success animate-pulse',
+      error: 'bg-destructive',
+      pending: 'bg-muted-foreground animate-pulse',
+    } as const;
+
+    for (const [variant, token] of Object.entries(tokens)) {
+      const { container, unmount } = render(<StatusDot variant={variant as keyof typeof tokens} />);
+      const dot = root(container).firstElementChild as HTMLElement;
+      expect(dot.className).toBe(`inline-block shrink-0 rounded-full ${token} size-2`);
+      unmount();
+    }
+  });
+
+  it('renders the exact class string for every size', () => {
+    const sizes = { sm: 'size-1.5', md: 'size-2', lg: 'size-2.5' } as const;
+    for (const [size, token] of Object.entries(sizes)) {
+      const { container, unmount } = render(
+        <StatusDot variant="info" size={size as keyof typeof sizes} />
+      );
+      expect((root(container).firstElementChild as HTMLElement).className).toBe(
+        `inline-block shrink-0 rounded-full bg-info ${token}`
+      );
+      unmount();
+    }
+  });
+});

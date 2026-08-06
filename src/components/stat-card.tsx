@@ -1,19 +1,42 @@
 import * as React from 'react';
+import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
+
+// `up`/`down` are direction aliases kept for compat; the rest is the canonical status vocabulary.
+export const TREND_TONE = {
+  up: 'text-success',
+  down: 'text-destructive',
+  default: 'text-muted-foreground',
+  success: 'text-success',
+  warning: 'text-warning',
+  destructive: 'text-destructive',
+  info: 'text-info',
+} as const;
+
+export type TrendTone = keyof typeof TREND_TONE;
+
+export const statCardTrendVariants = cva(
+  'flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium border border-border bg-muted/30',
+  {
+    variants: { tone: TREND_TONE },
+    defaultVariants: { tone: 'up' },
+  }
+);
 
 export interface StatCardTrend {
   value: string;
   up: boolean;
+  /** Overrides the colour derived from `up`. */
+  tone?: TrendTone;
 }
 
-export interface StatCardProps {
+export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: React.ReactNode;
   iconColor?: string;
   title: string;
   value: string | number;
   trend?: StatCardTrend;
   description?: React.ReactNode;
-  className?: string;
 }
 
 const TrendIcon = (): React.JSX.Element => (
@@ -34,7 +57,7 @@ const TrendIcon = (): React.JSX.Element => (
 );
 
 export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
-  ({ icon, iconColor, title, value, trend, description, className }, ref) => (
+  ({ icon, iconColor, title, value, trend, description, className, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
@@ -42,6 +65,7 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
         className
       )}
       data-slot="stat-card"
+      {...props}
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -62,8 +86,7 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
         {trend && (
           <div
             className={cn(
-              'flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-medium border border-border bg-muted/30',
-              trend.up ? 'text-success' : 'text-destructive'
+              statCardTrendVariants({ tone: trend.tone ?? (trend.up ? 'up' : 'down') })
             )}
           >
             <TrendIcon />

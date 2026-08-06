@@ -1,7 +1,26 @@
 'use client';
 
 import * as React from 'react';
+import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
+
+export const checkboxVariants = cva(
+  [
+    'flex size-4 shrink-0 items-center justify-center rounded border transition-colors',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+  ],
+  {
+    variants: {
+      marked: {
+        true: 'border-primary bg-primary text-primary-foreground',
+        false: 'border-muted-foreground/50 bg-background hover:border-muted-foreground',
+      },
+      error: { true: 'border-destructive', false: '' },
+      disabled: { true: 'cursor-not-allowed opacity-50', false: '' },
+    },
+    defaultVariants: { marked: false, error: false, disabled: false },
+  }
+);
 
 export interface CheckboxProps extends Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -15,6 +34,7 @@ export interface CheckboxProps extends Omit<
   name?: string;
   value?: string;
   required?: boolean;
+  error?: boolean;
 }
 
 const CheckIcon = (): React.JSX.Element => (
@@ -55,6 +75,7 @@ export const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
       indeterminate = false,
       onCheckedChange,
       disabled = false,
+      error = false,
       className,
       name,
       value = 'on',
@@ -94,20 +115,13 @@ export const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
           role="checkbox"
           aria-checked={indeterminate ? 'mixed' : checked}
           aria-required={required}
+          aria-invalid={error || undefined}
           disabled={disabled}
           onClick={handleClick}
           onKeyDown={handleKeyDown}
           data-slot="checkbox"
           data-state={indeterminate ? 'indeterminate' : checked ? 'checked' : 'unchecked'}
-          className={cn(
-            'flex size-4 shrink-0 items-center justify-center rounded border transition-colors',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-            marked
-              ? 'border-primary bg-primary text-primary-foreground'
-              : 'border-muted-foreground/50 bg-background hover:border-muted-foreground',
-            disabled && 'cursor-not-allowed opacity-50',
-            className
-          )}
+          className={cn(checkboxVariants({ marked, error, disabled, className }))}
           {...props}
         >
           {indeterminate ? <MinusIcon /> : checked && <CheckIcon />}

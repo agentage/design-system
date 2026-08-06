@@ -37,7 +37,7 @@ export const SidebarHeader = React.forwardRef<HTMLDivElement, React.HTMLAttribut
 );
 SidebarHeader.displayName = 'SidebarHeader';
 
-export interface SidebarContentProps extends React.HTMLAttributes<HTMLElement> {}
+export type SidebarContentProps = React.HTMLAttributes<HTMLElement>;
 
 export const SidebarContent = React.forwardRef<HTMLElement, SidebarContentProps>(
   ({ className, ...props }, ref) => (

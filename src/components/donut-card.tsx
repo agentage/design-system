@@ -13,21 +13,30 @@ export interface DonutSegment {
   color?: string;
 }
 
-export interface DonutCardProps {
+export interface DonutCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   segments: DonutSegment[];
   total?: number;
   centerLabel?: React.ReactNode;
   centerSubLabel?: React.ReactNode;
   description?: React.ReactNode;
-  className?: string;
   /** Overrides the accessible name derived from title + segments. */
   chartLabel?: string;
 }
 
 export const DonutCard = React.forwardRef<HTMLDivElement, DonutCardProps>(
   (
-    { title, segments, total, centerLabel, centerSubLabel, description, className, chartLabel },
+    {
+      title,
+      segments,
+      total,
+      centerLabel,
+      centerSubLabel,
+      description,
+      className,
+      chartLabel,
+      ...props
+    },
     ref
   ) => {
     const sum = total ?? (segments.reduce((s, x) => s + x.value, 0) || 1);
@@ -38,7 +47,7 @@ export const DonutCard = React.forwardRef<HTMLDivElement, DonutCardProps>(
       .map((s) => `${s.label} ${Math.round((s.value / sum) * 100)}%`)
       .join(', ');
     return (
-      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="donut-card">
+      <div ref={ref} className={cn(CARD_BASE, className)} data-slot="donut-card" {...props}>
         <div className={TITLE}>{title}</div>
         <div className="mt-3 flex items-center gap-4">
           <div className="relative size-24 shrink-0">
@@ -84,7 +93,7 @@ export const DonutCard = React.forwardRef<HTMLDivElement, DonutCardProps>(
                   </div>
                 )}
                 {centerSubLabel && (
-                  <div className="text-[9px] leading-tight text-muted-foreground">
+                  <div className="text-3xs leading-tight text-muted-foreground">
                     {centerSubLabel}
                   </div>
                 )}

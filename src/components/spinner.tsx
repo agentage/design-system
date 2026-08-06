@@ -1,20 +1,27 @@
 import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
-export interface SpinnerProps {
-  size?: 'sm' | 'md' | 'lg';
-  className?: string;
+export const spinnerVariants = cva('animate-spin text-primary', {
+  variants: {
+    size: {
+      sm: 'size-4',
+      md: 'size-6',
+      lg: 'size-8',
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+});
+
+export interface SpinnerProps
+  extends Omit<React.SVGAttributes<SVGSVGElement>, 'size'>, VariantProps<typeof spinnerVariants> {
   'aria-label'?: string;
 }
 
-const sizeClasses = {
-  sm: 'size-4',
-  md: 'size-6',
-  lg: 'size-8',
-};
-
 export const Spinner = React.forwardRef<SVGSVGElement, SpinnerProps>(
-  ({ size = 'md', className, 'aria-label': ariaLabel = 'Loading' }, ref) => (
+  ({ size, className, 'aria-label': ariaLabel = 'Loading', ...props }, ref) => (
     <svg
       ref={ref}
       role="status"
@@ -22,7 +29,8 @@ export const Spinner = React.forwardRef<SVGSVGElement, SpinnerProps>(
       data-slot="spinner"
       viewBox="0 0 24 24"
       fill="none"
-      className={cn('animate-spin text-primary', sizeClasses[size], className)}
+      className={cn(spinnerVariants({ size }), className)}
+      {...props}
     >
       <circle
         cx="12"
