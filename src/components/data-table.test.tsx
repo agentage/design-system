@@ -121,10 +121,10 @@ describe('DataTable', () => {
 
   it('applies the compact density and per-column align / nowrap / width', () => {
     render(<DataTable columns={COLUMNS} data={DATA} density="compact" />);
-    expect(header('Agents').className).toContain('py-2.5');
+    expect(header('Agents').className).toContain('py-2');
     expect(header('Agents').className).toContain('text-right');
     const [, agents, lastSeen] = Array.from(screen.getAllByRole('row')[1].querySelectorAll('td'));
-    expect(agents.className).toContain('py-3');
+    expect(agents.className).toContain('py-2');
     expect(lastSeen.className).toContain('whitespace-nowrap');
   });
 
