@@ -67,6 +67,8 @@ export {
   DropdownMenuSeparator,
   // Data Display
   EmptyState,
+  EntityList,
+  ListRow,
   // Forms
   FormField,
   // Typography
@@ -224,6 +226,8 @@ export type {
   FilterSortProps,
   SortOption,
   EmptyStateProps,
+  EntityListProps,
+  ListRowProps,
   FormFieldProps,
   HeadingProps,
   HoverCardProps,
@@ -264,6 +268,7 @@ export type {
   TabsListProps,
   TabsProps,
   TabsTriggerProps,
+  TabsVariant,
   ToggleButtonProps,
   ToggleGroupProps,
   ToggleOption,

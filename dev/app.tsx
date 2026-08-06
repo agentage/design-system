@@ -39,6 +39,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   EmptyState,
+  EntityList,
   FilterBar,
   FilterButtonGroup,
   FilterClear,
@@ -53,6 +54,7 @@ import {
   Input,
   Kbd,
   Label,
+  ListRow,
   Modal,
   ModalFooter,
   NavLink,
@@ -406,6 +408,36 @@ const RUNS = [
     machine: null as string | null,
     state: 'submitted' as const,
     started: '5s ago',
+  },
+];
+const DEPLOYMENTS = [
+  {
+    id: 'dpl-9f2a',
+    title: 'memory-api',
+    description: 'master · feat: git-per-memory search index',
+    status: 'online' as const,
+    time: '2 min ago',
+  },
+  {
+    id: 'dpl-7c31',
+    title: 'dashboard',
+    description: 'feature/list-views · feat: entity list rows',
+    status: 'working' as const,
+    time: '18 min ago',
+  },
+  {
+    id: 'dpl-4b88',
+    title: 'landing',
+    description: 'master · chore: docs registry cleanup',
+    status: 'error' as const,
+    time: '3 hours ago',
+  },
+  {
+    id: 'dpl-1a04',
+    title: 'mcp-catalog',
+    description: 'master · fix: facet crawl cache headers',
+    status: 'offline' as const,
+    time: 'yesterday',
   },
 ];
 const onlineCount = MACHINES.filter((m) => m.status === 'online').length;
@@ -1048,6 +1080,36 @@ const DataDisplayPage = () => {
             ))}
           </TableBody>
         </Table>
+      </S>
+
+      <S title="Entity List">
+        <p className="-mt-2 text-xs text-muted-foreground">
+          Flat bordered list with divided rows - deployments, memories, machines. Row links stretch
+          across the row; trailing actions stay clickable above the link.
+        </p>
+        <EntityList>
+          {DEPLOYMENTS.map((d) => (
+            <ListRow
+              key={d.id}
+              href="#"
+              leading={<StatusDot variant={d.status} />}
+              title={d.title}
+              description={d.description}
+              meta={d.time}
+              actions={
+                <DropdownMenu
+                  trigger={<IconButton icon={<EditIcon />} onClick={() => {}} title="Actions" />}
+                >
+                  <DropdownMenuLabel>Deployment</DropdownMenuLabel>
+                  <DropdownMenuItem>View logs</DropdownMenuItem>
+                  <DropdownMenuItem>Redeploy</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+                </DropdownMenu>
+              }
+            />
+          ))}
+        </EntityList>
       </S>
 
       <S title="Pagination">
@@ -1711,6 +1773,7 @@ const LayoutPage = () => (
 /* ═══════════════════ NAVIGATION & TYPOGRAPHY ═══════════════════ */
 const NavTypoPage = () => {
   const [tab, setTab] = useState('overview');
+  const [underlineTab, setUnderlineTab] = useState('deployments');
   const [collapsibleOpen, setCollapsibleOpen] = useState(false);
 
   return (
@@ -1757,6 +1820,33 @@ const NavTypoPage = () => {
           </TabsContent>
           <TabsContent value="logs">
             <p className="text-sm text-muted-foreground">Logs panel content.</p>
+          </TabsContent>
+        </Tabs>
+      </S>
+
+      <S title="Tabs - underline">
+        <p className="-mt-2 text-xs text-muted-foreground">
+          Page-level navigation variant: transparent list on a bottom rule, active tab marked by a
+          2px foreground underline.
+        </p>
+        <Tabs value={underlineTab} onValueChange={setUnderlineTab} variant="underline">
+          <TabsList>
+            <TabsTrigger value="project">Project</TabsTrigger>
+            <TabsTrigger value="deployments">Deployments</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
+          <TabsContent value="project">
+            <p className="text-sm text-muted-foreground">Project overview panel.</p>
+          </TabsContent>
+          <TabsContent value="deployments">
+            <p className="text-sm text-muted-foreground">Deployments panel.</p>
+          </TabsContent>
+          <TabsContent value="analytics">
+            <p className="text-sm text-muted-foreground">Analytics panel.</p>
+          </TabsContent>
+          <TabsContent value="settings">
+            <p className="text-sm text-muted-foreground">Settings panel.</p>
           </TabsContent>
         </Tabs>
       </S>
