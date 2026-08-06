@@ -47,6 +47,19 @@ describe('Sheet', () => {
     expect(document.activeElement).toBe(opener);
   });
 
+  it('renders into document.body, escaping any clipping ancestor', () => {
+    const { container } = render(
+      <div style={{ overflow: 'hidden' }}>
+        <Sheet open onOpenChange={vi.fn()} title="Filters">
+          content
+        </Sheet>
+      </div>
+    );
+    expect(container.querySelector('[data-slot="sheet"]')).toBeNull();
+    expect(screen.getByRole('dialog').closest('body')).toBe(document.body);
+    expect(document.body.style.overflow).toBe('hidden');
+  });
+
   it('keeps Tab inside the dialog', () => {
     render(
       <Sheet open onOpenChange={vi.fn()} title="Filters">

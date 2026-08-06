@@ -13,6 +13,8 @@ import {
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { useAnchorPosition } from '../lib/use-anchor-position';
+import { useMounted } from '../lib/use-mounted';
 import { cn } from '../lib/utils';
 
 interface DropdownMenuContextValue {
@@ -53,35 +55,11 @@ export const DropdownMenu = ({
   const menuRef = useRef<HTMLDivElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
   const autoFocusRef = useRef(false);
-  const [pos, setPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const mounted = useMounted();
   const menuId = `${useId()}-menu`;
+  const showing = open && mounted;
 
-  const updatePosition = useCallback(() => {
-    if (!wrapperRef.current) return;
-    const rect = wrapperRef.current.getBoundingClientRect();
-    const menuHeight = menuRef.current?.offsetHeight ?? 120;
-
-    let top: number;
-    if (side === 'top') {
-      top = rect.top - menuHeight - 4;
-      if (top < 8) top = rect.bottom + 4;
-    } else {
-      top = rect.bottom + 4;
-      if (top + menuHeight > window.innerHeight - 8) top = rect.top - menuHeight - 4;
-    }
-
-    let left: number;
-    if (align === 'start') {
-      left = rect.left;
-    } else if (align === 'center') {
-      left = rect.left + rect.width / 2 - 90;
-    } else {
-      left = rect.right - 180;
-    }
-    left = Math.max(8, Math.min(left, window.innerWidth - 188));
-
-    setPos({ top, left });
-  }, [side, align]);
+  const { top, left } = useAnchorPosition(wrapperRef, menuRef, showing, { side, align, offset: 4 });
 
   const closeMenu = useCallback((restoreFocus = true) => {
     setOpen(false);
@@ -95,8 +73,7 @@ export const DropdownMenu = ({
   };
 
   useEffect(() => {
-    if (!open) return;
-    updatePosition();
+    if (!showing) return;
     if (autoFocusRef.current) focusItem(menuRef.current, 0);
     const handleClick = (e: MouseEvent): void => {
       if (
@@ -106,14 +83,11 @@ export const DropdownMenu = ({
         return;
       closeMenu(false);
     };
-    const handleScroll = (): void => updatePosition();
     document.addEventListener('mousedown', handleClick);
-    window.addEventListener('scroll', handleScroll, true);
     return () => {
       document.removeEventListener('mousedown', handleClick);
-      window.removeEventListener('scroll', handleScroll, true);
     };
-  }, [open, updatePosition, closeMenu]);
+  }, [showing, closeMenu]);
 
   const handleTriggerKeyDown = (e: React.KeyboardEvent): void => {
     if (e.key === 'ArrowDown' || (!open && (e.key === 'Enter' || e.key === ' '))) {
@@ -160,16 +134,16 @@ export const DropdownMenu = ({
         >
           {trigger}
         </TriggerComp>
-        {open &&
+        {showing &&
           createPortal(
             <div
               ref={menuRef}
               id={menuId}
               role="menu"
               onKeyDown={handleMenuKeyDown}
-              style={{ position: 'fixed', top: pos.top, left: pos.left }}
+              style={{ position: 'fixed', top, left }}
               className={cn(
-                'z-[100] min-w-[180px] rounded-md border border-border bg-popover p-1 shadow-md',
+                'z-[var(--z-dropdown,100)] min-w-[180px] rounded-md border border-border bg-popover p-1 shadow-md',
                 className
               )}
             >

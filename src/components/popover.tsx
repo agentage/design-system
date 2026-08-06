@@ -1,6 +1,11 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { useAnchorPosition, type AnchorAlign } from '../lib/use-anchor-position';
+import { useFocusRestore } from '../lib/use-focus-restore';
+import { useMounted } from '../lib/use-mounted';
+import { cn } from '../lib/utils';
 
 export interface PopoverProps {
   trigger: ReactNode;
@@ -8,7 +13,14 @@ export interface PopoverProps {
   isOpen: boolean;
   onClose: () => void;
   align?: 'left' | 'right' | 'center';
+  className?: string;
 }
+
+const alignMap: Record<NonNullable<PopoverProps['align']>, AnchorAlign> = {
+  left: 'start',
+  right: 'end',
+  center: 'center',
+};
 
 export const Popover = ({
   trigger,
@@ -16,53 +28,63 @@ export const Popover = ({
   isOpen,
   onClose,
   align = 'left',
+  className,
 }: PopoverProps): React.JSX.Element => {
-  const popoverRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const mounted = useMounted();
+  const contentId = `${useId()}-popover`;
+  const showing = isOpen && mounted;
+
+  const { top, left } = useAnchorPosition(anchorRef, contentRef, showing, {
+    side: 'top',
+    align: alignMap[align],
+  });
+
+  useFocusRestore(showing, contentRef);
 
   useEffect(() => {
     if (!isOpen) return;
 
     const handleClickOutside = (event: MouseEvent): void => {
-      if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
-        onClose();
-      }
+      const target = event.target as Node;
+      if (anchorRef.current?.contains(target) || contentRef.current?.contains(target)) return;
+      onClose();
+    };
+    const handleEscape = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape') onClose();
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return (): void => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen, onClose]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleEscape = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
-
     document.addEventListener('keydown', handleEscape);
     return (): void => {
+      document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose]);
 
-  const alignmentClass =
-    align === 'right' ? 'right-0' : align === 'center' ? 'left-1/2 -translate-x-1/2' : 'left-0';
-
   return (
-    <div ref={popoverRef} className="relative">
+    <div ref={anchorRef} className="relative" data-slot="popover">
       {trigger}
 
-      {isOpen && (
-        <div
-          className={`absolute z-50 bottom-full mb-2 ${alignmentClass} min-w-[300px] rounded-lg border border-border bg-popover p-4 shadow-lg`}
-        >
-          {content}
-        </div>
-      )}
+      {showing &&
+        createPortal(
+          <div
+            ref={contentRef}
+            id={contentId}
+            role="dialog"
+            aria-label="Popover"
+            style={{ position: 'fixed', top, left }}
+            className={cn(
+              'z-[var(--z-overlay,50)] min-w-[300px] rounded-lg border border-border bg-popover p-4 shadow-lg',
+              className
+            )}
+            data-slot="popover-content"
+          >
+            {content}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

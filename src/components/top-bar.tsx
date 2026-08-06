@@ -15,7 +15,7 @@ export const TopBar = ({
   <header
     className={cn(
       'border-b border-border bg-background/95 backdrop-blur',
-      sticky && 'sticky top-0 z-40',
+      sticky && 'sticky top-0 z-[var(--z-sticky,40)]',
       className
     )}
     data-slot="top-bar"

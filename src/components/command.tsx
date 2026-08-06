@@ -1,6 +1,10 @@
 'use client';
 
 import { useCallback, useContext, useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { useFocusTrap } from '../lib/use-focus-trap';
+import { useMounted } from '../lib/use-mounted';
+import { useScrollLock } from '../lib/use-scroll-lock';
 import { cn } from '../lib/utils';
 import { CommandContext, nodeText } from './command.context';
 
@@ -47,7 +51,12 @@ export const Command = ({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const mounted = useMounted();
   const listId = `${useId()}-list`;
+
+  useScrollLock(open);
+  useFocusTrap(dialogRef, open && mounted);
 
   const register = useCallback((id: string, text: string) => {
     setItems((prev) => [...prev.filter((item) => item.id !== id), { id, text }]);
@@ -60,10 +69,7 @@ export const Command = ({
   const matches = items.filter((item) => item.text.includes(query)).map((item) => item.id);
 
   useEffect(() => {
-    if (open) {
-      setSearch('');
-      setTimeout(() => inputRef.current?.focus(), 0);
-    }
+    if (open) setSearch('');
   }, [open]);
 
   useEffect(() => setReady(true), []);
@@ -82,14 +88,9 @@ export const Command = ({
     const handleEscape = (e: KeyboardEvent): void => {
       if (e.key === 'Escape') onOpenChange(false);
     };
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     document.addEventListener('keydown', handleEscape);
-    document.body.style.overflow = 'hidden';
-    document.body.style.paddingRight = `${String(scrollbarWidth)}px`;
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
     };
   }, [open, onOpenChange]);
 
@@ -110,9 +111,9 @@ export const Command = ({
     e.preventDefault();
   };
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <CommandContext.Provider
       value={{
         query,
@@ -125,7 +126,7 @@ export const Command = ({
       }}
     >
       <div
-        className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh]"
+        className="fixed inset-0 z-[var(--z-overlay,50)] flex items-start justify-center pt-[20vh]"
         data-slot="command"
       >
         <div
@@ -133,6 +134,7 @@ export const Command = ({
           onClick={() => onOpenChange(false)}
         />
         <div
+          ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-label={dialogLabel}
@@ -167,7 +169,8 @@ export const Command = ({
           </div>
         </div>
       </div>
-    </CommandContext.Provider>
+    </CommandContext.Provider>,
+    document.body
   );
 };
 

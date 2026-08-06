@@ -1,17 +1,27 @@
 'use client';
 
 import { useEffect, type RefObject } from 'react';
+import { useFocusRestore } from './use-focus-restore';
 
-const FOCUSABLE_SELECTOR =
-  'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not(:disabled)',
+  'input:not(:disabled)',
+  'select:not(:disabled)',
+  'textarea:not(:disabled)',
+  '[tabindex]',
+]
+  .map((selector) => `${selector}:not([tabindex="-1"]):not([hidden])`)
+  .join(', ');
 
 /** Cycles Tab inside `ref` while `active`, then restores focus to whatever opened it. */
 export const useFocusTrap = (ref: RefObject<HTMLElement | null>, active: boolean): void => {
+  useFocusRestore(active, ref);
+
   useEffect(() => {
     const container = ref.current;
     if (!active || !container) return;
 
-    const opener = document.activeElement as HTMLElement | null;
     const initial = container.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
     (initial ?? container).focus();
 
@@ -40,7 +50,6 @@ export const useFocusTrap = (ref: RefObject<HTMLElement | null>, active: boolean
     document.addEventListener('keydown', handleTab);
     return (): void => {
       document.removeEventListener('keydown', handleTab);
-      opener?.focus();
     };
   }, [ref, active]);
 };

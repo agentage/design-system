@@ -1,7 +1,10 @@
 'use client';
 
 import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { useFocusTrap } from '../lib/use-focus-trap';
+import { useMounted } from '../lib/use-mounted';
+import { useScrollLock } from '../lib/use-scroll-lock';
 import { cn } from '../lib/utils';
 
 export interface ModalProps {
@@ -50,6 +53,7 @@ export const Modal = ({
   closeOnEscape = true,
 }: ModalProps): React.JSX.Element | null => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const mounted = useMounted();
   const instanceId = useId();
   const titleId = `${instanceId}-title`;
   const descId = `${instanceId}-desc`;
@@ -69,22 +73,8 @@ export const Modal = ({
     };
   }, [isOpen, onClose, closeOnEscape]);
 
-  useEffect(() => {
-    if (isOpen) {
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      document.body.style.overflow = 'hidden';
-      document.body.style.paddingRight = `${String(scrollbarWidth)}px`;
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-    }
-    return (): void => {
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-    };
-  }, [isOpen]);
-
-  useFocusTrap(modalRef, isOpen);
+  useScrollLock(isOpen);
+  useFocusTrap(modalRef, isOpen && mounted);
 
   const handleOverlayClick = (event: React.MouseEvent): void => {
     if (closeOnOverlayClick && event.target === event.currentTarget) {
@@ -92,11 +82,11 @@ export const Modal = ({
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[var(--z-overlay,50)] flex items-center justify-center p-4"
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
@@ -146,7 +136,8 @@ export const Modal = ({
 
         <div className="p-4">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

@@ -1,22 +1,19 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { withDescribedBy } from '../lib/aria';
+import { useAnchorPosition, type AnchorSide } from '../lib/use-anchor-position';
+import { useMounted } from '../lib/use-mounted';
 import { cn } from '../lib/utils';
 
 export interface TooltipProps {
   content: ReactNode;
   children: React.ReactElement;
-  side?: 'top' | 'bottom' | 'left' | 'right';
+  side?: AnchorSide;
   delayMs?: number;
   className?: string;
 }
-
-const sideClasses = {
-  top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-  bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
-  left: 'right-full top-1/2 -translate-y-1/2 mr-2',
-  right: 'left-full top-1/2 -translate-y-1/2 ml-2',
-};
 
 export const Tooltip = ({
   content,
@@ -26,42 +23,73 @@ export const Tooltip = ({
   className,
 }: TooltipProps): React.JSX.Element => {
   const [open, setOpen] = useState(false);
+  const anchorRef = useRef<HTMLSpanElement>(null);
+  const surfaceRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const mounted = useMounted();
+  const tooltipId = `${useId()}-tooltip`;
+  const showing = open && mounted;
 
-  const handleEnter = (): void => {
-    timeoutRef.current = setTimeout(() => setOpen(true), delayMs);
-  };
+  const { top, left } = useAnchorPosition(anchorRef, surfaceRef, showing, {
+    side,
+    align: 'center',
+  });
 
-  const handleLeave = (): void => {
+  const show = useCallback((delay: number) => {
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setOpen(true), delay);
+  }, []);
+
+  const hide = useCallback(() => {
     clearTimeout(timeoutRef.current);
     setOpen(false);
-  };
+  }, []);
 
   useEffect(() => () => clearTimeout(timeoutRef.current), []);
 
+  useEffect(() => {
+    if (!open) return;
+    const handleEscape = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape') hide();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return (): void => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [open, hide]);
+
   return (
-    <div
+    <span
+      ref={anchorRef}
       className="relative inline-flex"
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}
-      onFocus={handleEnter}
-      onBlur={handleLeave}
+      // Touch never opens a tooltip: the tap already activates the trigger underneath.
+      onPointerEnter={(event) => {
+        if (event.pointerType !== 'touch') show(delayMs);
+      }}
+      onPointerLeave={hide}
+      onFocus={() => show(0)}
+      onBlur={hide}
       data-slot="tooltip"
     >
-      {children}
-      {open && (
-        <div
-          role="tooltip"
-          className={cn(
-            'absolute z-50 max-w-xs rounded-md bg-foreground px-2.5 py-1.5 text-xs text-background shadow-md',
-            'animate-in fade-in-0 zoom-in-95',
-            sideClasses[side],
-            className
-          )}
-        >
-          {content}
-        </div>
-      )}
-    </div>
+      {withDescribedBy(children, showing ? tooltipId : undefined)}
+      {showing &&
+        createPortal(
+          <div
+            ref={surfaceRef}
+            id={tooltipId}
+            role="tooltip"
+            style={{ position: 'fixed', top, left }}
+            className={cn(
+              'z-[var(--z-overlay,50)] max-w-xs rounded-md bg-foreground px-2.5 py-1.5 text-xs text-background shadow-md',
+              'animate-in fade-in-0 zoom-in-95',
+              className
+            )}
+            data-slot="tooltip-content"
+          >
+            {content}
+          </div>,
+          document.body
+        )}
+    </span>
   );
 };

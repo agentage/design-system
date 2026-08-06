@@ -1,6 +1,21 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { useState } from 'react';
 import { describe, expect, it, vi, type Mock } from 'vitest';
 import { Command, CommandEmpty, CommandGroup, CommandItem } from './command';
+
+const Harness = (): React.JSX.Element => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ overflow: 'hidden' }}>
+      <button type="button" onClick={() => setOpen(true)}>
+        Open palette
+      </button>
+      <Command open={open} onOpenChange={setOpen}>
+        <CommandItem>Dashboard</CommandItem>
+      </Command>
+    </div>
+  );
+};
 
 const renderPalette = (onOpenChange: Mock = vi.fn()): { onOpenChange: Mock } => {
   render(
@@ -66,5 +81,31 @@ describe('Command', () => {
     const { onOpenChange } = renderPalette();
     fireEvent.keyDown(input(), { key: 'Escape' });
     expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('portals the palette to document.body and lands focus on the input', () => {
+    const { container } = render(
+      <div style={{ overflow: 'hidden' }}>
+        <Command open onOpenChange={vi.fn()}>
+          <CommandItem>Dashboard</CommandItem>
+        </Command>
+      </div>
+    );
+    expect(container.querySelector('[data-slot="command"]')).toBeNull();
+    expect(screen.getByRole('dialog').closest('body')).toBe(document.body);
+    expect(document.activeElement).toBe(screen.getByRole('combobox'));
+  });
+
+  it('locks body scroll and restores focus to the opener on close', () => {
+    render(<Harness />);
+    const opener = screen.getByRole('button', { name: 'Open palette' });
+    opener.focus();
+    fireEvent.click(opener);
+    expect(document.body.style.overflow).toBe('hidden');
+
+    fireEvent.keyDown(input(), { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.body.style.overflow).toBe('');
+    expect(document.activeElement).toBe(opener);
   });
 });
