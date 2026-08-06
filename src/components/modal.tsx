@@ -76,10 +76,8 @@ export const Modal = ({
   useScrollLock(isOpen);
   useFocusTrap(modalRef, isOpen && mounted);
 
-  const handleOverlayClick = (event: React.MouseEvent): void => {
-    if (closeOnOverlayClick && event.target === event.currentTarget) {
-      onClose();
-    }
+  const handleOverlayClick = (): void => {
+    if (closeOnOverlayClick) onClose();
   };
 
   if (!isOpen || !mounted) return null;
@@ -87,14 +85,17 @@ export const Modal = ({
   return createPortal(
     <div
       className="fixed inset-0 z-[var(--z-overlay,50)] flex items-center justify-center p-4"
-      onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? titleId : undefined}
       aria-describedby={description ? descId : undefined}
       data-slot="modal"
     >
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={handleOverlayClick}
+      />
 
       <div
         ref={modalRef}

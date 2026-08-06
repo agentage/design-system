@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
@@ -39,33 +40,34 @@ export interface AlertProps
   extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof alertVariants> {
   icon?: React.ReactNode;
   onClose?: () => void;
+  closeLabel?: string;
 }
 
-export const Alert = ({
-  className,
-  variant,
-  icon,
-  onClose,
-  children,
-  ...props
-}: AlertProps): React.JSX.Element => (
-  <div
-    role="alert"
-    data-slot="alert"
-    className={cn(alertVariants({ variant, className }))}
-    {...props}
-  >
-    {icon}
-    <div className="flex-1">{children}</div>
-    {onClose && (
-      <button
-        type="button"
-        onClick={onClose}
-        className="shrink-0 rounded-sm p-0.5 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
-        aria-label="Dismiss"
-      >
-        <CloseIcon />
-      </button>
-    )}
-  </div>
+export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
+  ({ className, variant, icon, onClose, closeLabel = 'Dismiss', children, ...props }, ref) => (
+    <div
+      ref={ref}
+      role="alert"
+      data-slot="alert"
+      className={cn(alertVariants({ variant, className }))}
+      {...props}
+    >
+      {icon}
+      <div className="flex-1">{children}</div>
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          className={cn(
+            'shrink-0 rounded-sm p-0.5 opacity-60 hover:opacity-100 transition-opacity cursor-pointer',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50'
+          )}
+          aria-label={closeLabel}
+        >
+          <CloseIcon />
+        </button>
+      )}
+    </div>
+  )
 );
+Alert.displayName = 'Alert';

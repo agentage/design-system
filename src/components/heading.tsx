@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { cn } from '../lib/utils';
 
 type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4';
@@ -14,17 +15,14 @@ const levelClasses: Record<HeadingLevel, string> = {
   h4: 'text-sm font-semibold',
 };
 
-export const Heading = ({
-  as: Tag = 'h2',
-  description,
-  className,
-  children,
-  ...props
-}: HeadingProps): React.JSX.Element => (
-  <div data-slot="heading">
-    <Tag className={cn(levelClasses[Tag], 'text-foreground', className)} {...props}>
-      {children}
-    </Tag>
-    {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
-  </div>
+export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(
+  ({ as: Tag = 'h2', description, className, children, ...props }, ref) => (
+    <div data-slot="heading">
+      <Tag ref={ref} className={cn(levelClasses[Tag], 'text-foreground', className)} {...props}>
+        {children}
+      </Tag>
+      {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+    </div>
+  )
 );
+Heading.displayName = 'Heading';

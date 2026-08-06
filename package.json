@@ -126,6 +126,10 @@
       "types": "./dist/components/filter-bar.d.ts",
       "import": "./dist/components/filter-bar.js"
     },
+    "./filter-bar.parts": {
+      "types": "./dist/components/filter-bar.parts.d.ts",
+      "import": "./dist/components/filter-bar.parts.js"
+    },
     "./footer": {
       "types": "./dist/components/footer.d.ts",
       "import": "./dist/components/footer.js"
@@ -173,6 +177,10 @@
     "./label": {
       "types": "./dist/components/label.d.ts",
       "import": "./dist/components/label.js"
+    },
+    "./list-navigation": {
+      "types": "./dist/lib/list-navigation.d.ts",
+      "import": "./dist/lib/list-navigation.js"
     },
     "./markdown": {
       "types": "./dist/components/markdown.d.ts",
@@ -265,6 +273,10 @@
     "./stat-card": {
       "types": "./dist/components/stat-card.d.ts",
       "import": "./dist/components/stat-card.js"
+    },
+    "./stat-card-charts": {
+      "types": "./dist/components/stat-card-charts.d.ts",
+      "import": "./dist/components/stat-card-charts.js"
     },
     "./stat-card-extensions": {
       "types": "./dist/components/stat-card-extensions.d.ts",
@@ -389,7 +401,9 @@
     "@vitejs/plugin-react": "^6.0.3",
     "eslint": "^10.5.0",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "jsdom": "^29.1.1",
     "postcss": "^8.5.26",
     "prettier": "^3.8.4",
@@ -400,5 +414,10 @@
     "vite": "^8.1.0",
     "vite-plugin-dts": "^5.0.3",
     "vitest": "^4.1.8"
+  },
+  "overrides": {
+    "eslint-plugin-jsx-a11y": {
+      "eslint": "$eslint"
+    }
   }
 }

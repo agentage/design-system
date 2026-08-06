@@ -140,6 +140,7 @@ export const DropdownMenu = ({
               ref={menuRef}
               id={menuId}
               role="menu"
+              tabIndex={-1}
               onKeyDown={handleMenuKeyDown}
               style={{ position: 'fixed', top, left }}
               className={cn(

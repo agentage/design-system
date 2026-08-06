@@ -39,6 +39,15 @@ describe('FormField', () => {
     ).toBe('Max 200 characters');
   });
 
+  it('marks the control required for assistive tech', () => {
+    render(
+      <FormField label="Name" required>
+        <Input placeholder="Name" />
+      </FormField>
+    );
+    expect(screen.getByPlaceholderText('Name').getAttribute('aria-required')).toBe('true');
+  });
+
   it('keeps an explicit id on the control', () => {
     render(
       <FormField label="Role" id="role">

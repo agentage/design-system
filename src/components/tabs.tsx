@@ -28,14 +28,14 @@ const TabsContext = React.createContext<TabsContextValue>({
   variant: 'default',
 });
 
-export const Tabs: React.FC<TabsProps> = ({
+export const Tabs = ({
   defaultValue = '',
   value: controlledValue,
   onValueChange,
   variant = 'default',
   className,
   children,
-}) => {
+}: TabsProps): React.JSX.Element => {
   const [internalValue, setInternalValue] = React.useState(defaultValue);
   const instanceId = React.useId();
   const value = controlledValue ?? internalValue;
@@ -54,29 +54,33 @@ export const Tabs: React.FC<TabsProps> = ({
   );
 };
 
-export interface TabsListProps {
-  className?: string;
+export interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
-export const TabsList: React.FC<TabsListProps> = ({ className, children }) => {
-  const { variant } = React.useContext(TabsContext);
+export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
+  ({ className, children, ...props }, ref) => {
+    const { variant } = React.useContext(TabsContext);
 
-  return (
-    <div
-      className={cn(
-        variant === 'underline'
-          ? 'flex items-center gap-4 border-b border-border'
-          : 'inline-flex items-center gap-1 rounded-lg bg-muted p-1',
-        className
-      )}
-      role="tablist"
-      data-slot="tabs-list"
-    >
-      {children}
-    </div>
-  );
-};
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          variant === 'underline'
+            ? 'flex items-center gap-4 border-b border-border'
+            : 'inline-flex items-center gap-1 rounded-lg bg-muted p-1',
+          className
+        )}
+        role="tablist"
+        data-slot="tabs-list"
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+TabsList.displayName = 'TabsList';
 
 export interface TabsTriggerProps {
   value: string;
@@ -85,79 +89,78 @@ export interface TabsTriggerProps {
   disabled?: boolean;
 }
 
-export const TabsTrigger: React.FC<TabsTriggerProps> = ({
-  value: triggerValue,
-  className,
-  children,
-  disabled = false,
-}) => {
-  const { value, onValueChange, instanceId, variant } = React.useContext(TabsContext);
-  const isActive = value === triggerValue;
+export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
+  ({ value: triggerValue, className, children, disabled = false }, ref) => {
+    const { value, onValueChange, instanceId, variant } = React.useContext(TabsContext);
+    const isActive = value === triggerValue;
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
-    const tablist = e.currentTarget.closest('[role="tablist"]');
-    if (!tablist) return;
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
+      const tablist = e.currentTarget.closest('[role="tablist"]');
+      if (!tablist) return;
 
-    const tabs = Array.from(
-      tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]:not(:disabled)')
-    );
-    const currentIndex = tabs.indexOf(e.currentTarget);
+      const tabs = Array.from(
+        tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]:not(:disabled)')
+      );
+      const currentIndex = tabs.indexOf(e.currentTarget);
 
-    let nextIndex = -1;
-    if (e.key === 'ArrowRight') {
-      nextIndex = (currentIndex + 1) % tabs.length;
-    } else if (e.key === 'ArrowLeft') {
-      nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
-    } else if (e.key === 'Home') {
-      nextIndex = 0;
-    } else if (e.key === 'End') {
-      nextIndex = tabs.length - 1;
-    }
-
-    if (nextIndex >= 0) {
-      e.preventDefault();
-      tabs[nextIndex].focus();
-      const nextValue = tabs[nextIndex].getAttribute('data-value');
-      if (nextValue) {
-        onValueChange(nextValue);
+      let nextIndex = -1;
+      if (e.key === 'ArrowRight') {
+        nextIndex = (currentIndex + 1) % tabs.length;
+      } else if (e.key === 'ArrowLeft') {
+        nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+      } else if (e.key === 'Home') {
+        nextIndex = 0;
+      } else if (e.key === 'End') {
+        nextIndex = tabs.length - 1;
       }
-    }
-  };
 
-  return (
-    <button
-      role="tab"
-      aria-selected={isActive}
-      aria-controls={`${instanceId}-panel-${triggerValue}`}
-      id={`${instanceId}-trigger-${triggerValue}`}
-      data-value={triggerValue}
-      tabIndex={isActive ? 0 : -1}
-      disabled={disabled}
-      onClick={() => {
-        onValueChange(triggerValue);
-      }}
-      onKeyDown={handleKeyDown}
-      data-slot="tabs-trigger"
-      className={cn(
-        variant === 'underline'
-          ? '-mb-px inline-flex items-center justify-center gap-2 whitespace-nowrap border-b-2 px-1 pb-2.5 pt-1 text-sm font-medium transition-all'
-          : 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        'disabled:pointer-events-none disabled:opacity-50',
-        variant === 'underline'
-          ? isActive
-            ? 'border-foreground text-foreground'
-            : 'border-transparent text-muted-foreground hover:text-foreground'
-          : isActive
-            ? 'bg-background text-foreground shadow-sm'
-            : 'text-muted-foreground hover:text-foreground',
-        className
-      )}
-    >
-      {children}
-    </button>
-  );
-};
+      if (nextIndex >= 0) {
+        e.preventDefault();
+        tabs[nextIndex].focus();
+        const nextValue = tabs[nextIndex].getAttribute('data-value');
+        if (nextValue) {
+          onValueChange(nextValue);
+        }
+      }
+    };
+
+    return (
+      <button
+        ref={ref}
+        role="tab"
+        aria-selected={isActive}
+        aria-controls={`${instanceId}-panel-${triggerValue}`}
+        id={`${instanceId}-trigger-${triggerValue}`}
+        data-value={triggerValue}
+        tabIndex={isActive ? 0 : -1}
+        disabled={disabled}
+        onClick={() => {
+          onValueChange(triggerValue);
+        }}
+        onKeyDown={handleKeyDown}
+        data-slot="tabs-trigger"
+        className={cn(
+          variant === 'underline'
+            ? '-mb-px inline-flex items-center justify-center gap-2 whitespace-nowrap border-b-2 px-1 pb-2.5 pt-1 text-sm font-medium transition-all'
+            : 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'disabled:pointer-events-none disabled:opacity-50',
+          variant === 'underline'
+            ? isActive
+              ? 'border-foreground text-foreground'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+            : isActive
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground',
+          className
+        )}
+      >
+        {children}
+      </button>
+    );
+  }
+);
+TabsTrigger.displayName = 'TabsTrigger';
 
 export interface TabsContentProps {
   value: string;
@@ -165,30 +168,30 @@ export interface TabsContentProps {
   children: React.ReactNode;
 }
 
-export const TabsContent: React.FC<TabsContentProps> = ({
-  value: contentValue,
-  className,
-  children,
-}) => {
-  const { value, instanceId } = React.useContext(TabsContext);
+export const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
+  ({ value: contentValue, className, children }, ref) => {
+    const { value, instanceId } = React.useContext(TabsContext);
 
-  if (value !== contentValue) {
-    return null;
+    if (value !== contentValue) {
+      return null;
+    }
+
+    return (
+      <div
+        ref={ref}
+        role="tabpanel"
+        id={`${instanceId}-panel-${contentValue}`}
+        aria-labelledby={`${instanceId}-trigger-${contentValue}`}
+        tabIndex={0}
+        data-slot="tabs-content"
+        className={cn(
+          'mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          className
+        )}
+      >
+        {children}
+      </div>
+    );
   }
-
-  return (
-    <div
-      role="tabpanel"
-      id={`${instanceId}-panel-${contentValue}`}
-      aria-labelledby={`${instanceId}-trigger-${contentValue}`}
-      tabIndex={0}
-      data-slot="tabs-content"
-      className={cn(
-        'mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        className
-      )}
-    >
-      {children}
-    </div>
-  );
-};
+);
+TabsContent.displayName = 'TabsContent';

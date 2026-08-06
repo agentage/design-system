@@ -1,8 +1,15 @@
+import { createRef } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { Checkbox } from './checkbox';
 
 describe('Checkbox', () => {
+  it('exposes the button through a forwarded ref', () => {
+    const ref = createRef<HTMLButtonElement>();
+    render(<Checkbox ref={ref} aria-label="Accept terms" />);
+    expect(ref.current).toBe(screen.getByRole('checkbox'));
+  });
+
   it('passes through name, id and aria-label', () => {
     const { container } = render(<Checkbox id="terms" name="terms" aria-label="Accept terms" />);
     expect(screen.getByRole('checkbox', { name: 'Accept terms' }).id).toBe('terms');

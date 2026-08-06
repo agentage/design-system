@@ -41,11 +41,9 @@ h6 {
   letter-spacing: -0.015em;
 }
 
-/* Prevent text selection in UI chrome */
+/* Only genuinely decorative controls suppress selection; nav/aside text must stay copyable. */
 button,
-[role='button'],
-nav,
-aside {
+[role='button'] {
   user-select: none;
   -webkit-user-select: none;
 }

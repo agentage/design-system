@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { cn } from '../lib/utils';
 
 export interface SectionProps {
@@ -10,38 +11,35 @@ export interface SectionProps {
   className?: string;
 }
 
-export const Section = ({
-  icon,
-  iconColor,
-  title,
-  description,
-  action,
-  children,
-  className,
-}: SectionProps): React.JSX.Element => (
-  <div
-    className={cn('rounded-lg border border-border bg-sidebar p-4', className)}
-    data-slot="section"
-  >
-    <div className="flex items-center justify-between mb-4">
-      <div className="flex items-center gap-3">
-        {icon && (
-          <div
-            className={cn(
-              'flex size-8 items-center justify-center rounded-md [&_svg]:size-4',
-              iconColor ?? 'bg-primary/10 text-primary'
-            )}
-          >
-            {icon}
+export const Section = React.forwardRef<HTMLDivElement, SectionProps>(
+  ({ icon, iconColor, title, description, action, children, className }, ref) => (
+    <div
+      ref={ref}
+      className={cn('rounded-lg border border-border bg-sidebar p-4', className)}
+      data-slot="section"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          {icon && (
+            <div
+              aria-hidden="true"
+              className={cn(
+                'flex size-8 items-center justify-center rounded-md [&_svg]:size-4',
+                iconColor ?? 'bg-primary/10 text-primary'
+              )}
+            >
+              {icon}
+            </div>
+          )}
+          <div>
+            <div className="text-sm font-medium text-foreground">{title}</div>
+            {description && <div className="text-xs text-muted-foreground">{description}</div>}
           </div>
-        )}
-        <div>
-          <div className="text-sm font-medium text-foreground">{title}</div>
-          {description && <div className="text-xs text-muted-foreground">{description}</div>}
         </div>
+        {action}
       </div>
-      {action}
+      {children}
     </div>
-    {children}
-  </div>
+  )
 );
+Section.displayName = 'Section';

@@ -67,6 +67,7 @@ export const Sheet = ({
   return createPortal(
     <div className="fixed inset-0 z-[var(--z-overlay,50)]" data-slot="sheet">
       <div
+        aria-hidden="true"
         className="fixed inset-0 bg-black/50 backdrop-blur-sm"
         onClick={() => onOpenChange(false)}
       />

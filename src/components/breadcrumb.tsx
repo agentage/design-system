@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { cn } from '../lib/utils';
 
 const ChevronIcon = (): React.JSX.Element => (
@@ -15,66 +16,83 @@ const ChevronIcon = (): React.JSX.Element => (
   </svg>
 );
 
-export const Breadcrumb = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLElement>): React.JSX.Element => (
-  <nav aria-label="Breadcrumb" className={className} data-slot="breadcrumb" {...props} />
+export const Breadcrumb = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
+  ({ className, ...props }, ref) => (
+    <nav
+      ref={ref}
+      aria-label="Breadcrumb"
+      className={cn(className)}
+      data-slot="breadcrumb"
+      {...props}
+    />
+  )
 );
+Breadcrumb.displayName = 'Breadcrumb';
 
-export const BreadcrumbList = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLOListElement>): React.JSX.Element => (
+export const BreadcrumbList = React.forwardRef<
+  HTMLOListElement,
+  React.HTMLAttributes<HTMLOListElement>
+>(({ className, ...props }, ref) => (
   <ol
+    ref={ref}
     className={cn('flex items-center gap-1.5 text-sm text-muted-foreground', className)}
     data-slot="breadcrumb-list"
     {...props}
   />
-);
+));
+BreadcrumbList.displayName = 'BreadcrumbList';
 
-export const BreadcrumbItem = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLLIElement>): React.JSX.Element => (
-  <li
-    className={cn('inline-flex items-center gap-1.5', className)}
-    data-slot="breadcrumb-item"
-    {...props}
-  />
+export const BreadcrumbItem = React.forwardRef<HTMLLIElement, React.HTMLAttributes<HTMLLIElement>>(
+  ({ className, ...props }, ref) => (
+    <li
+      ref={ref}
+      className={cn('inline-flex items-center gap-1.5', className)}
+      data-slot="breadcrumb-item"
+      {...props}
+    />
+  )
 );
+BreadcrumbItem.displayName = 'BreadcrumbItem';
 
-export const BreadcrumbLink = ({
-  className,
-  ...props
-}: React.AnchorHTMLAttributes<HTMLAnchorElement>): React.JSX.Element => (
+export const BreadcrumbLink = React.forwardRef<
+  HTMLAnchorElement,
+  React.AnchorHTMLAttributes<HTMLAnchorElement>
+>(({ className, children, ...props }, ref) => (
   <a
-    className={cn('transition-colors hover:text-foreground', className)}
+    ref={ref}
+    className={cn(
+      'transition-colors hover:text-foreground',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+      className
+    )}
     data-slot="breadcrumb-link"
     {...props}
-  />
-);
+  >
+    {children}
+  </a>
+));
+BreadcrumbLink.displayName = 'BreadcrumbLink';
 
-export const BreadcrumbPage = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLSpanElement>): React.JSX.Element => (
+export const BreadcrumbPage = React.forwardRef<
+  HTMLSpanElement,
+  React.HTMLAttributes<HTMLSpanElement>
+>(({ className, ...props }, ref) => (
   <span
-    role="link"
-    aria-disabled="true"
+    ref={ref}
     aria-current="page"
     className={cn('font-medium text-foreground', className)}
     data-slot="breadcrumb-page"
     {...props}
   />
-);
+));
+BreadcrumbPage.displayName = 'BreadcrumbPage';
 
-export const BreadcrumbSeparator = ({
-  className,
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLLIElement>): React.JSX.Element => (
+export const BreadcrumbSeparator = React.forwardRef<
+  HTMLLIElement,
+  React.HTMLAttributes<HTMLLIElement>
+>(({ className, children, ...props }, ref) => (
   <li
+    ref={ref}
     role="presentation"
     aria-hidden="true"
     className={cn('text-muted-foreground', className)}
@@ -83,4 +101,5 @@ export const BreadcrumbSeparator = ({
   >
     {children ?? <ChevronIcon />}
   </li>
-);
+));
+BreadcrumbSeparator.displayName = 'BreadcrumbSeparator';

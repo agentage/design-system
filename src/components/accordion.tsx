@@ -70,20 +70,42 @@ export interface AccordionItemProps {
   value: string;
   children: React.ReactNode;
   className?: string;
+  disabled?: boolean;
 }
 
-const AccordionItemContext = React.createContext<{ value: string }>({ value: '' });
+interface AccordionItemContextValue {
+  value: string;
+  triggerId: string;
+  contentId: string;
+  disabled: boolean;
+}
+
+const AccordionItemContext = React.createContext<AccordionItemContextValue>({
+  value: '',
+  triggerId: '',
+  contentId: '',
+  disabled: false,
+});
 
 export const AccordionItem = ({
   value,
   children,
   className,
+  disabled = false,
 }: AccordionItemProps): React.JSX.Element => {
   const { openItems } = React.useContext(AccordionContext);
   const isOpen = openItems.includes(value);
+  const instanceId = React.useId();
 
   return (
-    <AccordionItemContext.Provider value={{ value }}>
+    <AccordionItemContext.Provider
+      value={{
+        value,
+        disabled,
+        triggerId: `${instanceId}-trigger`,
+        contentId: `${instanceId}-content`,
+      }}
+    >
       <div className={className} data-state={isOpen ? 'open' : 'closed'} data-slot="accordion-item">
         {children}
       </div>
@@ -91,56 +113,86 @@ export const AccordionItem = ({
   );
 };
 
+const NAV_KEYS = ['ArrowDown', 'ArrowUp', 'Home', 'End'];
+
+const moveFocus = (trigger: HTMLButtonElement, key: string): void => {
+  const root = trigger.closest('[data-slot="accordion"]');
+  if (!root) return;
+  const all = Array.from(
+    root.querySelectorAll<HTMLButtonElement>('[data-slot="accordion-trigger"]:not(:disabled)')
+  );
+  const at = all.indexOf(trigger);
+  if (at < 0) return;
+  if (key === 'ArrowDown') all[(at + 1) % all.length].focus();
+  else if (key === 'ArrowUp') all[(at - 1 + all.length) % all.length].focus();
+  else if (key === 'Home') all[0].focus();
+  else if (key === 'End') all[all.length - 1].focus();
+};
+
 export interface AccordionTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
-export const AccordionTrigger = ({
-  className,
-  children,
-  ...props
-}: AccordionTriggerProps): React.JSX.Element => {
-  const { toggle, openItems } = React.useContext(AccordionContext);
-  const { value } = React.useContext(AccordionItemContext);
-  const isOpen = openItems.includes(value);
+export const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTriggerProps>(
+  ({ className, children, disabled, onKeyDown, ...props }, ref) => {
+    const { toggle, openItems } = React.useContext(AccordionContext);
+    const item = React.useContext(AccordionItemContext);
+    const isOpen = openItems.includes(item.value);
 
-  return (
-    <button
-      type="button"
-      onClick={() => toggle(value)}
-      aria-expanded={isOpen}
-      className={cn(
-        'flex w-full items-center justify-between py-4 text-sm font-medium text-foreground cursor-pointer',
-        'transition-colors hover:text-foreground/80',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-        className
-      )}
-      data-slot="accordion-trigger"
-      {...props}
-    >
-      <span className="text-left">{children}</span>
-      <ChevronDown open={isOpen} />
-    </button>
-  );
-};
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
+      onKeyDown?.(e);
+      if (e.defaultPrevented || !NAV_KEYS.includes(e.key)) return;
+      e.preventDefault();
+      moveFocus(e.currentTarget, e.key);
+    };
+
+    return (
+      <button
+        ref={ref}
+        type="button"
+        id={item.triggerId || undefined}
+        onClick={() => toggle(item.value)}
+        onKeyDown={handleKeyDown}
+        aria-expanded={isOpen}
+        aria-controls={item.contentId || undefined}
+        disabled={disabled ?? item.disabled}
+        className={cn(
+          'flex w-full items-center justify-between py-4 text-sm font-medium text-foreground cursor-pointer',
+          'transition-colors hover:text-foreground/80',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+          className
+        )}
+        data-slot="accordion-trigger"
+        {...props}
+      >
+        <span className="text-left">{children}</span>
+        <ChevronDown open={isOpen} />
+      </button>
+    );
+  }
+);
+AccordionTrigger.displayName = 'AccordionTrigger';
 
 export interface AccordionContentProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export const AccordionContent = ({
-  className,
-  children,
-  ...props
-}: AccordionContentProps): React.JSX.Element | null => {
-  const { openItems } = React.useContext(AccordionContext);
-  const { value } = React.useContext(AccordionItemContext);
+export const AccordionContent = React.forwardRef<HTMLDivElement, AccordionContentProps>(
+  ({ className, children, ...props }, ref) => {
+    const { openItems } = React.useContext(AccordionContext);
+    const { value, triggerId, contentId } = React.useContext(AccordionItemContext);
 
-  if (!openItems.includes(value)) return null;
+    if (!openItems.includes(value)) return null;
 
-  return (
-    <div
-      className={cn('pb-4 text-sm text-muted-foreground', className)}
-      data-slot="accordion-content"
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
+    return (
+      <div
+        ref={ref}
+        id={contentId || undefined}
+        role="region"
+        aria-labelledby={triggerId || undefined}
+        className={cn('pb-4 text-sm text-muted-foreground', className)}
+        data-slot="accordion-content"
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+AccordionContent.displayName = 'AccordionContent';

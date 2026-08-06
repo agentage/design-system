@@ -20,6 +20,7 @@ Single source of truth for the Agentage design system (OKLCH tokens + React comp
 ## RSC contract
 
 - Any component using client-only React (state, effects, refs, context, portals, DOM/browser APIs) MUST start with `'use client';`. `useId` / `useMemo` / `useCallback` / `forwardRef` / `memo` exist in React's server build, so they alone do not require the directive.
+- Attaching a DOM event handler (`onClick`, `onChange`, `onKeyDown`, …) also requires it, even in a hook-free component — a server component cannot pass a function prop to the DOM.
 - Rolldown (Vite 8) preserves module-level directives under `preserveModules` — no extra plugin needed. Keep `'use client'` as **line 1**.
 - Invariant: no server-safe module may transitively import a client module. `dist/components/card.js` → `dist/lib/utils.js` and nothing else.
 

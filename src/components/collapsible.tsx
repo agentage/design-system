@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { createContext, useContext, useId, useState, type ReactNode } from 'react';
 import { cn } from '../lib/utils';
@@ -68,59 +69,58 @@ export interface CollapsibleTriggerProps extends React.ButtonHTMLAttributes<HTML
   asChild?: boolean;
 }
 
-export const CollapsibleTrigger = ({
-  asChild = false,
-  className,
-  children,
-  onClick,
-  ...props
-}: CollapsibleTriggerProps): React.JSX.Element => {
-  const { open, toggle, triggerId, contentId } = useContext(CollapsibleContext);
-  const Comp = asChild ? Slot : 'button';
+export const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, CollapsibleTriggerProps>(
+  ({ asChild = false, className, children, onClick, ...props }, ref) => {
+    const { open, toggle, triggerId, contentId } = useContext(CollapsibleContext);
+    const Comp = asChild ? Slot : 'button';
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
-    onClick?.(e);
-    if (!e.defaultPrevented) toggle();
-  };
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
+      onClick?.(e);
+      if (!e.defaultPrevented) toggle();
+    };
 
-  return (
-    <Comp
-      {...(asChild ? {} : { type: 'button' as const })}
-      id={triggerId || undefined}
-      aria-expanded={open}
-      aria-controls={contentId || undefined}
-      onClick={handleClick}
-      className={cn(
-        'flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-        'text-foreground hover:bg-accent/50',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-        className
-      )}
-      data-slot="collapsible-trigger"
-      {...props}
-    >
-      {asChild ? children : <span className="flex-1 text-left truncate">{children}</span>}
-    </Comp>
-  );
-};
+    return (
+      <Comp
+        ref={ref}
+        {...(asChild ? {} : { type: 'button' as const })}
+        id={triggerId || undefined}
+        aria-expanded={open}
+        aria-controls={contentId || undefined}
+        onClick={handleClick}
+        className={cn(
+          'flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+          'text-foreground hover:bg-accent/50',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+          className
+        )}
+        data-slot="collapsible-trigger"
+        {...props}
+      >
+        {asChild ? children : <span className="flex-1 text-left truncate">{children}</span>}
+      </Comp>
+    );
+  }
+);
+CollapsibleTrigger.displayName = 'CollapsibleTrigger';
 
 export interface CollapsibleContentProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export const CollapsibleContent = ({
-  className,
-  ...props
-}: CollapsibleContentProps): React.JSX.Element => {
-  const { open, triggerId, contentId } = useContext(CollapsibleContext);
+export const CollapsibleContent = React.forwardRef<HTMLDivElement, CollapsibleContentProps>(
+  ({ className, ...props }, ref) => {
+    const { open, triggerId, contentId } = useContext(CollapsibleContext);
 
-  return (
-    <div
-      id={contentId || undefined}
-      role="region"
-      aria-labelledby={triggerId || undefined}
-      hidden={!open}
-      className={cn('overflow-hidden transition-all', !open && 'hidden', className)}
-      data-slot="collapsible-content"
-      {...props}
-    />
-  );
-};
+    return (
+      <div
+        ref={ref}
+        id={contentId || undefined}
+        role="region"
+        aria-labelledby={triggerId || undefined}
+        hidden={!open}
+        className={cn('overflow-hidden transition-all', !open && 'hidden', className)}
+        data-slot="collapsible-content"
+        {...props}
+      />
+    );
+  }
+);
+CollapsibleContent.displayName = 'CollapsibleContent';
