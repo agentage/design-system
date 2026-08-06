@@ -35,7 +35,7 @@ describe('StatCard', () => {
     render(<StatCard title="Runs" value={3} pressable onClick={onClick} />);
     const button = screen.getByRole('button');
     expect(button.getAttribute('type')).toBe('button');
-    expect(button.className).toContain('active:translate-y-0');
+    expect(button.className).toContain('active:shadow-sm');
     await userEvent.click(button);
     expect(onClick).toHaveBeenCalledTimes(1);
   });

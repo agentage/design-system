@@ -87,7 +87,7 @@ describe('rendered class strings stay byte-identical', () => {
   it('keeps the stat card root, icon and trend classes', () => {
     const { container } = render(<StatCard title="T" value={1} icon={<svg />} className="mt-4" />);
     expect(cls(q(container, '[data-slot="stat-card"]'))).toBe(
-      'rounded-lg border border-border bg-sidebar p-5 transition-[transform,box-shadow,border-color] duration-[140ms] hover:-translate-y-[3px] hover:border-muted-foreground hover:shadow-md mt-4'
+      'rounded-lg border border-border bg-sidebar p-5 transition-[box-shadow,border-color] duration-[140ms] hover:border-muted-foreground hover:shadow-md mt-4'
     );
     expect(cls(q(container, '[data-slot="stat-card"] div div div'))).toBe(
       'flex size-8 items-center justify-center rounded-md [&_svg]:size-4 bg-primary-soft text-primary-emphasis'
