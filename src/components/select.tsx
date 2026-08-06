@@ -2,26 +2,14 @@
 
 import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
+import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
-const Chevron = ({ className }: { className?: string }): React.JSX.Element => (
-  <svg
-    width={14}
-    height={14}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-    className={cn('shrink-0', className)}
-  >
-    <polyline points="6 9 12 15 18 9" />
-  </svg>
-);
+const POINTS = { down: '6 9 12 15 18 9', up: '18 15 12 9 6 15', check: '20 6 9 17 4 12' };
 
-const Check = ({ className }: { className?: string }): React.JSX.Element => (
+type SelectIconProps = { points: string; className?: string };
+
+const SelectIcon = ({ points, className }: SelectIconProps): React.JSX.Element => (
   <svg
     width={14}
     height={14}
@@ -34,42 +22,29 @@ const Check = ({ className }: { className?: string }): React.JSX.Element => (
     aria-hidden="true"
     className={className}
   >
-    <polyline points="20 6 9 17 4 12" />
+    <polyline points={points} />
   </svg>
 );
 
-const Up = ({ className }: { className?: string }): React.JSX.Element => (
-  <svg
-    width={14}
-    height={14}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-    className={className}
-  >
-    <polyline points="18 15 12 9 6 15" />
-  </svg>
-);
-
-const Down = ({ className }: { className?: string }): React.JSX.Element => (
-  <svg
-    width={14}
-    height={14}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-    className={className}
-  >
-    <polyline points="6 9 12 15 18 9" />
-  </svg>
+export const selectTriggerVariants = cva(
+  [
+    'inline-flex w-full items-center justify-between gap-2 rounded-md border border-border',
+    'bg-background text-foreground transition-colors',
+    'focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20',
+    'data-[placeholder]:text-muted-foreground',
+    'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+    '[&>span:first-child]:min-w-0 [&>span:first-child]:flex-1 [&>span:first-child]:truncate [&>span:first-child]:text-left',
+  ],
+  {
+    variants: {
+      compact: {
+        true: 'h-7 px-2 text-xs',
+        false: 'h-9 px-3 text-sm bg-muted/30 focus:bg-background',
+      },
+      error: { true: 'border-destructive', false: '' },
+    },
+    defaultVariants: { compact: false, error: false },
+  }
 );
 
 export const Select = SelectPrimitive.Root;
@@ -79,33 +54,26 @@ export const SelectValue = SelectPrimitive.Value;
 export interface SelectTriggerProps extends React.ComponentPropsWithoutRef<
   typeof SelectPrimitive.Trigger
 > {
-  /** Compact height (h-7, text-xs) — for filter rows. Default false renders the form-input height. */
+  /** Compact height (h-7, text-xs) - for filter rows. Default false renders the form-input height. */
   compact?: boolean;
+  error?: boolean;
 }
 
 export const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   SelectTriggerProps
->(({ className, children, compact = false, ...props }, ref) => (
+>(({ className, children, compact = false, error = false, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
     data-slot="select-trigger"
     data-compact={compact || undefined}
-    className={cn(
-      'inline-flex w-full items-center justify-between gap-2 rounded-md border border-border',
-      'bg-background text-foreground transition-colors',
-      'focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20',
-      'data-[placeholder]:text-muted-foreground',
-      'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
-      '[&>span:first-child]:min-w-0 [&>span:first-child]:flex-1 [&>span:first-child]:truncate [&>span:first-child]:text-left',
-      compact ? 'h-7 px-2 text-xs' : 'h-9 px-3 text-sm bg-muted/30 focus:bg-background',
-      className
-    )}
+    aria-invalid={error || undefined}
+    className={cn(selectTriggerVariants({ compact, error, className }))}
     {...props}
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <Chevron className="shrink-0 text-muted-foreground" />
+      <SelectIcon points={POINTS.down} className="shrink-0 text-muted-foreground" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ));
@@ -123,7 +91,7 @@ export const SelectScrollUpButton = React.forwardRef<
     )}
     {...props}
   >
-    <Up />
+    <SelectIcon points={POINTS.up} />
   </SelectPrimitive.ScrollUpButton>
 ));
 SelectScrollUpButton.displayName = 'SelectScrollUpButton';
@@ -140,7 +108,7 @@ export const SelectScrollDownButton = React.forwardRef<
     )}
     {...props}
   >
-    <Down />
+    <SelectIcon points={POINTS.down} />
   </SelectPrimitive.ScrollDownButton>
 ));
 SelectScrollDownButton.displayName = 'SelectScrollDownButton';
@@ -209,7 +177,7 @@ export const SelectItem = React.forwardRef<
       <span className="flex items-center gap-2 truncate text-left">{children}</span>
     </SelectPrimitive.ItemText>
     <SelectPrimitive.ItemIndicator className="ml-auto flex size-3.5 shrink-0 items-center justify-center">
-      <Check className="text-primary" />
+      <SelectIcon points={POINTS.check} className="text-primary" />
     </SelectPrimitive.ItemIndicator>
   </SelectPrimitive.Item>
 ));

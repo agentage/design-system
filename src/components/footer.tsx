@@ -1,4 +1,18 @@
+import * as React from 'react';
+import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
+
+const footerInnerVariants = cva('', {
+  variants: {
+    contained: {
+      true: 'mx-auto max-w-6xl px-6 py-10',
+      false: 'px-6 py-10',
+    },
+  },
+  defaultVariants: {
+    contained: true,
+  },
+});
 
 export interface FooterProps extends React.HTMLAttributes<HTMLElement> {
   children?: React.ReactNode;
@@ -6,85 +20,90 @@ export interface FooterProps extends React.HTMLAttributes<HTMLElement> {
   contained?: boolean;
 }
 
-export const Footer = ({
-  className,
-  children,
-  contained = true,
-  ...props
-}: FooterProps): React.JSX.Element => (
-  <footer
-    className={cn('border-t border-border bg-sidebar text-sidebar-foreground', className)}
-    data-slot="footer"
-    {...props}
-  >
-    <div className={cn(contained ? 'mx-auto max-w-6xl px-6 py-10' : 'px-6 py-10')}>{children}</div>
-  </footer>
+export const Footer = React.forwardRef<HTMLElement, FooterProps>(
+  ({ className, children, contained = true, ...props }, ref) => (
+    <footer
+      ref={ref}
+      className={cn('border-t border-border bg-sidebar text-sidebar-foreground', className)}
+      data-slot="footer"
+      {...props}
+    >
+      <div className={cn(footerInnerVariants({ contained }))}>{children}</div>
+    </footer>
+  )
 );
+Footer.displayName = 'Footer';
 
-export const FooterSections = ({
-  className,
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
+export const FooterSections = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, children, ...props }, ref) => (
   <div
+    ref={ref}
     className={cn('grid grid-cols-2 gap-8 md:grid-cols-4', className)}
     data-slot="footer-sections"
     {...props}
   >
     {children}
   </div>
-);
+));
+FooterSections.displayName = 'FooterSections';
 
 export interface FooterSectionProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
 }
 
-export const FooterSection = ({
-  title,
-  className,
-  children,
-  ...props
-}: FooterSectionProps): React.JSX.Element => (
-  <div className={cn('space-y-3', className)} data-slot="footer-section" {...props}>
-    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-      {title}
+export const FooterSection = React.forwardRef<HTMLDivElement, FooterSectionProps>(
+  ({ title, className, children, ...props }, ref) => (
+    <div ref={ref} className={cn('space-y-3', className)} data-slot="footer-section" {...props}>
+      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </div>
+      <ul className="space-y-2 text-sm">{children}</ul>
     </div>
-    <ul className="space-y-2 text-sm">{children}</ul>
-  </div>
+  )
 );
+FooterSection.displayName = 'FooterSection';
 
-export const FooterLink = ({
-  className,
-  ...props
-}: React.AnchorHTMLAttributes<HTMLAnchorElement>): React.JSX.Element => (
+export const FooterLink = React.forwardRef<
+  HTMLAnchorElement,
+  React.AnchorHTMLAttributes<HTMLAnchorElement>
+>(({ className, children, ...props }, ref) => (
   <li>
     <a
-      className={cn('text-foreground/70 transition-colors hover:text-foreground', className)}
+      ref={ref}
+      className={cn(
+        'text-foreground/70 transition-colors hover:text-foreground',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+        className
+      )}
       data-slot="footer-link"
       {...props}
-    />
+    >
+      {children}
+    </a>
   </li>
-);
+));
+FooterLink.displayName = 'FooterLink';
 
 export interface FooterBottomProps extends React.HTMLAttributes<HTMLDivElement> {
   copyright?: React.ReactNode;
 }
 
-export const FooterBottom = ({
-  copyright,
-  className,
-  children,
-  ...props
-}: FooterBottomProps): React.JSX.Element => (
-  <div
-    className={cn(
-      'mt-10 flex flex-col items-start justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground md:flex-row md:items-center',
-      className
-    )}
-    data-slot="footer-bottom"
-    {...props}
-  >
-    {copyright && <div>{copyright}</div>}
-    {children}
-  </div>
+export const FooterBottom = React.forwardRef<HTMLDivElement, FooterBottomProps>(
+  ({ copyright, className, children, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        'mt-10 flex flex-col items-start justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground md:flex-row md:items-center',
+        className
+      )}
+      data-slot="footer-bottom"
+      {...props}
+    >
+      {copyright && <div>{copyright}</div>}
+      {children}
+    </div>
+  )
 );
+FooterBottom.displayName = 'FooterBottom';

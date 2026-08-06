@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { Modal } from './modal';
+import { Modal, ModalFooter } from './modal';
 
 const Harness = (): React.JSX.Element => {
   const [open, setOpen] = useState(false);
@@ -60,5 +60,44 @@ describe('Modal', () => {
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(document.activeElement).toBe(opener);
+  });
+});
+
+// Frozen pre-CVA output of the hand-rolled sizeClasses lookup.
+const MODAL_BASE =
+  'relative z-10 w-full rounded-lg border border-border bg-background shadow-lg outline-none';
+
+const panelClass = (): string | undefined =>
+  document.body.querySelector('[data-slot="modal-content"]')?.className;
+
+describe('Modal class parity', () => {
+  it.each([
+    ['sm', 'max-w-sm'],
+    ['md', 'max-w-md'],
+    ['lg', 'max-w-lg'],
+  ] as const)('renders size=%s byte-identically', (size, expected) => {
+    render(
+      <Modal isOpen onClose={vi.fn()} size={size}>
+        body
+      </Modal>
+    );
+    expect(panelClass()).toBe(`${MODAL_BASE} ${expected}`);
+  });
+
+  it('merges className last and spreads props onto the panel', () => {
+    render(
+      <Modal isOpen onClose={vi.fn()} className="mt-4" id="m">
+        body
+      </Modal>
+    );
+    expect(panelClass()).toBe(`${MODAL_BASE} max-w-md mt-4`);
+    expect(document.body.querySelector('#m')).not.toBeNull();
+  });
+
+  it('keeps the ModalFooter surface unchanged', () => {
+    render(<ModalFooter className="pt-2">f</ModalFooter>);
+    expect(document.body.querySelector('[data-slot="modal-footer"]')?.className).toBe(
+      'flex items-center justify-end gap-2 border-t border-border -mx-4 -mb-4 mt-4 px-4 py-3 bg-muted/30 rounded-b-lg pt-2'
+    );
   });
 });

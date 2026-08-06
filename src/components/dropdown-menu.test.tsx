@@ -1,6 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { DropdownMenu, DropdownMenuItem } from './dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from './dropdown-menu';
 
 const setup = (onPick = vi.fn()) => {
   render(
@@ -73,5 +78,43 @@ describe('DropdownMenu', () => {
     fireEvent.click(screen.getByRole('menuitem', { name: 'View' }));
     expect(onPick).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('menu')).toBeNull();
+  });
+});
+
+// Frozen pre-CVA output of the item variant ternary.
+const ITEM_BASE =
+  'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm cursor-pointer transition-colors focus:outline-none focus:bg-accent focus:text-accent-foreground';
+
+describe('DropdownMenuItem class parity', () => {
+  it('renders the default variant byte-identically', () => {
+    render(<DropdownMenuItem>View</DropdownMenuItem>);
+    expect(screen.getByRole('menuitem').className).toBe(
+      `${ITEM_BASE} text-popover-foreground hover:bg-accent hover:text-accent-foreground`
+    );
+  });
+
+  it('renders the destructive variant and merges className last', () => {
+    render(
+      <DropdownMenuItem variant="destructive" className="mt-4">
+        Delete
+      </DropdownMenuItem>
+    );
+    expect(screen.getByRole('menuitem').className).toBe(
+      `${ITEM_BASE} text-destructive hover:bg-destructive/10 mt-4`
+    );
+  });
+
+  it('keeps the separator and label surfaces unchanged and spreads props', () => {
+    render(
+      <>
+        <DropdownMenuSeparator className="mt-4" id="sep" />
+        <DropdownMenuLabel className="mt-4">L</DropdownMenuLabel>
+      </>
+    );
+    expect(screen.getByRole('separator').className).toBe('-mx-1 my-1 h-px bg-border mt-4');
+    expect(screen.getByRole('separator').id).toBe('sep');
+    expect(screen.getByText('L').className).toBe(
+      'px-2 py-1.5 text-xs font-semibold text-muted-foreground mt-4'
+    );
   });
 });

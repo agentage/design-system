@@ -7,14 +7,13 @@ import { useAnchorPosition, type AnchorAlign } from '../lib/use-anchor-position'
 import { useMounted } from '../lib/use-mounted';
 import { cn } from '../lib/utils';
 
-export interface HoverCardProps {
+export interface HoverCardProps extends React.HTMLAttributes<HTMLDivElement> {
   trigger: ReactNode;
   children: ReactNode;
   openDelay?: number;
   closeDelay?: number;
   align?: AnchorAlign;
   side?: 'top' | 'bottom';
-  className?: string;
   /** Accessible name for the card surface. */
   label?: string;
 }
@@ -28,6 +27,7 @@ export const HoverCard = ({
   side = 'bottom',
   className,
   label = 'More information',
+  ...props
 }: HoverCardProps): React.JSX.Element => {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLSpanElement>(null);
@@ -99,6 +99,7 @@ export const HoverCard = ({
               className
             )}
             data-slot="hover-card-content"
+            {...props}
             {...hoverProps}
           >
             {children}

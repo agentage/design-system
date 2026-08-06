@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import * as React from 'react';
+import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
+/** The one sanctioned extended size scale in the design system; every other component uses sm|md|lg. */
 export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -12,14 +14,27 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: AvatarSize;
 }
 
-const sizeClasses: Record<AvatarSize, string> = {
-  xs: 'size-6 text-[10px]',
-  sm: 'size-8 text-xs',
-  md: 'size-10 text-sm',
-  lg: 'size-12 text-base',
-  xl: 'size-16 text-lg',
-  '2xl': 'size-20 text-xl',
-};
+export const avatarVariants = cva(
+  [
+    'relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full',
+    'bg-muted text-muted-foreground font-medium',
+  ],
+  {
+    variants: {
+      size: {
+        xs: 'size-6 text-2xs',
+        sm: 'size-8 text-xs',
+        md: 'size-10 text-sm',
+        lg: 'size-12 text-base',
+        xl: 'size-16 text-lg',
+        '2xl': 'size-20 text-xl',
+      },
+    },
+    defaultVariants: {
+      size: 'md',
+    },
+  }
+);
 
 const getInitials = (name: string): string => {
   const parts = name.trim().split(/\s+/);
@@ -27,41 +42,34 @@ const getInitials = (name: string): string => {
   return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 };
 
-export const Avatar = ({
-  name,
-  src,
-  alt,
-  size = 'md',
-  className,
-  ...props
-}: AvatarProps): React.JSX.Element => {
-  const [imgError, setImgError] = useState(false);
-  const showImage = src && !imgError;
-  const initials = name ? getInitials(name) : '?';
+export const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
+  ({ name, src, alt, size = 'md', className, 'aria-label': ariaLabel, ...props }, ref) => {
+    const [imgError, setImgError] = React.useState(false);
+    const showImage = src && !imgError;
+    const initials = name ? getInitials(name) : '?';
 
-  return (
-    <div
-      data-slot="avatar"
-      className={cn(
-        'relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full',
-        'bg-muted text-muted-foreground font-medium',
-        sizeClasses[size],
-        className
-      )}
-      {...props}
-    >
-      {showImage ? (
-        <img
-          src={src}
-          alt={alt ?? name ?? 'Avatar'}
-          className="size-full object-cover"
-          onError={() => {
-            setImgError(true);
-          }}
-        />
-      ) : (
-        <span aria-hidden="true">{initials}</span>
-      )}
-    </div>
-  );
-};
+    return (
+      <div
+        ref={ref}
+        data-slot="avatar"
+        aria-label={showImage ? ariaLabel : (ariaLabel ?? name)}
+        className={cn(avatarVariants({ size }), className)}
+        {...props}
+      >
+        {showImage ? (
+          <img
+            src={src}
+            alt={alt ?? name ?? 'Avatar'}
+            className="size-full object-cover"
+            onError={() => {
+              setImgError(true);
+            }}
+          />
+        ) : (
+          <span>{initials}</span>
+        )}
+      </div>
+    );
+  }
+);
+Avatar.displayName = 'Avatar';

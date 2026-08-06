@@ -1,14 +1,30 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import * as React from 'react';
+import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
-export interface DatePickerProps {
+export const datePickerTriggerVariants = cva(
+  [
+    'flex h-9 w-full items-center gap-2 rounded-md border border-border bg-muted/30 px-3 text-sm cursor-pointer transition-colors',
+    'hover:border-ring focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20',
+  ],
+  {
+    variants: {
+      disabled: { true: 'opacity-50 cursor-not-allowed', false: '' },
+      placeholder: { true: 'text-muted-foreground', false: '' },
+      error: { true: 'border-destructive', false: '' },
+    },
+    defaultVariants: { disabled: false, placeholder: false, error: false },
+  }
+);
+
+export interface DatePickerProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: Date;
   onValueChange?: (date: Date) => void;
   placeholder?: string;
   disabled?: boolean;
-  className?: string;
+  error?: boolean;
 }
 
 const CalendarIcon = (): React.JSX.Element => (
@@ -21,6 +37,7 @@ const CalendarIcon = (): React.JSX.Element => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
   >
     <path d="M8 2v4" />
     <path d="M16 2v4" />
@@ -29,62 +46,86 @@ const CalendarIcon = (): React.JSX.Element => (
   </svg>
 );
 
-export const DatePicker = ({
-  value,
-  onValueChange,
-  placeholder = 'Pick a date',
-  disabled = false,
-  className,
-}: DatePickerProps): React.JSX.Element => {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [internalValue, setInternalValue] = useState<string>(
-    value ? value.toISOString().split('T')[0] : ''
-  );
+const toInputValue = (date: Date): string => date.toISOString().split('T')[0];
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const dateStr = e.target.value;
-    setInternalValue(dateStr);
-    if (dateStr) {
-      onValueChange?.(new Date(dateStr + 'T00:00:00'));
-    }
-  };
+export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
+  (
+    {
+      value,
+      onValueChange,
+      placeholder = 'Pick a date',
+      disabled = false,
+      error = false,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const inputRef = React.useRef<HTMLInputElement>(null);
+    const [open, setOpen] = React.useState(false);
+    const [internalValue, setInternalValue] = React.useState<string>(
+      value ? toInputValue(value) : ''
+    );
+    // Derived, so a controlled `value` always wins over the last locally picked date.
+    const inputValue = value === undefined ? internalValue : toInputValue(value);
 
-  const displayValue = value
-    ? value.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
-    : '';
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+      const dateStr = e.target.value;
+      setInternalValue(dateStr);
+      setOpen(false);
+      if (dateStr) {
+        onValueChange?.(new Date(dateStr + 'T00:00:00'));
+      }
+    };
 
-  const handleClick = (): void => {
-    if (!disabled && inputRef.current) {
-      inputRef.current.showPicker();
-    }
-  };
+    const displayValue = value
+      ? value.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+      : '';
 
-  return (
-    <div className={cn('relative', className)} data-slot="date-picker">
-      <button
-        type="button"
-        onClick={handleClick}
-        disabled={disabled}
-        className={cn(
-          'flex h-9 w-full items-center gap-2 rounded-md border border-border bg-muted/30 px-3 text-sm cursor-pointer transition-colors',
-          'hover:border-ring focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20',
-          disabled && 'opacity-50 cursor-not-allowed',
-          !displayValue && 'text-muted-foreground'
-        )}
-      >
-        <CalendarIcon />
-        <span className="flex-1 truncate text-left">{displayValue || placeholder}</span>
-      </button>
-      <input
-        ref={inputRef}
-        type="date"
-        value={internalValue}
-        onChange={handleChange}
-        disabled={disabled}
-        className="sr-only"
-        aria-label={placeholder}
-        tabIndex={-1}
-      />
-    </div>
-  );
-};
+    // showPicker throws outside a user gesture and is missing in Firefox/older Safari.
+    const handleClick = (): void => {
+      const input = inputRef.current;
+      if (disabled || !input) return;
+      try {
+        input.showPicker();
+        setOpen(true);
+      } catch {
+        input.focus();
+        input.click();
+      }
+    };
+
+    return (
+      <div className={cn('relative', className)} data-slot="date-picker" {...props}>
+        {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props -- the focusable trigger carries the field's invalid state */}
+        <button
+          ref={ref}
+          type="button"
+          onClick={handleClick}
+          disabled={disabled}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          aria-invalid={error || undefined}
+          className={cn(datePickerTriggerVariants({ disabled, placeholder: !displayValue, error }))}
+        >
+          <CalendarIcon />
+          <span className="flex-1 truncate text-left">{displayValue || placeholder}</span>
+        </button>
+        <input
+          ref={inputRef}
+          type="date"
+          value={inputValue}
+          onChange={handleChange}
+          onBlur={() => {
+            setOpen(false);
+          }}
+          disabled={disabled}
+          className="sr-only"
+          aria-label={placeholder}
+          tabIndex={-1}
+        />
+      </div>
+    );
+  }
+);
+DatePicker.displayName = 'DatePicker';

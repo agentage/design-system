@@ -22,6 +22,10 @@
       "types": "./dist/components/accordion.d.ts",
       "import": "./dist/components/accordion.js"
     },
+    "./accordion.context": {
+      "types": "./dist/components/accordion.context.d.ts",
+      "import": "./dist/components/accordion.context.js"
+    },
     "./alert": {
       "types": "./dist/components/alert.d.ts",
       "import": "./dist/components/alert.js"
@@ -86,6 +90,10 @@
       "types": "./dist/components/combobox.d.ts",
       "import": "./dist/components/combobox.js"
     },
+    "./combobox.variants": {
+      "types": "./dist/components/combobox.variants.d.ts",
+      "import": "./dist/components/combobox.variants.js"
+    },
     "./command": {
       "types": "./dist/components/command.d.ts",
       "import": "./dist/components/command.js"
@@ -93,6 +101,14 @@
     "./command.context": {
       "types": "./dist/components/command.context.d.ts",
       "import": "./dist/components/command.context.js"
+    },
+    "./command.parts": {
+      "types": "./dist/components/command.parts.d.ts",
+      "import": "./dist/components/command.parts.js"
+    },
+    "./command.variants": {
+      "types": "./dist/components/command.variants.d.ts",
+      "import": "./dist/components/command.variants.js"
     },
     "./copy-button": {
       "types": "./dist/components/copy-button.d.ts",
@@ -114,6 +130,10 @@
       "types": "./dist/components/dropdown-menu.d.ts",
       "import": "./dist/components/dropdown-menu.js"
     },
+    "./dropdown-menu.variants": {
+      "types": "./dist/components/dropdown-menu.variants.d.ts",
+      "import": "./dist/components/dropdown-menu.variants.js"
+    },
     "./empty-state": {
       "types": "./dist/components/empty-state.d.ts",
       "import": "./dist/components/empty-state.js"
@@ -125,6 +145,14 @@
     "./filter-bar": {
       "types": "./dist/components/filter-bar.d.ts",
       "import": "./dist/components/filter-bar.js"
+    },
+    "./filter-bar.parts": {
+      "types": "./dist/components/filter-bar.parts.d.ts",
+      "import": "./dist/components/filter-bar.parts.js"
+    },
+    "./filter-bar.variants": {
+      "types": "./dist/components/filter-bar.variants.d.ts",
+      "import": "./dist/components/filter-bar.variants.js"
     },
     "./footer": {
       "types": "./dist/components/footer.d.ts",
@@ -173,6 +201,10 @@
     "./label": {
       "types": "./dist/components/label.d.ts",
       "import": "./dist/components/label.js"
+    },
+    "./list-navigation": {
+      "types": "./dist/lib/list-navigation.d.ts",
+      "import": "./dist/lib/list-navigation.js"
     },
     "./markdown": {
       "types": "./dist/components/markdown.d.ts",
@@ -266,6 +298,10 @@
       "types": "./dist/components/stat-card.d.ts",
       "import": "./dist/components/stat-card.js"
     },
+    "./stat-card-charts": {
+      "types": "./dist/components/stat-card-charts.d.ts",
+      "import": "./dist/components/stat-card-charts.js"
+    },
     "./stat-card-extensions": {
       "types": "./dist/components/stat-card-extensions.d.ts",
       "import": "./dist/components/stat-card-extensions.js"
@@ -285,6 +321,10 @@
     "./tabs": {
       "types": "./dist/components/tabs.d.ts",
       "import": "./dist/components/tabs.js"
+    },
+    "./tabs.variants": {
+      "types": "./dist/components/tabs.variants.d.ts",
+      "import": "./dist/components/tabs.variants.js"
     },
     "./toast": {
       "types": "./dist/components/toast.d.ts",
@@ -389,7 +429,9 @@
     "@vitejs/plugin-react": "^6.0.3",
     "eslint": "^10.5.0",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "jsdom": "^29.1.1",
     "postcss": "^8.5.26",
     "prettier": "^3.8.4",
@@ -400,5 +442,10 @@
     "vite": "^8.1.0",
     "vite-plugin-dts": "^5.0.3",
     "vitest": "^4.1.8"
+  },
+  "overrides": {
+    "eslint-plugin-jsx-a11y": {
+      "eslint": "$eslint"
+    }
   }
 }

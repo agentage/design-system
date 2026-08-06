@@ -1,122 +1,18 @@
+import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
+import { TREND_TONE, type TrendTone } from './stat-card';
 
-export interface SparklineProps {
-  data: number[];
-  className?: string;
-  stroke?: string;
-  fill?: string;
-  height?: number;
-  /** Highlight the latest reading with a dot at the end of the line. */
-  showLastDot?: boolean;
-  /** Highlight the min and max points with small markers. */
-  showMinMax?: boolean;
-}
+// The inline charts moved to ./stat-card-charts; re-exported to keep this import path.
+export { Sparkline, MiniBars } from './stat-card-charts';
+export type { SparklineProps, MiniBarsProps } from './stat-card-charts';
 
-export const Sparkline = ({
-  data,
-  className,
-  stroke = 'stroke-primary',
-  fill = 'fill-primary/15',
-  height = 32,
-  showLastDot = false,
-  showMinMax = false,
-}: SparklineProps): React.JSX.Element => {
-  if (data.length < 2) return <div className={cn('h-8 w-full', className)} />;
-  const w = 100;
-  const max = Math.max(...data);
-  const min = Math.min(...data);
-  const range = max - min || 1;
-  const coords = data.map((v, i) => ({
-    x: (i / (data.length - 1)) * w,
-    y: height - ((v - min) / range) * (height - 2) - 1,
-    v,
-  }));
-  const pts = coords.map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' ');
-  const firstX = coords[0].x;
-  const lastP = coords[coords.length - 1];
-  const area = `M ${firstX.toFixed(2)},${height} L ${pts.replace(/ /g, ' L ')} L ${lastP.x.toFixed(2)},${height} Z`;
-  const maxIdx = data.indexOf(max);
-  const minIdx = data.indexOf(min);
-  return (
-    <svg
-      viewBox={`0 0 ${w} ${height}`}
-      preserveAspectRatio="none"
-      className={cn('h-8 w-full overflow-visible', className)}
-      data-slot="sparkline"
-    >
-      <path d={area} className={fill} />
-      <polyline points={pts} fill="none" strokeWidth="1.5" className={stroke} />
-      {showMinMax && (
-        <>
-          <circle
-            cx={coords[maxIdx].x}
-            cy={coords[maxIdx].y}
-            r="1.5"
-            className="fill-success"
-            vectorEffect="non-scaling-stroke"
-          />
-          <circle
-            cx={coords[minIdx].x}
-            cy={coords[minIdx].y}
-            r="1.5"
-            className="fill-destructive"
-            vectorEffect="non-scaling-stroke"
-          />
-        </>
-      )}
-      {showLastDot && (
-        <circle
-          cx={lastP.x}
-          cy={lastP.y}
-          r="1.8"
-          className={cn(stroke.replace('stroke-', 'fill-'))}
-          vectorEffect="non-scaling-stroke"
-        />
-      )}
-    </svg>
-  );
-};
-
-export interface MiniBarsProps {
-  data: number[];
-  className?: string;
-  color?: string;
-  height?: number;
-}
-
-export const MiniBars = ({
-  data,
-  className,
-  color = 'fill-primary',
-  height = 32,
-}: MiniBarsProps): React.JSX.Element => {
-  const max = Math.max(...data) || 1;
-  const bw = 100 / data.length;
-  const gap = bw * 0.2;
-  return (
-    <svg
-      viewBox={`0 0 100 ${height}`}
-      preserveAspectRatio="none"
-      className={cn('h-8 w-full', className)}
-      data-slot="mini-bars"
-    >
-      {data.map((v, i) => {
-        const h = (v / max) * (height - 2);
-        return (
-          <rect
-            key={i}
-            x={i * bw + gap / 2}
-            y={height - h}
-            width={bw - gap}
-            height={Math.max(h, 1)}
-            rx="0.5"
-            className={cn(color, 'opacity-85')}
-          />
-        );
-      })}
-    </svg>
-  );
-};
+export const statComparisonDeltaVariants = cva(
+  'inline-flex items-center gap-0.5 tabular-nums font-medium',
+  {
+    variants: { tone: TREND_TONE },
+    defaultVariants: { tone: 'up' },
+  }
+);
 
 export interface BreakdownSegment {
   label: string;
@@ -124,21 +20,29 @@ export interface BreakdownSegment {
   color?: string;
 }
 
-export interface StatBreakdownProps {
+export interface StatBreakdownProps extends React.HTMLAttributes<HTMLDivElement> {
   segments: BreakdownSegment[];
-  className?: string;
   showLegend?: boolean;
+  /** Overrides the accessible name derived from the segments. */
+  chartLabel?: string;
 }
 
 export const StatBreakdown = ({
   segments,
   className,
   showLegend = true,
+  chartLabel,
+  ...props
 }: StatBreakdownProps): React.JSX.Element => {
   const total = segments.reduce((s, x) => s + x.value, 0) || 1;
+  const summary = segments.map((s) => `${s.label} ${s.value}`).join(', ');
   return (
-    <div className={cn('space-y-2', className)} data-slot="stat-breakdown">
-      <div className="flex h-2 overflow-hidden rounded-full bg-muted">
+    <div className={cn('space-y-2', className)} data-slot="stat-breakdown" {...props}>
+      <div
+        className="flex h-2 overflow-hidden rounded-full bg-muted"
+        role="img"
+        aria-label={chartLabel ?? `Breakdown: ${summary}`}
+      >
         {segments.map((s, i) => (
           <div
             key={i}
@@ -149,7 +53,7 @@ export const StatBreakdown = ({
         ))}
       </div>
       {showLegend && (
-        <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-2xs text-muted-foreground">
           {segments.map((s, i) => (
             <div key={i} className="flex items-center gap-1">
               <span className={cn('size-1.5 rounded-full', s.color ?? 'bg-primary')} />
@@ -163,11 +67,10 @@ export const StatBreakdown = ({
   );
 };
 
-export interface StatProgressProps {
+export interface StatProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   current: number;
   target: number;
   format?: (n: number) => string;
-  className?: string;
 }
 
 export const StatProgress = ({
@@ -175,15 +78,17 @@ export const StatProgress = ({
   target,
   format,
   className,
+  ...props
 }: StatProgressProps): React.JSX.Element => {
   const fmt = format ?? ((n: number) => n.toLocaleString());
   const pct = Math.min(100, (current / Math.max(target, 1)) * 100);
   return (
-    <div className={cn('space-y-1', className)} data-slot="stat-progress">
-      <div className="flex h-1.5 overflow-hidden rounded-full bg-muted">
+    <div className={cn('space-y-1', className)} data-slot="stat-progress" {...props}>
+      {/* Track duplicates the numbers printed below it, so it stays out of the a11y tree. */}
+      <div aria-hidden="true" className="flex h-1.5 overflow-hidden rounded-full bg-muted">
         <div className="bg-primary" style={{ width: `${pct}%` }} />
       </div>
-      <div className="flex justify-between text-[10px] text-muted-foreground">
+      <div className="flex justify-between text-2xs text-muted-foreground">
         <span>
           <span className="tabular-nums text-foreground/80">{fmt(current)}</span> of {fmt(target)}
         </span>
@@ -193,12 +98,13 @@ export const StatProgress = ({
   );
 };
 
-export interface StatComparisonProps {
+export interface StatComparisonProps extends React.HTMLAttributes<HTMLDivElement> {
   current: number;
   previous: number;
   format?: (n: number) => string;
-  className?: string;
   periodLabel?: string;
+  /** Overrides the colour derived from the sign of the delta. */
+  tone?: TrendTone;
 }
 
 export const StatComparison = ({
@@ -207,6 +113,8 @@ export const StatComparison = ({
   format,
   className,
   periodLabel = 'vs prev',
+  tone,
+  ...props
 }: StatComparisonProps): React.JSX.Element => {
   const fmt = format ?? ((n: number) => n.toLocaleString());
   const delta = current - previous;
@@ -214,19 +122,16 @@ export const StatComparison = ({
   const up = delta >= 0;
   return (
     <div
-      className={cn('flex items-baseline gap-2 text-[10px] text-muted-foreground', className)}
+      className={cn('flex items-baseline gap-2 text-2xs text-muted-foreground', className)}
       data-slot="stat-comparison"
+      {...props}
     >
       <span>
         {periodLabel} <span className="tabular-nums text-foreground/70">{fmt(previous)}</span>
       </span>
-      <span
-        className={cn(
-          'inline-flex items-center gap-0.5 tabular-nums font-medium',
-          up ? 'text-success' : 'text-destructive'
-        )}
-      >
+      <span className={cn(statComparisonDeltaVariants({ tone: tone ?? (up ? 'up' : 'down') }))}>
         <span aria-hidden="true">{up ? '▲' : '▼'}</span>
+        <span className="sr-only">{up ? 'Up' : 'Down'}</span>
         {pct.toFixed(1)}%
       </span>
     </div>

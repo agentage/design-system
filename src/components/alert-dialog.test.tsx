@@ -64,3 +64,52 @@ describe('AlertDialog', () => {
     expect(document.activeElement).toBe(opener);
   });
 });
+
+// Frozen pre-CVA output of the destructive branch.
+const CONFIRM_BASE =
+  'inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50';
+
+const confirmClass = (): string | undefined =>
+  document.body.querySelectorAll('[role="alertdialog"] button')[1]?.className;
+
+describe('AlertDialog class parity', () => {
+  it('renders the default confirm button byte-identically', () => {
+    render(<AlertDialog open onOpenChange={vi.fn()} title="T" onConfirm={vi.fn()} />);
+    expect(confirmClass()).toBe(
+      `${CONFIRM_BASE} bg-primary text-primary-foreground hover:bg-primary/90`
+    );
+  });
+
+  it('renders the destructive confirm button byte-identically', () => {
+    render(
+      <AlertDialog
+        open
+        onOpenChange={vi.fn()}
+        title="T"
+        onConfirm={vi.fn()}
+        variant="destructive"
+      />
+    );
+    expect(confirmClass()).toBe(
+      `${CONFIRM_BASE} bg-destructive text-on-solid hover:bg-destructive/90`
+    );
+  });
+
+  it('merges className last on the panel and spreads props', () => {
+    render(
+      <AlertDialog
+        open
+        onOpenChange={vi.fn()}
+        title="T"
+        onConfirm={vi.fn()}
+        className="mt-4"
+        id="ad"
+      />
+    );
+    const panel = document.body.querySelector('[data-slot="alert-dialog-content"]');
+    expect(panel?.className).toBe(
+      'relative z-10 w-full max-w-md rounded-lg border border-border bg-background p-6 shadow-lg mt-4'
+    );
+    expect(panel?.id).toBe('ad');
+  });
+});

@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
@@ -11,6 +12,9 @@ export const statusDotVariants = cva('inline-block shrink-0 rounded-full', {
       warning: 'bg-warning',
       info: 'bg-info',
       pending: 'bg-muted-foreground animate-pulse',
+      default: 'bg-muted-foreground',
+      success: 'bg-success',
+      destructive: 'bg-destructive',
     },
     size: {
       sm: 'size-1.5',
@@ -29,23 +33,18 @@ export interface StatusDotProps
   label?: string;
 }
 
-export const StatusDot = ({
-  variant,
-  size,
-  label,
-  className,
-  ...props
-}: StatusDotProps): React.JSX.Element => (
-  <span
-    className={cn('inline-flex items-center gap-1.5', label && 'text-sm')}
-    data-slot="status-dot"
-  >
+export const StatusDot = React.forwardRef<HTMLSpanElement, StatusDotProps>(
+  ({ variant, size, label, className, 'aria-label': ariaLabel, ...props }, ref) => (
     <span
-      className={cn(statusDotVariants({ variant, size, className }))}
-      role="status"
-      aria-label={label ?? String(variant)}
+      ref={ref}
+      className={cn('inline-flex items-center gap-1.5', label && 'text-sm', className)}
+      data-slot="status-dot"
+      aria-label={label ? ariaLabel : (ariaLabel ?? String(variant))}
       {...props}
-    />
-    {label && <span className="text-muted-foreground leading-none">{label}</span>}
-  </span>
+    >
+      <span className={cn(statusDotVariants({ variant, size }))} aria-hidden="true" />
+      {label && <span className="text-muted-foreground leading-none">{label}</span>}
+    </span>
+  )
 );
+StatusDot.displayName = 'StatusDot';

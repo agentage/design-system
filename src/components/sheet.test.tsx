@@ -73,3 +73,34 @@ describe('Sheet', () => {
     expect(document.activeElement).toBe(focusables[0]);
   });
 });
+
+// Frozen pre-CVA output of the side ternary.
+const SHEET_BASE =
+  'fixed inset-y-0 z-[var(--z-overlay,50)] flex w-80 flex-col border-border bg-background shadow-lg outline-none';
+
+const panelClass = (): string | undefined =>
+  document.body.querySelector('[data-slot="sheet-content"]')?.className;
+
+describe('Sheet class parity', () => {
+  it.each([
+    ['left', 'left-0 border-r'],
+    ['right', 'right-0 border-l'],
+  ] as const)('renders side=%s byte-identically', (side, expected) => {
+    render(
+      <Sheet open onOpenChange={vi.fn()} side={side}>
+        body
+      </Sheet>
+    );
+    expect(panelClass()).toBe(`${SHEET_BASE} ${expected}`);
+  });
+
+  it('defaults to right, merges className last and spreads props', () => {
+    render(
+      <Sheet open onOpenChange={vi.fn()} className="mt-4" id="s">
+        body
+      </Sheet>
+    );
+    expect(panelClass()).toBe(`${SHEET_BASE} right-0 border-l mt-4`);
+    expect(document.body.querySelector('#s')).not.toBeNull();
+  });
+});

@@ -39,6 +39,15 @@ describe('FormField', () => {
     ).toBe('Max 200 characters');
   });
 
+  it('marks the control required for assistive tech', () => {
+    render(
+      <FormField label="Name" required>
+        <Input placeholder="Name" />
+      </FormField>
+    );
+    expect(screen.getByPlaceholderText('Name').getAttribute('aria-required')).toBe('true');
+  });
+
   it('keeps an explicit id on the control', () => {
     render(
       <FormField label="Role" id="role">
@@ -46,5 +55,27 @@ describe('FormField', () => {
       </FormField>
     );
     expect(screen.getByPlaceholderText('Role').id).toBe('custom');
+  });
+});
+
+describe('FormField class strings', () => {
+  it('keeps the root class string byte-identical', () => {
+    const { container } = render(
+      <FormField label="Name" className="mt-4">
+        <Input placeholder="Name" />
+      </FormField>
+    );
+    expect((container.querySelector('[data-slot="form-field"]') as HTMLElement).className).toBe(
+      'space-y-1.5 mt-4'
+    );
+  });
+
+  it('spreads unknown props onto the root', () => {
+    render(
+      <FormField label="Name" data-testid="ff">
+        <Input placeholder="Name" />
+      </FormField>
+    );
+    expect(screen.getByTestId('ff').getAttribute('data-slot')).toBe('form-field');
   });
 });

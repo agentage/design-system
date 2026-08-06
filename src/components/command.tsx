@@ -1,12 +1,15 @@
 'use client';
 
-import { useCallback, useContext, useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useFocusTrap } from '../lib/use-focus-trap';
 import { useMounted } from '../lib/use-mounted';
 import { useScrollLock } from '../lib/use-scroll-lock';
 import { cn } from '../lib/utils';
-import { CommandContext, nodeText } from './command.context';
+import { CommandContext } from './command.context';
+import { commandContentVariants } from './command.variants';
+
+export { commandContentVariants, commandItemVariants } from './command.variants';
 
 const SearchIcon = (): React.JSX.Element => (
   <svg
@@ -25,12 +28,11 @@ const SearchIcon = (): React.JSX.Element => (
   </svg>
 );
 
-export interface CommandProps {
+export interface CommandProps extends React.HTMLAttributes<HTMLDivElement> {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   placeholder?: string;
   children: ReactNode;
-  className?: string;
   /** Accessible name for the search input. */
   'aria-label'?: string;
   /** Accessible name for the palette dialog. */
@@ -45,6 +47,7 @@ export const Command = ({
   className,
   'aria-label': ariaLabel = 'Search',
   dialogLabel = 'Command palette',
+  ...props
 }: CommandProps): React.JSX.Element | null => {
   const [search, setSearch] = useState('');
   const [items, setItems] = useState<{ id: string; text: string }[]>([]);
@@ -130,7 +133,8 @@ export const Command = ({
         data-slot="command"
       >
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+          aria-hidden="true"
+          className="fixed inset-0 bg-overlay backdrop-blur-sm"
           onClick={() => onOpenChange(false)}
         />
         <div
@@ -138,10 +142,9 @@ export const Command = ({
           role="dialog"
           aria-modal="true"
           aria-label={dialogLabel}
-          className={cn(
-            'relative z-10 w-full max-w-lg rounded-lg border border-border bg-popover shadow-2xl overflow-hidden',
-            className
-          )}
+          className={cn(commandContentVariants(), className)}
+          data-slot="command-content"
+          {...props}
         >
           <div className="flex items-center gap-2 border-b border-border px-3">
             <SearchIcon />
@@ -160,7 +163,7 @@ export const Command = ({
               placeholder={placeholder}
               className="flex-1 bg-transparent py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
-            <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+            <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-2xs font-medium text-muted-foreground">
               ESC
             </kbd>
           </div>
@@ -173,105 +176,5 @@ export const Command = ({
     document.body
   );
 };
-
-export interface CommandGroupProps {
-  heading?: string;
-  children: ReactNode;
-}
-
-export const CommandGroup = ({ heading, children }: CommandGroupProps): React.JSX.Element => {
-  const { query, matchCount } = useContext(CommandContext);
-  const ref = useRef<HTMLDivElement>(null);
-  const [empty, setEmpty] = useState(false);
-
-  useEffect(() => {
-    setEmpty(!ref.current?.querySelector('[data-slot="command-item"]:not([hidden])'));
-  }, [query, matchCount]);
-
-  return (
-    <div
-      ref={ref}
-      role="group"
-      aria-label={heading}
-      data-slot="command-group"
-      hidden={empty}
-      className={cn('py-1', empty && 'hidden')}
-    >
-      {heading && (
-        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{heading}</div>
-      )}
-      {children}
-    </div>
-  );
-};
-
-export interface CommandItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  icon?: ReactNode;
-  shortcut?: string;
-  /** Overrides the text matched against the query (defaults to the item's own text). */
-  value?: string;
-}
-
-export const CommandItem = ({
-  icon,
-  shortcut,
-  value,
-  className,
-  children,
-  id: providedId,
-  ...props
-}: CommandItemProps): React.JSX.Element => {
-  const { activeId, setActiveId, isMatch, register } = useContext(CommandContext);
-  const generatedId = useId();
-  const id = providedId ?? generatedId;
-  const text = (value ?? nodeText(children)).trim().toLowerCase();
-
-  useEffect(() => register(id, text), [register, id, text]);
-
-  const visible = isMatch(id);
-  const active = activeId === id;
-
-  return (
-    <button
-      type="button"
-      id={id}
-      role="option"
-      aria-selected={active}
-      tabIndex={-1}
-      hidden={!visible}
-      onMouseEnter={() => setActiveId(id)}
-      className={cn(
-        'flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm transition-colors',
-        'text-popover-foreground hover:bg-accent hover:text-accent-foreground',
-        'focus:outline-none focus:bg-accent focus:text-accent-foreground',
-        active && 'bg-accent text-accent-foreground',
-        !visible && 'hidden',
-        className
-      )}
-      data-slot="command-item"
-      {...props}
-    >
-      {icon && <span className="shrink-0 text-muted-foreground [&_svg]:size-4">{icon}</span>}
-      <span className="flex-1 truncate text-left">{children}</span>
-      {shortcut && (
-        <kbd className="ml-auto text-xs text-muted-foreground font-mono">{shortcut}</kbd>
-      )}
-    </button>
-  );
-};
-
-export const CommandSeparator = (): React.JSX.Element | null => {
-  const { matchCount, ready } = useContext(CommandContext);
-  if (ready && matchCount === 0) return null;
-  return <div className="-mx-2 my-1 h-px bg-border" data-slot="command-separator" />;
-};
-
-export const CommandEmpty = ({ children }: { children: ReactNode }): React.JSX.Element | null => {
-  const { matchCount, ready } = useContext(CommandContext);
-  if (!ready || matchCount > 0) return null;
-  return (
-    <div className="py-6 text-center text-sm text-muted-foreground" data-slot="command-empty">
-      {children}
-    </div>
-  );
-};
+export { CommandEmpty, CommandGroup, CommandItem, CommandSeparator } from './command.parts';
+export type { CommandGroupProps, CommandItemProps } from './command.parts';

@@ -1,4 +1,5 @@
 'use client';
+import * as React from 'react';
 import { useState } from 'react';
 import { type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
@@ -46,44 +47,51 @@ export interface CopyButtonProps
   iconOnly?: boolean;
 }
 
-export const CopyButton = ({
-  text,
-  label = 'Copy',
-  successLabel = 'Copied',
-  duration = 1500,
-  iconOnly = false,
-  variant = 'outline',
-  size,
-  className,
-  onClick,
-  ...props
-}: CopyButtonProps): React.JSX.Element => {
-  const [copied, setCopied] = useState(false);
+export const CopyButton = React.forwardRef<HTMLButtonElement, CopyButtonProps>(
+  (
+    {
+      text,
+      label = 'Copy',
+      successLabel = 'Copied',
+      duration = 1500,
+      iconOnly = false,
+      variant = 'outline',
+      size,
+      className,
+      onClick,
+      ...props
+    },
+    ref
+  ) => {
+    const [copied, setCopied] = useState(false);
 
-  const handle = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
-    onClick?.(e);
-    if (e.defaultPrevented) return;
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), duration);
-    } catch {
-      // swallow — caller can supply their own onClick fallback
-    }
-  };
+    const handle = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
+      onClick?.(e);
+      if (e.defaultPrevented) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), duration);
+      } catch {
+        // swallow - caller can supply their own onClick fallback
+      }
+    };
 
-  return (
-    <button
-      type="button"
-      className={cn(buttonVariants({ variant, size: iconOnly ? 'icon-sm' : size }), className)}
-      onClick={handle}
-      aria-label={iconOnly ? (copied ? successLabel : label) : undefined}
-      data-slot="copy-button"
-      data-copied={copied || undefined}
-      {...props}
-    >
-      {copied ? <CheckIcon /> : <CopyIcon />}
-      {!iconOnly && <span>{copied ? successLabel : label}</span>}
-    </button>
-  );
-};
+    return (
+      <button
+        ref={ref}
+        type="button"
+        className={cn(buttonVariants({ variant, size: iconOnly ? 'icon-sm' : size }), className)}
+        onClick={handle}
+        aria-label={iconOnly ? (copied ? successLabel : label) : undefined}
+        data-slot="copy-button"
+        data-copied={copied || undefined}
+        {...props}
+      >
+        {copied ? <CheckIcon /> : <CopyIcon />}
+        {!iconOnly && <span aria-live="polite">{copied ? successLabel : label}</span>}
+      </button>
+    );
+  }
+);
+CopyButton.displayName = 'CopyButton';

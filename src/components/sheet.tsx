@@ -2,19 +2,34 @@
 
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { useFocusTrap } from '../lib/use-focus-trap';
 import { useMounted } from '../lib/use-mounted';
 import { useScrollLock } from '../lib/use-scroll-lock';
 import { cn } from '../lib/utils';
 
-export interface SheetProps {
+export const sheetVariants = cva(
+  'fixed inset-y-0 z-[var(--z-overlay,50)] flex w-80 flex-col border-border bg-background shadow-lg outline-none',
+  {
+    variants: {
+      side: {
+        left: 'left-0 border-r',
+        right: 'right-0 border-l',
+      },
+    },
+    defaultVariants: {
+      side: 'right',
+    },
+  }
+);
+
+export interface SheetProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, VariantProps<typeof sheetVariants> {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  side?: 'left' | 'right';
   title?: string;
   description?: string;
   children: ReactNode;
-  className?: string;
 }
 
 const CloseIcon = (): React.JSX.Element => (
@@ -36,11 +51,12 @@ const CloseIcon = (): React.JSX.Element => (
 export const Sheet = ({
   open,
   onOpenChange,
-  side = 'right',
+  side,
   title,
   description,
   children,
   className,
+  ...props
 }: SheetProps): React.JSX.Element | null => {
   const sheetRef = useRef<HTMLDivElement>(null);
   const mounted = useMounted();
@@ -67,7 +83,8 @@ export const Sheet = ({
   return createPortal(
     <div className="fixed inset-0 z-[var(--z-overlay,50)]" data-slot="sheet">
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+        aria-hidden="true"
+        className="fixed inset-0 bg-overlay backdrop-blur-sm"
         onClick={() => onOpenChange(false)}
       />
       <div
@@ -77,11 +94,9 @@ export const Sheet = ({
         aria-labelledby={title != null ? titleId : undefined}
         aria-describedby={description != null ? descId : undefined}
         tabIndex={-1}
-        className={cn(
-          'fixed inset-y-0 z-[var(--z-overlay,50)] flex w-80 flex-col border-border bg-background shadow-lg outline-none',
-          side === 'left' ? 'left-0 border-r' : 'right-0 border-l',
-          className
-        )}
+        className={cn(sheetVariants({ side }), className)}
+        data-slot="sheet-content"
+        {...props}
       >
         {title != null && (
           <div className="flex items-start justify-between border-b border-border p-4">

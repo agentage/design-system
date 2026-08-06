@@ -2,6 +2,8 @@ import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
+import reactHooks from 'eslint-plugin-react-hooks';
 
 export default [
   {
@@ -20,9 +22,15 @@ export default [
     plugins: {
       '@typescript-eslint': typescriptEslint,
       prettier: prettierPlugin,
+      'jsx-a11y': jsxA11y,
+      'react-hooks': reactHooks,
     },
     rules: {
       ...prettierConfig.rules,
+      ...jsxA11y.flatConfigs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      // Warn only: the SSR mount flag and the palette's open-reset predate this rule.
+      'react-hooks/set-state-in-effect': 'warn',
       'prettier/prettier': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/consistent-type-imports': [

@@ -109,3 +109,37 @@ describe('Command', () => {
     expect(document.activeElement).toBe(opener);
   });
 });
+
+// Frozen pre-CVA output of the item's active/hidden conditionals.
+const COMMAND_ITEM_BASE =
+  'flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm transition-colors';
+
+describe('CommandItem class parity', () => {
+  it('renders the active and inactive states byte-identically', () => {
+    render(
+      <Command open onOpenChange={vi.fn()}>
+        <CommandItem>Alpha</CommandItem>
+        <CommandItem className="pl-2">Beta</CommandItem>
+      </Command>
+    );
+    const items = document.body.querySelectorAll('[data-slot="command-item"]');
+    expect(items[0].className).toBe(
+      `${COMMAND_ITEM_BASE} hover:bg-accent hover:text-accent-foreground focus:outline-none focus:bg-accent focus:text-accent-foreground bg-accent text-accent-foreground`
+    );
+    expect(items[1].className).toBe(
+      `${COMMAND_ITEM_BASE} text-popover-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none focus:bg-accent focus:text-accent-foreground pl-2`
+    );
+  });
+
+  it('merges className last on the palette surface and spreads props', () => {
+    render(
+      <Command open onOpenChange={vi.fn()} className="mt-4" id="palette">
+        <CommandItem>Alpha</CommandItem>
+      </Command>
+    );
+    expect(document.body.querySelector('[data-slot="command-content"]')?.className).toBe(
+      'relative z-10 w-full max-w-lg rounded-lg border border-border bg-popover shadow-2xl overflow-hidden mt-4'
+    );
+    expect(document.body.querySelector('#palette')).not.toBeNull();
+  });
+});

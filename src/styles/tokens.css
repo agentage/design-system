@@ -61,11 +61,20 @@
   --color-input: oklch(0.237 0.017 277);
   --color-ring: oklch(0.78 0.155 72);
 
+  /* Theme-independent: the scrim behind every overlay, and the fixed-white
+   * foreground for solid saturated fills (destructive/success/warning/info).
+   * Unlike --color-*-foreground these do not flip with the theme. */
+  --color-overlay: oklch(0 0 0 / 0.5);
+  --color-on-solid: oklch(1 0 0);
+
   /* ---- Typography ---- */
 
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
+  /* Sub-xs steps for dense metric captions and chart axis labels. */
+  --text-3xs: 0.5625rem;
+  --text-2xs: 0.625rem;
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;

@@ -1,3 +1,6 @@
+'use client';
+
+import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
@@ -15,7 +18,7 @@ export const chipVariants = cva(
         info: 'bg-info/10 text-info border border-info/20',
       },
       interactive: {
-        true: 'cursor-pointer hover:bg-accent',
+        true: 'cursor-pointer hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
         false: '',
       },
     },
@@ -50,40 +53,61 @@ export interface ChipProps
   removeLabel?: string;
 }
 
-export const Chip = ({
-  className,
-  variant,
-  interactive,
-  children,
-  onRemove,
-  onClick,
-  removeLabel = 'Remove',
-  ...props
-}: ChipProps): React.JSX.Element => {
-  const clickable = !!onClick || !!interactive;
-  return (
-    <span
-      className={cn(chipVariants({ variant, interactive: clickable, className }))}
-      onClick={onClick}
-      role={clickable ? 'button' : undefined}
-      tabIndex={clickable ? 0 : undefined}
-      data-slot="chip"
-      {...props}
-    >
-      <span>{children}</span>
-      {onRemove && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove();
-          }}
-          aria-label={removeLabel}
-          className="-mr-1 rounded-full p-0.5 transition-colors hover:bg-foreground/10"
-        >
-          <XIcon />
-        </button>
-      )}
-    </span>
-  );
-};
+export const Chip = React.forwardRef<HTMLSpanElement, ChipProps>(
+  (
+    {
+      className,
+      variant,
+      interactive,
+      children,
+      onRemove,
+      onClick,
+      onKeyDown,
+      removeLabel = 'Remove',
+      ...props
+    },
+    ref
+  ) => {
+    const clickable = !!onClick || !!interactive;
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>): void => {
+      onKeyDown?.(e);
+      if (!clickable || e.defaultPrevented) return;
+      // Keys pressed on the nested remove button must not also activate the chip.
+      if (e.target !== e.currentTarget) return;
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onClick?.();
+      }
+    };
+
+    return (
+      <span
+        ref={ref}
+        className={cn(chipVariants({ variant, interactive: clickable, className }))}
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        role={clickable ? 'button' : undefined}
+        tabIndex={clickable ? 0 : undefined}
+        data-slot="chip"
+        {...props}
+      >
+        <span>{children}</span>
+        {onRemove && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            aria-label={removeLabel}
+            className="-mr-1 rounded-full p-0.5 transition-colors hover:bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          >
+            <XIcon />
+          </button>
+        )}
+      </span>
+    );
+  }
+);
+Chip.displayName = 'Chip';

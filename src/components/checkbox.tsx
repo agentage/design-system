@@ -1,7 +1,26 @@
 'use client';
 
 import * as React from 'react';
+import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
+
+export const checkboxVariants = cva(
+  [
+    'flex size-4 shrink-0 items-center justify-center rounded border transition-colors',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+  ],
+  {
+    variants: {
+      marked: {
+        true: 'border-primary bg-primary text-primary-foreground',
+        false: 'border-muted-foreground/50 bg-background hover:border-muted-foreground',
+      },
+      error: { true: 'border-destructive', false: '' },
+      disabled: { true: 'cursor-not-allowed opacity-50', false: '' },
+    },
+    defaultVariants: { marked: false, error: false, disabled: false },
+  }
+);
 
 export interface CheckboxProps extends Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -15,6 +34,7 @@ export interface CheckboxProps extends Omit<
   name?: string;
   value?: string;
   required?: boolean;
+  error?: boolean;
 }
 
 const CheckIcon = (): React.JSX.Element => (
@@ -48,80 +68,81 @@ const MinusIcon = (): React.JSX.Element => (
   </svg>
 );
 
-export const Checkbox = ({
-  checked = false,
-  indeterminate = false,
-  onCheckedChange,
-  disabled = false,
-  className,
-  name,
-  value = 'on',
-  required,
-  onClick,
-  onKeyDown,
-  ...props
-}: CheckboxProps): React.JSX.Element => {
-  const inputRef = React.useRef<HTMLInputElement>(null);
+export const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
+  (
+    {
+      checked = false,
+      indeterminate = false,
+      onCheckedChange,
+      disabled = false,
+      error = false,
+      className,
+      name,
+      value = 'on',
+      required,
+      onClick,
+      onKeyDown,
+      ...props
+    },
+    ref
+  ) => {
+    const inputRef = React.useRef<HTMLInputElement>(null);
 
-  React.useEffect(() => {
-    if (inputRef.current) inputRef.current.indeterminate = indeterminate;
-  }, [indeterminate]);
+    React.useEffect(() => {
+      if (inputRef.current) inputRef.current.indeterminate = indeterminate;
+    }, [indeterminate]);
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
-    onClick?.(e);
-    if (!disabled) onCheckedChange?.(!checked);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
-    onKeyDown?.(e);
-    if (e.key === ' ' || e.key === 'Enter') {
-      e.preventDefault();
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
+      onClick?.(e);
       if (!disabled) onCheckedChange?.(!checked);
-    }
-  };
+    };
 
-  const marked = checked || indeterminate;
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
+      onKeyDown?.(e);
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        if (!disabled) onCheckedChange?.(!checked);
+      }
+    };
 
-  return (
-    <>
-      <button
-        type="button"
-        role="checkbox"
-        aria-checked={indeterminate ? 'mixed' : checked}
-        aria-required={required}
-        disabled={disabled}
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
-        data-slot="checkbox"
-        data-state={indeterminate ? 'indeterminate' : checked ? 'checked' : 'unchecked'}
-        className={cn(
-          'flex size-4 shrink-0 items-center justify-center rounded border transition-colors',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-          marked
-            ? 'border-primary bg-primary text-primary-foreground'
-            : 'border-muted-foreground/50 bg-background hover:border-muted-foreground',
-          disabled && 'cursor-not-allowed opacity-50',
-          className
-        )}
-        {...props}
-      >
-        {indeterminate ? <MinusIcon /> : checked && <CheckIcon />}
-      </button>
-      {name && (
-        <input
-          ref={inputRef}
-          type="checkbox"
-          name={name}
-          value={value}
-          checked={checked}
-          required={required}
+    const marked = checked || indeterminate;
+
+    return (
+      <>
+        <button
+          ref={ref}
+          type="button"
+          role="checkbox"
+          aria-checked={indeterminate ? 'mixed' : checked}
+          aria-required={required}
+          aria-invalid={error || undefined}
           disabled={disabled}
-          readOnly
-          tabIndex={-1}
-          aria-hidden="true"
-          className="sr-only pointer-events-none absolute"
-        />
-      )}
-    </>
-  );
-};
+          onClick={handleClick}
+          onKeyDown={handleKeyDown}
+          data-slot="checkbox"
+          data-state={indeterminate ? 'indeterminate' : checked ? 'checked' : 'unchecked'}
+          className={cn(checkboxVariants({ marked, error, disabled, className }))}
+          {...props}
+        >
+          {indeterminate ? <MinusIcon /> : checked && <CheckIcon />}
+        </button>
+        {name && (
+          <input
+            ref={inputRef}
+            type="checkbox"
+            name={name}
+            value={value}
+            checked={checked}
+            required={required}
+            disabled={disabled}
+            readOnly
+            tabIndex={-1}
+            aria-hidden="true"
+            className="sr-only pointer-events-none absolute"
+          />
+        )}
+      </>
+    );
+  }
+);
+Checkbox.displayName = 'Checkbox';

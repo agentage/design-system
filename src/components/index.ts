@@ -295,3 +295,61 @@ export type {
   RankedItem,
   RankedListCardProps,
 } from './card-patterns';
+
+// ---------------------------------------------------------------------------
+// Variant recipes (CVA). Every component with variants exposes its recipe so
+// consumers can compose the same classes onto their own elements.
+// ---------------------------------------------------------------------------
+
+export { alertDialogConfirmVariants } from './alert-dialog';
+export { avatarVariants } from './avatar';
+export { cardSurface } from './card-base';
+export type { CardSurfaceVariants } from './card-base';
+export type { CardProps } from './card';
+export { checkboxVariants } from './checkbox';
+export { codeBlockCopyVariants } from './code-block';
+export {
+  comboboxOptionIndicatorVariants,
+  comboboxOptionVariants,
+  comboboxTriggerVariants,
+} from './combobox.variants';
+export { commandContentVariants, commandItemVariants } from './command.variants';
+export { datePickerTriggerVariants } from './date-picker';
+export { docSidebarItemVariants } from './doc-sidebar';
+export { dropdownMenuContentVariants, dropdownMenuItemVariants } from './dropdown-menu.variants';
+export type { DropdownMenuSeparatorProps } from './dropdown-menu';
+export {
+  filterClearVariants,
+  filterOptionVariants,
+  filterSearchInputVariants,
+} from './filter-bar.variants';
+export { headingVariants } from './heading';
+export { iconButtonVariants } from './icon-button';
+export { iconContainerVariants } from './icon-container';
+export { inputVariants, textareaVariants } from './input';
+export { modalVariants } from './modal';
+export { multiStatTrendVariants } from './multi-stat-card';
+export { navLinkVariants } from './nav-link';
+export { pageHeaderActionVariants } from './page-header';
+export { paginationButtonVariants } from './pagination';
+export { progressVariants } from './progress';
+export { radioGroupIndicatorVariants, radioGroupItemVariants } from './radio-group';
+export { scrollAreaVariants } from './scroll-area';
+export { selectTriggerVariants } from './select';
+export { separatorVariants } from './separator';
+export { sheetVariants } from './sheet';
+export type { SidebarContentProps } from './sidebar';
+export { skeletonVariants } from './skeleton';
+export { sliderThumbVariants, sliderVariants } from './slider';
+export { spinnerVariants } from './spinner';
+export { statCardTrendVariants } from './stat-card';
+export type { TrendTone } from './stat-card';
+export { statComparisonDeltaVariants } from './stat-card-extensions';
+export { switchThumbVariants, switchVariants } from './switch';
+export { tableHeadVariants } from './table';
+export type { TableHeadProps } from './table';
+export { tabsContentVariants, tabsListVariants, tabsTriggerVariants } from './tabs.variants';
+export { toastVariants } from './toast';
+export { toggleButtonVariants, toggleGroupVariants } from './toggle-group';
+export type { ToggleGroupColumns } from './toggle-group';
+export { topBarNavItemVariants, topBarVariants } from './top-bar';
