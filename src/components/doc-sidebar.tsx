@@ -14,7 +14,7 @@ export const docSidebarItemVariants = cva(
         false: '',
       },
       active: {
-        true: 'bg-primary/10 font-medium text-primary',
+        true: 'bg-primary/10 font-medium text-primary-emphasis',
         false: 'text-foreground/70 hover:bg-accent hover:text-foreground',
       },
     },

@@ -177,7 +177,7 @@ export const SelectItem = React.forwardRef<
       <span className="flex items-center gap-2 truncate text-left">{children}</span>
     </SelectPrimitive.ItemText>
     <SelectPrimitive.ItemIndicator className="ml-auto flex size-3.5 shrink-0 items-center justify-center">
-      <SelectIcon points={POINTS.check} className="text-primary" />
+      <SelectIcon points={POINTS.check} className="text-primary-emphasis" />
     </SelectPrimitive.ItemIndicator>
   </SelectPrimitive.Item>
 ));

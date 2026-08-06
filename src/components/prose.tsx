@@ -6,7 +6,7 @@ export const Prose = ({ className, ...props }: ProseProps): React.JSX.Element =>
   <div
     className={cn(
       'text-sm leading-relaxed text-muted-foreground',
-      '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-4 [&_a:hover]:text-primary/80',
+      '[&_a]:text-primary-emphasis [&_a]:underline [&_a]:underline-offset-4 [&_a:hover]:text-foreground',
       '[&_strong]:font-semibold [&_strong]:text-foreground',
       '[&_p+p]:mt-4',
       '[&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mt-2',

@@ -37,8 +37,9 @@ export const ScoreCard = React.forwardRef<HTMLDivElement, ScoreCardProps>(
           {current && (
             <span
               className="ml-auto rounded-full px-2 py-0.5 text-2xs font-medium"
+              /* 10% is the tint the status tokens are contrast-tuned against (badge/chip). */
               style={{
-                background: `color-mix(in oklch, ${current.color} 20%, transparent)`,
+                background: `color-mix(in oklch, ${current.color} 10%, transparent)`,
                 color: current.color,
               }}
             >

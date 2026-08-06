@@ -23,6 +23,9 @@
 
   --color-primary: oklch(0.78 0.155 72);
   --color-primary-foreground: oklch(0.085 0.013 277);
+  /* Primary as a *foreground* (link/label/icon). Identical to --color-primary here;
+   * the light theme forks it because amber-on-white only reaches 2.4:1. */
+  --color-primary-emphasis: oklch(0.78 0.155 72);
   /* Soft amber wash — the reserved background for active/selected/pinned state. */
   --color-primary-soft: oklch(0.78 0.155 72 / 0.12);
 
@@ -158,7 +161,10 @@ html[data-theme='light'] {
   --color-sidebar-border: oklch(0.924 0.005 277);
 
   --color-primary: oklch(0.735 0.152 68);
-  --color-primary-foreground: oklch(1 0 0);
+  /* Near-black ink on the amber fill: white was 2.42:1, this is 7.77:1. */
+  --color-primary-foreground: oklch(0.18 0.032 277);
+  /* Lightest amber that still clears 4.5:1 as text on bg-primary/10 over the sidebar — 4.61:1. */
+  --color-primary-emphasis: oklch(0.505 0.11 68);
   --color-primary-soft: oklch(0.735 0.152 68 / 0.14);
 
   --color-secondary: oklch(0.955 0.005 277);
@@ -171,17 +177,19 @@ html[data-theme='light'] {
   /* L 0.53 is the ceiling that clears 4.5:1 on the darkest surface it rests on (sidebar/muted/secondary, L 0.955) — 4.64:1. */
   --color-muted-foreground: oklch(0.53 0.014 256);
 
-  --color-destructive: oklch(0.628 0.208 25.6);
+  /* Status colors carry text on their own /10 tint (badge, chip, alert, toast), so each is
+   * the lightest in-gamut value clearing 4.5:1 there over the darkest surface (sidebar). */
+  --color-destructive: oklch(0.515 0.208 25.6);
   --color-destructive-foreground: oklch(1 0 0);
   --color-destructive-solid: oklch(0.588 0.208 25.6);
 
-  --color-success: oklch(0.627 0.185 149);
+  --color-success: oklch(0.485 0.137 149);
   --color-success-foreground: oklch(1 0 0);
 
-  --color-warning: oklch(0.62 0.19 43);
+  --color-warning: oklch(0.515 0.152 43);
   --color-warning-foreground: oklch(1 0 0);
 
-  --color-info: oklch(0.548 0.22 262);
+  --color-info: oklch(0.51 0.22 262);
   --color-info-foreground: oklch(1 0 0);
 
   /* Darker than --color-muted-foreground (0.53) so the offline pill
@@ -221,7 +229,9 @@ html[data-theme='light'] {
     --color-sidebar-border: oklch(0.924 0.005 277);
 
     --color-primary: oklch(0.735 0.152 68);
-    --color-primary-foreground: oklch(1 0 0);
+    /* Mirrors the html[data-theme='light'] values — see the notes there. */
+    --color-primary-foreground: oklch(0.18 0.032 277);
+    --color-primary-emphasis: oklch(0.505 0.11 68);
 
     --color-secondary: oklch(0.955 0.005 277);
     --color-secondary-foreground: oklch(0.18 0.032 277);
@@ -233,17 +243,18 @@ html[data-theme='light'] {
     /* Mirrors the html[data-theme='light'] value — see the note there. */
     --color-muted-foreground: oklch(0.53 0.014 256);
 
-    --color-destructive: oklch(0.628 0.208 25.6);
+    /* Mirrors the html[data-theme='light'] values — see the notes there. */
+    --color-destructive: oklch(0.515 0.208 25.6);
     --color-destructive-foreground: oklch(1 0 0);
     --color-destructive-solid: oklch(0.588 0.208 25.6);
 
-    --color-success: oklch(0.627 0.185 149);
+    --color-success: oklch(0.485 0.137 149);
     --color-success-foreground: oklch(1 0 0);
 
-    --color-warning: oklch(0.62 0.19 43);
+    --color-warning: oklch(0.515 0.152 43);
     --color-warning-foreground: oklch(1 0 0);
 
-    --color-info: oklch(0.548 0.22 262);
+    --color-info: oklch(0.51 0.22 262);
     --color-info-foreground: oklch(1 0 0);
 
     /* Darker than --color-muted-foreground (0.53) so the offline pill

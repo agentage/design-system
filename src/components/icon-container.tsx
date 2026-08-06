@@ -12,7 +12,7 @@ export const iconContainerVariants = cva('flex items-center justify-center round
       rose: 'bg-rose-500/10 text-rose-500',
       cyan: 'bg-cyan-500/10 text-cyan-500',
       muted: 'bg-muted/50 text-muted-foreground',
-      default: 'bg-primary/10 text-primary',
+      default: 'bg-primary/10 text-primary-emphasis',
       success: 'bg-success/10 text-success',
       warning: 'bg-warning/10 text-warning',
       destructive: 'bg-destructive/10 text-destructive',

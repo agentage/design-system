@@ -90,7 +90,7 @@ describe('rendered class strings stay byte-identical', () => {
       'rounded-lg border border-border bg-sidebar p-5 transition-[transform,box-shadow,border-color] duration-[140ms] hover:-translate-y-[3px] hover:border-muted-foreground hover:shadow-md mt-4'
     );
     expect(cls(q(container, '[data-slot="stat-card"] div div div'))).toBe(
-      'flex size-8 items-center justify-center rounded-md [&_svg]:size-4 bg-primary-soft text-primary'
+      'flex size-8 items-center justify-center rounded-md [&_svg]:size-4 bg-primary-soft text-primary-emphasis'
     );
     expect(trendClass({ value: '+1%', up: true })).toBe(`${TREND_BASE} text-success`);
     expect(trendClass({ value: '-1%', up: false })).toBe(`${TREND_BASE} text-destructive`);

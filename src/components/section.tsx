@@ -25,7 +25,7 @@ export const Section = React.forwardRef<HTMLDivElement, SectionProps>(
               aria-hidden="true"
               className={cn(
                 'flex size-8 items-center justify-center rounded-md [&_svg]:size-4',
-                iconColor ?? 'bg-primary/10 text-primary'
+                iconColor ?? 'bg-primary/10 text-primary-emphasis'
               )}
             >
               {icon}
