@@ -2,8 +2,8 @@ import { cva } from 'class-variance-authority';
 
 export type TabsVariant = 'default' | 'underline';
 
-// Empty base: the list has no shared classes, only per-variant ones.
-export const tabsListVariants = cva('', {
+// `w-fit self-start` stops the list stretching to the Tabs column width.
+export const tabsListVariants = cva('w-fit self-start', {
   variants: {
     variant: {
       default: 'inline-flex items-center gap-1 rounded-lg bg-muted p-1',

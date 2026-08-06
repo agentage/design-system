@@ -26,10 +26,12 @@ export const codeBlockCopyVariants = cva(
   }
 );
 
-export interface CodeBlockProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface CodeBlockProps extends React.HTMLAttributes<HTMLDivElement> {
   code: string;
   language?: string;
   showCopy?: boolean;
+  /** Pre-tokenized markup (highlight.js / shiki) rendered instead of the raw `code` text. */
+  children?: React.ReactNode;
 }
 
 const CopyIcon = (): React.JSX.Element => (
@@ -64,7 +66,7 @@ const CheckIcon = (): React.JSX.Element => (
 );
 
 export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
-  ({ code, language, showCopy = true, className, ...props }, ref) => {
+  ({ code, language, showCopy = true, className, children, ...props }, ref) => {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async (): Promise<void> => {
@@ -86,7 +88,7 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
           </div>
         )}
         <pre className="overflow-x-auto p-4 text-sm leading-relaxed">
-          <code className="font-mono text-foreground">{code}</code>
+          {children ?? <code className="font-mono text-foreground">{code}</code>}
         </pre>
         {showCopy && (
           <button

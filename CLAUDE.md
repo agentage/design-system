@@ -13,7 +13,8 @@ Single source of truth for the Agentage design system (OKLCH tokens + React comp
 
 - `npm run build` — `tsc --noEmit` + Vite lib build. Output is **one file per source module** (`rollupOptions.output.preserveModules`), each with its own `.d.ts` beside it (vite-plugin-dts, no `rollupTypes`). Runtime `dependencies` are external so their own client boundaries survive.
 - `npm run build:showcase` — Vite static build of the `dev/` playground → `dist-showcase/` (deployed to ds.agentage.io).
-- `npm run verify` — type-check + lint + format:check + exports:check + test + build (CI runs this on PR + push).
+- `npm run verify` — type-check (src + e2e) + lint + format:check + exports:check + test:coverage + build (CI runs this on PR + push). Coverage floor is 70% lines/functions/branches/statements over `src/`.
+- `npm run test:e2e` — Playwright against the built showcase (`build:showcase` → `vite preview` :4173 → chromium): axe WCAG A/AA scan of all 8 pages + 6 screenshot baselines. Runs as its own CI job inside `mcr.microsoft.com/playwright:v1.62.1-noble`. **Regenerate baselines in that same image**, never on the host — font metrics must match: `docker run --rm --ipc=host -v "$PWD":/work -w /work -u "$(id -u):$(id -g)" -e HOME=/tmp mcr.microsoft.com/playwright:v1.62.1-noble npx playwright test --update-snapshots`.
 - Exports: `.` (barrel), `./<component>` per module, `./theme.css`, `./primitives.css`, `./styles/*.css`, `./package.json`. `files` ships `dist` + `src/styles`.
 - The exports map is generated — `npm run exports:generate` after adding/renaming a component; `exports:check` fails `verify` when it drifts.
 

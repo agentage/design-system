@@ -18,7 +18,8 @@ export const chipVariants = cva(
         info: 'bg-info/10 text-info border border-info/20',
       },
       interactive: {
-        true: 'cursor-pointer hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+        // Ring lives on the wrapper but is driven by the inner body's focus.
+        true: 'cursor-pointer hover:bg-accent has-[[data-slot=chip-body]:focus-visible]:ring-2 has-[[data-slot=chip-body]:focus-visible]:ring-ring/50',
         false: '',
       },
     },
@@ -73,8 +74,6 @@ export const Chip = React.forwardRef<HTMLSpanElement, ChipProps>(
     const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>): void => {
       onKeyDown?.(e);
       if (!clickable || e.defaultPrevented) return;
-      // Keys pressed on the nested remove button must not also activate the chip.
-      if (e.target !== e.currentTarget) return;
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         onClick?.();
@@ -84,24 +83,33 @@ export const Chip = React.forwardRef<HTMLSpanElement, ChipProps>(
     return (
       <span
         ref={ref}
-        className={cn(chipVariants({ variant, interactive: clickable, className }))}
-        onClick={onClick}
-        onKeyDown={handleKeyDown}
-        role={clickable ? 'button' : undefined}
-        tabIndex={clickable ? 0 : undefined}
+        className={cn(
+          chipVariants({ variant, interactive: clickable, className }),
+          clickable && 'relative'
+        )}
+        onKeyDown={clickable ? undefined : onKeyDown}
         data-slot="chip"
         {...props}
       >
-        <span>{children}</span>
+        {/* Body owns the button role; its stretched ::after keeps the whole chip clickable while
+            the remove button stays a sibling rather than a nested control. */}
+        <span
+          data-slot="chip-body"
+          role={clickable ? 'button' : undefined}
+          tabIndex={clickable ? 0 : undefined}
+          onClick={clickable ? onClick : undefined}
+          onKeyDown={clickable ? handleKeyDown : undefined}
+          className={clickable ? 'outline-none after:absolute after:inset-0' : undefined}
+        >
+          {children}
+        </span>
         {onRemove && (
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove();
-            }}
+            onClick={onRemove}
             aria-label={removeLabel}
-            className="-mr-1 rounded-full p-0.5 transition-colors hover:bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+            data-slot="chip-remove"
+            className="relative z-10 -mr-1 rounded-full p-0.5 transition-colors hover:bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
           >
             <XIcon />
           </button>

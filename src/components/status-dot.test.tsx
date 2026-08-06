@@ -73,3 +73,35 @@ describe('statusDotVariants', () => {
     }
   });
 });
+
+describe('StatusDot primary', () => {
+  it('paints the dot with the primary token', () => {
+    const { container } = render(<StatusDot variant="primary" />);
+    const dot = root(container).firstElementChild as HTMLElement;
+    expect(dot.className).toContain('bg-primary');
+  });
+
+  it('forwards className and props to the root wrapper', () => {
+    const { container } = render(<StatusDot variant="primary" className="mr-2" data-x="r" />);
+    const wrapper = root(container);
+    expect(wrapper.className).toContain('mr-2');
+    expect(wrapper.dataset.x).toBe('r');
+    expect((wrapper.firstElementChild as HTMLElement).className).not.toContain('mr-2');
+  });
+});
+
+describe('StatusDot naming', () => {
+  it('carries an img role when it is named only by aria-label', () => {
+    const { container } = render(<StatusDot variant="online" />);
+    const wrapper = root(container);
+    expect(wrapper.getAttribute('role')).toBe('img');
+    expect(wrapper.getAttribute('aria-label')).toBe('online');
+  });
+
+  it('stays role-less when a visible label supplies the name', () => {
+    const { container } = render(<StatusDot variant="online" label="Online" />);
+    const wrapper = root(container);
+    expect(wrapper.getAttribute('role')).toBeNull();
+    expect(wrapper.getAttribute('aria-label')).toBeNull();
+  });
+});

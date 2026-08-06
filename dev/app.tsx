@@ -299,7 +299,7 @@ const PAGES = [
 type Page = (typeof PAGES)[number];
 
 const S = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <section className="space-y-4">
+  <section className="space-y-4" data-section={title}>
     <h2 className="text-lg font-semibold text-foreground border-b border-border pb-2">{title}</h2>
     <div className="space-y-3">{children}</div>
   </section>
@@ -640,10 +640,10 @@ const FoundationsPage = () => (
         <Button size="default">Default</Button>
         <Button size="lg">Large</Button>
         <Button disabled>Disabled</Button>
-        <Button size="icon">
+        <Button size="icon" aria-label="Edit">
           <EditIcon />
         </Button>
-        <Button size="icon-sm">
+        <Button size="icon-sm" aria-label="Info">
           <InfoIcon />
         </Button>
       </div>
@@ -688,6 +688,12 @@ const FoundationsPage = () => (
               <Skeleton variant="rectangular" className="h-16" />
             </div>
           </CardContent>
+        </Card>
+        <Card variant="flat">
+          <p className="text-sm font-semibold">Flat variant</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            p-5, no shadow, block layout — for content that brings its own spacing.
+          </p>
         </Card>
       </div>
     </S>
@@ -874,15 +880,24 @@ const DataDisplayPage = () => {
             value={5}
             description="All registered"
           />
-          <StatCard
-            title="CPU"
-            value="34%"
-            description={<Progress value={34} className="mt-2" />}
-          />
+          <StatCard title="CPU" value="34%" progress={34} progressLabel="CPU used" />
           <StatCard
             title="Memory"
             value="6.2 / 16 GB"
-            description={<Progress value={39} variant="info" className="mt-2" />}
+            description={
+              <Progress value={39} variant="info" className="mt-2" label="Memory used" />
+            }
+          />
+        </div>
+        <div className="grid grid-cols-4 gap-4">
+          <StatCard title="Storage" value="4.2 / 10 GB" progress={42} description="Plan quota" />
+          <StatCard
+            pressable
+            icon={<ServerIcon />}
+            title="Machines"
+            value={MACHINES.length}
+            description="Pressable — opens the machines list"
+            onClick={() => undefined}
           />
         </div>
       </S>
@@ -1154,6 +1169,7 @@ const DataDisplayPage = () => {
           <StatusDot variant="warning" label="Warning" />
           <StatusDot variant="info" label="Info" />
           <StatusDot variant="pending" label="Pending" />
+          <StatusDot variant="primary" label="Primary" />
         </div>
       </S>
 
@@ -1182,7 +1198,7 @@ const DataDisplayPage = () => {
           ).map(([label, value, variant]) => (
             <div key={label} className="flex items-center gap-3">
               <span className="text-xs text-muted-foreground w-16">{label}</span>
-              <Progress value={value} variant={variant} />
+              <Progress value={value} variant={variant} label={label} />
               <span className="text-xs text-muted-foreground w-8">{value}%</span>
             </div>
           ))}
@@ -1221,7 +1237,7 @@ const FormsPage = () => {
           </FormField>
           <FormField label="Role" className="col-span-2">
             <Select>
-              <SelectTrigger>
+              <SelectTrigger aria-label="Role">
                 <SelectValue placeholder="Select role..." />
               </SelectTrigger>
               <SelectContent>
@@ -1472,6 +1488,12 @@ const FeedbackPage = () => {
           onOpenChange={setSheetOpen}
           title="Agent Details"
           description="View and edit agent configuration."
+          header={
+            <>
+              <Avatar name="Code Reviewer" size="sm" />
+              <Badge variant="secondary">admin</Badge>
+            </>
+          }
         >
           <div className="space-y-4">
             <div className="flex items-center gap-3">
@@ -1711,11 +1733,15 @@ const LayoutPage = () => (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm">Auto-restart on failure</span>
-              <Switch checked={true} onCheckedChange={() => {}} />
+              <Switch
+                checked={true}
+                onCheckedChange={() => {}}
+                aria-label="Auto-restart on failure"
+              />
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm">Verbose logging</span>
-              <Switch onCheckedChange={() => {}} />
+              <Switch onCheckedChange={() => {}} aria-label="Verbose logging" />
             </div>
           </div>
         </Section>
@@ -1775,7 +1801,12 @@ const LayoutPage = () => (
               subtitle="Overview of your platform"
             />
           </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div
+            className="flex-1 overflow-y-auto p-4 space-y-3"
+            tabIndex={0}
+            role="region"
+            aria-label="Dashboard content"
+          >
             <div className="grid grid-cols-3 gap-3">
               <StatCard
                 icon={<ServerIcon />}

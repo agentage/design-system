@@ -104,3 +104,41 @@ describe('Sheet class parity', () => {
     expect(document.body.querySelector('#s')).not.toBeNull();
   });
 });
+
+describe('Sheet header slot', () => {
+  it('renders header content in the title bar', () => {
+    render(
+      <Sheet
+        open
+        onOpenChange={vi.fn()}
+        title="Ada Lovelace"
+        description="Owner"
+        header={<span>admin</span>}
+      >
+        content
+      </Sheet>
+    );
+    const header = document.querySelector('[data-slot="sheet-header"]') as HTMLElement;
+    expect(header.textContent).toBe('admin');
+    expect(screen.getByRole('button', { name: 'Close' })).toBeTruthy();
+  });
+
+  it('renders the title bar for a header with no title', () => {
+    render(
+      <Sheet open onOpenChange={vi.fn()} header={<span>admin</span>}>
+        content
+      </Sheet>
+    );
+    expect(document.querySelector('[data-slot="sheet-header"]')).toBeTruthy();
+    expect(screen.getByRole('dialog').getAttribute('aria-labelledby')).toBeNull();
+  });
+
+  it('omits the header wrapper when no header is given', () => {
+    render(
+      <Sheet open onOpenChange={vi.fn()} title="Filters">
+        content
+      </Sheet>
+    );
+    expect(document.querySelector('[data-slot="sheet-header"]')).toBeNull();
+  });
+});

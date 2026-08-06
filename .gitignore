@@ -8,3 +8,5 @@ coverage
 .idea
 .vscode
 *.tsbuildinfo
+test-results
+playwright-report

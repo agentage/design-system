@@ -48,7 +48,6 @@ export const StatBreakdown = ({
             key={i}
             className={cn(s.color ?? 'bg-primary', i > 0 && 'border-l border-card')}
             style={{ width: `${(s.value / total) * 100}%` }}
-            aria-label={`${s.label}: ${s.value}`}
           />
         ))}
       </div>

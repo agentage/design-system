@@ -2,7 +2,7 @@ import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
-export const progressVariants = cva('h-full rounded-full transition-all duration-300', {
+export const progressVariants = cva('h-full rounded-full transition-all', {
   variants: {
     variant: {
       default: 'bg-primary',
@@ -33,6 +33,8 @@ export interface ProgressProps
   label?: string;
   /** Unknown progress: omits `aria-valuenow` and renders an animated full-width bar. */
   indeterminate?: boolean;
+  /** Fill transition in ms; `false` disables the transition. Defaults to 300. */
+  duration?: number | false;
 }
 
 export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
@@ -43,6 +45,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
       variant = 'default',
       label,
       indeterminate = false,
+      duration = 300,
       className,
       'aria-label': ariaLabel,
       ...props
@@ -50,6 +53,10 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
     ref
   ) => {
     const percentage = Math.min(100, Math.max(0, (value / max) * 100));
+    const fillStyle: React.CSSProperties = {
+      ...(indeterminate ? {} : { width: `${String(percentage)}%` }),
+      transitionDuration: duration === false ? '0s' : `${String(duration)}ms`,
+    };
 
     return (
       <div
@@ -66,7 +73,8 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
       >
         <div
           className={cn(progressVariants({ variant, indeterminate }))}
-          style={indeterminate ? undefined : { width: `${String(percentage)}%` }}
+          data-slot="progress-fill"
+          style={fillStyle}
         />
       </div>
     );

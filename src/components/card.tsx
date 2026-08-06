@@ -1,19 +1,25 @@
 import * as React from 'react';
 import { cn } from '../lib/utils';
+import { cardSurface } from './card-base';
+
+export type CardVariant = 'default' | 'flat';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
-export const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, children, ...props }, ref) => (
+export interface CardRootProps extends CardProps {
+  /** `flat` drops the shadow and the slot grid for a padded block. */
+  variant?: CardVariant;
+}
+
+export const Card = React.forwardRef<HTMLDivElement, CardRootProps>(
+  ({ className, children, variant = 'default', ...props }, ref) => (
     <div
       ref={ref}
       data-slot="card"
-      className={cn(
-        'bg-card text-card-foreground flex flex-col gap-6 rounded-xl border border-border py-6 shadow-sm',
-        className
-      )}
+      data-variant={variant}
+      className={cn(cardSurface({ surface: variant === 'flat' ? 'flat' : 'card' }), className)}
       {...props}
     >
       {children}

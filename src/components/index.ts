@@ -247,7 +247,7 @@ export { Footer, FooterSections, FooterSection, FooterLink, FooterBottom } from 
 export type { FooterProps, FooterSectionProps, FooterBottomProps } from './footer';
 
 export { MarkdownRenderer } from './markdown';
-export type { MarkdownRendererProps } from './markdown';
+export type { MarkdownComponents, MarkdownRendererProps } from './markdown';
 
 export { TopBar, TopBarBrand, TopBarNav, TopBarNavItem, TopBarActions } from './top-bar';
 export type { TopBarProps, TopBarNavItemProps } from './top-bar';
@@ -305,7 +305,7 @@ export { alertDialogConfirmVariants } from './alert-dialog';
 export { avatarVariants } from './avatar';
 export { cardSurface } from './card-base';
 export type { CardSurfaceVariants } from './card-base';
-export type { CardProps } from './card';
+export type { CardProps, CardRootProps, CardVariant } from './card';
 export { checkboxVariants } from './checkbox';
 export { codeBlockCopyVariants } from './code-block';
 export {
@@ -342,7 +342,7 @@ export type { SidebarContentProps } from './sidebar';
 export { skeletonVariants } from './skeleton';
 export { sliderThumbVariants, sliderVariants } from './slider';
 export { spinnerVariants } from './spinner';
-export { statCardTrendVariants } from './stat-card';
+export { statCardTrendVariants, statCardVariants } from './stat-card';
 export type { TrendTone } from './stat-card';
 export { statComparisonDeltaVariants } from './stat-card-extensions';
 export { switchThumbVariants, switchVariants } from './switch';
