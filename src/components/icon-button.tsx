@@ -1,28 +1,20 @@
 import { cn } from '../lib/utils';
 
-export interface IconButtonProps {
+export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon: React.ReactNode;
   onClick: (e: React.MouseEvent) => void;
-  title?: string;
-  'aria-label'?: string;
-  disabled?: boolean;
-  className?: string;
-  onMouseDown?: (e: React.MouseEvent) => void;
 }
 
 export const IconButton = ({
   icon,
-  onClick,
   title,
   'aria-label': ariaLabel,
   disabled,
   className,
-  onMouseDown,
+  ...props
 }: IconButtonProps): React.JSX.Element => (
   <button
     type="button"
-    onClick={onClick}
-    onMouseDown={onMouseDown}
     title={title}
     aria-label={ariaLabel ?? title}
     disabled={disabled}
@@ -34,6 +26,7 @@ export const IconButton = ({
       disabled && 'opacity-50 cursor-not-allowed',
       className
     )}
+    {...props}
   >
     {icon}
   </button>

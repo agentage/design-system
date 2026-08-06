@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { useFocusTrap } from '../lib/use-focus-trap';
 import { cn } from '../lib/utils';
 
 export interface SheetProps {
@@ -39,6 +40,11 @@ export const Sheet = ({
   className,
 }: SheetProps): React.JSX.Element | null => {
   const sheetRef = useRef<HTMLDivElement>(null);
+  const instanceId = useId();
+  const titleId = `${instanceId}-title`;
+  const descId = `${instanceId}-desc`;
+
+  useFocusTrap(sheetRef, open);
 
   useEffect(() => {
     if (!open) return;
@@ -66,8 +72,13 @@ export const Sheet = ({
       />
       <div
         ref={sheetRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title != null ? titleId : undefined}
+        aria-describedby={description != null ? descId : undefined}
+        tabIndex={-1}
         className={cn(
-          'fixed inset-y-0 z-50 flex w-80 flex-col border-border bg-background shadow-lg',
+          'fixed inset-y-0 z-50 flex w-80 flex-col border-border bg-background shadow-lg outline-none',
           side === 'left' ? 'left-0 border-r' : 'right-0 border-l',
           className
         )}
@@ -75,8 +86,14 @@ export const Sheet = ({
         {title != null && (
           <div className="flex items-start justify-between border-b border-border p-4">
             <div>
-              <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-              {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+              <h2 id={titleId} className="text-lg font-semibold text-foreground">
+                {title}
+              </h2>
+              {description && (
+                <p id={descId} className="mt-1 text-sm text-muted-foreground">
+                  {description}
+                </p>
+              )}
             </div>
             <button
               onClick={() => onOpenChange(false)}

@@ -1,12 +1,20 @@
+'use client';
+
 import * as React from 'react';
 import { cn } from '../lib/utils';
 
-export interface CheckboxProps {
+export interface CheckboxProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'onChange' | 'value'
+> {
   checked?: boolean;
+  /** Renders the mixed state (`aria-checked="mixed"`) and sets it on the hidden native input. */
+  indeterminate?: boolean;
   onCheckedChange?: (checked: boolean) => void;
-  disabled?: boolean;
-  className?: string;
-  id?: string;
+  /** Submitted with the surrounding form via a hidden native input. */
+  name?: string;
+  value?: string;
+  required?: boolean;
 }
 
 const CheckIcon = (): React.JSX.Element => (
@@ -19,51 +27,101 @@ const CheckIcon = (): React.JSX.Element => (
     strokeWidth="3"
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
   >
     <polyline points="20 6 9 17 4 12" />
   </svg>
 );
 
-export const Checkbox: React.FC<CheckboxProps> = ({
+const MinusIcon = (): React.JSX.Element => (
+  <svg
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+    aria-hidden="true"
+  >
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
+
+export const Checkbox = ({
   checked = false,
+  indeterminate = false,
   onCheckedChange,
   disabled = false,
   className,
-  id,
-}) => {
-  const handleClick = (): void => {
-    if (!disabled && onCheckedChange) {
-      onCheckedChange(!checked);
-    }
+  name,
+  value = 'on',
+  required,
+  onClick,
+  onKeyDown,
+  ...props
+}: CheckboxProps): React.JSX.Element => {
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (inputRef.current) inputRef.current.indeterminate = indeterminate;
+  }, [indeterminate]);
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
+    onClick?.(e);
+    if (!disabled) onCheckedChange?.(!checked);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent): void => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
+    onKeyDown?.(e);
     if (e.key === ' ' || e.key === 'Enter') {
       e.preventDefault();
-      handleClick();
+      if (!disabled) onCheckedChange?.(!checked);
     }
   };
 
+  const marked = checked || indeterminate;
+
   return (
-    <button
-      type="button"
-      role="checkbox"
-      aria-checked={checked}
-      id={id}
-      disabled={disabled}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      data-slot="checkbox"
-      className={cn(
-        'flex size-4 shrink-0 items-center justify-center rounded border transition-colors',
-        checked
-          ? 'border-primary bg-primary text-primary-foreground'
-          : 'border-muted-foreground/50 bg-background hover:border-muted-foreground',
-        disabled && 'cursor-not-allowed opacity-50',
-        className
+    <>
+      <button
+        type="button"
+        role="checkbox"
+        aria-checked={indeterminate ? 'mixed' : checked}
+        aria-required={required}
+        disabled={disabled}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        data-slot="checkbox"
+        data-state={indeterminate ? 'indeterminate' : checked ? 'checked' : 'unchecked'}
+        className={cn(
+          'flex size-4 shrink-0 items-center justify-center rounded border transition-colors',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+          marked
+            ? 'border-primary bg-primary text-primary-foreground'
+            : 'border-muted-foreground/50 bg-background hover:border-muted-foreground',
+          disabled && 'cursor-not-allowed opacity-50',
+          className
+        )}
+        {...props}
+      >
+        {indeterminate ? <MinusIcon /> : checked && <CheckIcon />}
+      </button>
+      {name && (
+        <input
+          ref={inputRef}
+          type="checkbox"
+          name={name}
+          value={value}
+          checked={checked}
+          required={required}
+          disabled={disabled}
+          readOnly
+          tabIndex={-1}
+          aria-hidden="true"
+          className="sr-only pointer-events-none absolute"
+        />
       )}
-    >
-      {checked && <CheckIcon />}
-    </button>
+    </>
   );
 };

@@ -25,6 +25,7 @@ import {
   Checkbox,
   CodeBlock,
   InlineCode,
+  Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
   Combobox,
@@ -1544,9 +1545,14 @@ const FeedbackPage = () => {
       </S>
 
       <S title="Command Palette">
-        <Button variant="outline" onClick={() => setCmdOpen(true)}>
-          Open Command <Kbd>⌘K</Kbd>
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" onClick={() => setCmdOpen(true)}>
+            Open Command <Kbd>⌘K</Kbd>
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Type to filter, <Kbd>↑</Kbd> <Kbd>↓</Kbd> to move, <Kbd>Enter</Kbd> to run.
+          </span>
+        </div>
         <Command open={cmdOpen} onOpenChange={setCmdOpen}>
           <CommandGroup heading="Navigation">
             <CommandItem icon={<HomeIcon />} shortcut="⌘1" onClick={() => setCmdOpen(false)}>
@@ -1892,19 +1898,21 @@ const NavTypoPage = () => {
       </S>
 
       <S title="Collapsible">
-        <div className="max-w-md border border-border rounded-lg overflow-hidden">
-          <CollapsibleTrigger onClick={() => setCollapsibleOpen(!collapsibleOpen)}>
+        <Collapsible
+          open={collapsibleOpen}
+          onOpenChange={setCollapsibleOpen}
+          className="max-w-md border border-border rounded-lg overflow-hidden"
+        >
+          <CollapsibleTrigger>
             Thinking... {collapsibleOpen ? '(collapse)' : '(expand)'}
           </CollapsibleTrigger>
-          {collapsibleOpen && (
-            <CollapsibleContent className="px-3 pb-3">
-              <p className="text-sm text-muted-foreground">
-                I need to analyze the code structure and determine the best approach for
-                implementing this feature...
-              </p>
-            </CollapsibleContent>
-          )}
-        </div>
+          <CollapsibleContent className="px-3 pb-3">
+            <p className="text-sm text-muted-foreground">
+              I need to analyze the code structure and determine the best approach for implementing
+              this feature...
+            </p>
+          </CollapsibleContent>
+        </Collapsible>
       </S>
 
       <S title="Accordion">
