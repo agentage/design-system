@@ -51,7 +51,7 @@ export const PageHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
         {icon && (
           <div
             aria-hidden="true"
-            className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary [&_svg]:size-3.5"
+            className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary-emphasis [&_svg]:size-3.5"
           >
             {icon}
           </div>

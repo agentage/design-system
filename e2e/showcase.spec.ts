@@ -20,8 +20,14 @@ const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
  */
 const EXCLUDED_RULES: { id: string; reason: string }[] = [];
 
-const gotoPage = async (page: Page, name: string): Promise<void> => {
+/** Both themes are gated — light was invisible to CI and carried its own contrast debt. */
+const THEMES = ['dark', 'light'] as const;
+
+const gotoPage = async (page: Page, name: string, theme: string = 'dark'): Promise<void> => {
   await page.goto('/');
+  if (theme !== 'dark') {
+    await page.locator('header').getByRole('radio', { name: 'Light', exact: true }).click();
+  }
   await page.getByRole('button', { name, exact: true }).click();
   await page.waitForTimeout(150);
 };
@@ -29,17 +35,21 @@ const gotoPage = async (page: Page, name: string): Promise<void> => {
 const section = (page: Page, title: string) => page.locator(`[data-section="${title}"]`);
 
 test.describe('showcase a11y', () => {
-  for (const name of PAGES) {
-    test(`${name} has no WCAG A/AA violations`, async ({ page }) => {
-      await gotoPage(page, name);
-      const results = await new AxeBuilder({ page })
-        .withTags(WCAG_TAGS)
-        .disableRules(EXCLUDED_RULES.map((r) => r.id))
-        .analyze();
-      expect(
-        results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(' | ')}`)
-      ).toEqual([]);
-    });
+  for (const theme of THEMES) {
+    for (const name of PAGES) {
+      test(`${theme} / ${name} has no WCAG A/AA violations`, async ({ page }) => {
+        await gotoPage(page, name, theme);
+        const results = await new AxeBuilder({ page })
+          .withTags(WCAG_TAGS)
+          .disableRules(EXCLUDED_RULES.map((r) => r.id))
+          .analyze();
+        expect(
+          results.violations.flatMap((v) =>
+            v.nodes.map((n) => `${v.id}: ${String(n.target)} ${JSON.stringify(n.any[0]?.data)}`)
+          )
+        ).toEqual([]);
+      });
+    }
   }
 });
 

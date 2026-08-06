@@ -5,9 +5,9 @@ import { Spinner } from './spinner';
 
 // Frozen pre-CVA output: the hand-rolled sizeClasses lookup produced exactly these strings.
 const CLASSES = {
-  sm: 'animate-spin text-primary size-4',
-  md: 'animate-spin text-primary size-6',
-  lg: 'animate-spin text-primary size-8',
+  sm: 'animate-spin text-primary-emphasis size-4',
+  md: 'animate-spin text-primary-emphasis size-6',
+  lg: 'animate-spin text-primary-emphasis size-8',
 };
 
 const classOf = (container: HTMLElement): string | null =>
@@ -21,7 +21,7 @@ describe('Spinner', () => {
 
   it('defaults to md and merges className last', () => {
     const { container } = render(<Spinner className="mt-4" />);
-    expect(classOf(container)).toBe('animate-spin text-primary size-6 mt-4');
+    expect(classOf(container)).toBe('animate-spin text-primary-emphasis size-6 mt-4');
   });
 
   it('exposes a labelled status role and forwards a ref', () => {

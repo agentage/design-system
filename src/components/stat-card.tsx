@@ -101,7 +101,7 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
               <div
                 className={cn(
                   'flex size-8 items-center justify-center rounded-md [&_svg]:size-4',
-                  iconColor ?? 'bg-primary-soft text-primary'
+                  iconColor ?? 'bg-primary-soft text-primary-emphasis'
                 )}
               >
                 {icon}

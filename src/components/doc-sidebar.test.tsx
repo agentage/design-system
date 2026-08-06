@@ -4,7 +4,7 @@ import { DocSidebar, DocSidebarItem } from './doc-sidebar';
 
 const BASE =
   'block rounded-md px-2 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50';
-const ACTIVE = 'bg-primary/10 font-medium text-primary';
+const ACTIVE = 'bg-primary/10 font-medium text-primary-emphasis';
 const IDLE = 'text-foreground/70 hover:bg-accent hover:text-foreground';
 
 describe('docSidebarItemVariants', () => {
