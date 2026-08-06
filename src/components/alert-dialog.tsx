@@ -1,6 +1,10 @@
 'use client';
 
 import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { useFocusTrap } from '../lib/use-focus-trap';
+import { useMounted } from '../lib/use-mounted';
+import { useScrollLock } from '../lib/use-scroll-lock';
 import { cn } from '../lib/utils';
 
 export interface AlertDialogProps {
@@ -27,9 +31,13 @@ export const AlertDialog = ({
   children,
 }: AlertDialogProps): React.JSX.Element | null => {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const mounted = useMounted();
   const instanceId = useId();
   const titleId = `${instanceId}-title`;
   const descId = `${instanceId}-desc`;
+
+  useScrollLock(open);
+  useFocusTrap(dialogRef, open && mounted);
 
   useEffect(() => {
     if (!open) return;
@@ -37,28 +45,22 @@ export const AlertDialog = ({
       if (e.key === 'Escape') onOpenChange(false);
     };
     document.addEventListener('keydown', handleEscape);
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    document.body.style.overflow = 'hidden';
-    document.body.style.paddingRight = `${String(scrollbarWidth)}px`;
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
     };
   }, [open, onOpenChange]);
 
+  // Runs after the trap's initial focus so the safe action stays the landing point.
   useEffect(() => {
-    if (open && dialogRef.current) {
-      const cancel = dialogRef.current.querySelector<HTMLButtonElement>('[data-cancel]');
-      cancel?.focus();
-    }
-  }, [open]);
+    if (open && mounted)
+      dialogRef.current?.querySelector<HTMLButtonElement>('[data-cancel]')?.focus();
+  }, [open, mounted]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[var(--z-overlay,50)] flex items-center justify-center p-4"
       role="alertdialog"
       aria-modal="true"
       aria-labelledby={titleId}
@@ -113,6 +115,7 @@ export const AlertDialog = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

@@ -30,6 +30,10 @@
       "types": "./dist/components/alert-dialog.d.ts",
       "import": "./dist/components/alert-dialog.js"
     },
+    "./aria": {
+      "types": "./dist/lib/aria.d.ts",
+      "import": "./dist/lib/aria.js"
+    },
     "./avatar": {
       "types": "./dist/components/avatar.d.ts",
       "import": "./dist/components/avatar.js"
@@ -298,9 +302,25 @@
       "types": "./dist/components/top-bar.d.ts",
       "import": "./dist/components/top-bar.js"
     },
+    "./use-anchor-position": {
+      "types": "./dist/lib/use-anchor-position.d.ts",
+      "import": "./dist/lib/use-anchor-position.js"
+    },
+    "./use-focus-restore": {
+      "types": "./dist/lib/use-focus-restore.d.ts",
+      "import": "./dist/lib/use-focus-restore.js"
+    },
     "./use-focus-trap": {
       "types": "./dist/lib/use-focus-trap.d.ts",
       "import": "./dist/lib/use-focus-trap.js"
+    },
+    "./use-mounted": {
+      "types": "./dist/lib/use-mounted.d.ts",
+      "import": "./dist/lib/use-mounted.js"
+    },
+    "./use-scroll-lock": {
+      "types": "./dist/lib/use-scroll-lock.d.ts",
+      "import": "./dist/lib/use-scroll-lock.js"
     },
     "./utils": {
       "types": "./dist/lib/utils.d.ts",

@@ -1,7 +1,10 @@
 'use client';
 
 import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { useFocusTrap } from '../lib/use-focus-trap';
+import { useMounted } from '../lib/use-mounted';
+import { useScrollLock } from '../lib/use-scroll-lock';
 import { cn } from '../lib/utils';
 
 export interface SheetProps {
@@ -40,11 +43,13 @@ export const Sheet = ({
   className,
 }: SheetProps): React.JSX.Element | null => {
   const sheetRef = useRef<HTMLDivElement>(null);
+  const mounted = useMounted();
   const instanceId = useId();
   const titleId = `${instanceId}-title`;
   const descId = `${instanceId}-desc`;
 
-  useFocusTrap(sheetRef, open);
+  useScrollLock(open);
+  useFocusTrap(sheetRef, open && mounted);
 
   useEffect(() => {
     if (!open) return;
@@ -52,20 +57,15 @@ export const Sheet = ({
       if (e.key === 'Escape') onOpenChange(false);
     };
     document.addEventListener('keydown', handleEscape);
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    document.body.style.overflow = 'hidden';
-    document.body.style.paddingRight = `${String(scrollbarWidth)}px`;
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
     };
   }, [open, onOpenChange]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-50" data-slot="sheet">
+  return createPortal(
+    <div className="fixed inset-0 z-[var(--z-overlay,50)]" data-slot="sheet">
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm"
         onClick={() => onOpenChange(false)}
@@ -78,7 +78,7 @@ export const Sheet = ({
         aria-describedby={description != null ? descId : undefined}
         tabIndex={-1}
         className={cn(
-          'fixed inset-y-0 z-50 flex w-80 flex-col border-border bg-background shadow-lg outline-none',
+          'fixed inset-y-0 z-[var(--z-overlay,50)] flex w-80 flex-col border-border bg-background shadow-lg outline-none',
           side === 'left' ? 'left-0 border-r' : 'right-0 border-l',
           className
         )}
@@ -106,6 +106,7 @@ export const Sheet = ({
         )}
         <div className="flex-1 overflow-y-auto p-4">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
