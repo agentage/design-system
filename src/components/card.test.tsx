@@ -44,3 +44,23 @@ describe('Card', () => {
     expect(refs.footer.current?.getAttribute('data-slot')).toBe('card-footer');
   });
 });
+
+describe('Card flat variant', () => {
+  it('drops the shadow and slot grid for a padded block', () => {
+    const { container } = render(<Card variant="flat">Body</Card>);
+    const card = container.querySelector('[data-slot="card"]') as HTMLElement;
+    expect(card.dataset.variant).toBe('flat');
+    expect(card.className).toContain('p-5');
+    expect(card.className).toContain('block');
+    expect(card.className).not.toContain('shadow-sm');
+    expect(card.className).not.toContain('py-6');
+  });
+
+  it('keeps the default surface unchanged', () => {
+    const { container } = render(<Card>Body</Card>);
+    const card = container.querySelector('[data-slot="card"]') as HTMLElement;
+    expect(card.dataset.variant).toBe('default');
+    expect(card.className).toContain('shadow-sm');
+    expect(card.className).toContain('py-6');
+  });
+});

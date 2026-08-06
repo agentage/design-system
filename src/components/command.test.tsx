@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { useState } from 'react';
+import { createRef, useState } from 'react';
 import { describe, expect, it, vi, type Mock } from 'vitest';
 import { Command, CommandEmpty, CommandGroup, CommandItem } from './command';
 
@@ -141,5 +141,50 @@ describe('CommandItem class parity', () => {
       'relative z-10 w-full max-w-lg rounded-lg border border-border bg-popover shadow-2xl overflow-hidden mt-4'
     );
     expect(document.body.querySelector('#palette')).not.toBeNull();
+  });
+});
+
+describe('Command input pass-through', () => {
+  it('spreads inputProps onto the search input', () => {
+    render(
+      <Command open onOpenChange={vi.fn()} inputProps={{ id: 'palette-q', 'data-testid': 'q' }}>
+        <CommandItem>Dashboard</CommandItem>
+      </Command>
+    );
+    const el = screen.getByTestId('q');
+    expect(el).toBe(input());
+    expect(el.id).toBe('palette-q');
+    expect(el.dataset.slot).toBe('command-input');
+  });
+
+  it('forwards a ref to the search input', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(
+      <Command open onOpenChange={vi.fn()} inputRef={ref}>
+        <CommandItem>Dashboard</CommandItem>
+      </Command>
+    );
+    expect(ref.current).toBe(input());
+  });
+
+  it('keeps arrow-key navigation after an inputProps keydown handler', () => {
+    const onKeyDown = vi.fn();
+    render(
+      <Command open onOpenChange={vi.fn()} inputProps={{ onKeyDown }}>
+        <CommandItem>Dashboard</CommandItem>
+        <CommandItem>Machines</CommandItem>
+      </Command>
+    );
+    fireEvent.keyDown(input(), { key: 'ArrowDown' });
+    expect(onKeyDown).toHaveBeenCalledTimes(1);
+    expect(input().getAttribute('aria-activedescendant')).toBe(
+      screen.getByText('Machines').closest('[role="option"]')?.id
+    );
+  });
+
+  it('gives the search icon a stable slot and class', () => {
+    renderPalette();
+    const icon = document.querySelector('[data-slot="command-search-icon"]') as SVGElement;
+    expect(icon.getAttribute('class')).toContain('command-search-icon');
   });
 });

@@ -63,3 +63,31 @@ describe('CodeBlock class parity', () => {
     expect(root?.id).toBe('cb');
   });
 });
+
+describe('CodeBlock highlighted slot', () => {
+  it('renders pre-tokenized children instead of the raw code', () => {
+    const { container } = render(
+      <CodeBlock code="const a = 1;">
+        <code data-testid="hl">
+          <span className="tok">const</span> a = 1;
+        </code>
+      </CodeBlock>
+    );
+    expect(screen.getByTestId('hl')).toBeTruthy();
+    expect((container.querySelector('pre') as HTMLElement).querySelectorAll('code').length).toBe(1);
+  });
+
+  it('still copies the raw code when children are supplied', async () => {
+    const writeText = vi.fn(() => Promise.resolve());
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    render(
+      <CodeBlock code="const a = 1;">
+        <code>tokens</code>
+      </CodeBlock>
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Copy code' }));
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith('const a = 1;');
+    });
+  });
+});

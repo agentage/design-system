@@ -20,6 +20,10 @@ interface TabsContextValue {
   onValueChange: (value: string) => void;
   instanceId: string;
   variant: TabsVariant;
+  /** True when the current value matches one of the registered triggers. */
+  hasActive: boolean;
+  firstValue: string | null;
+  registerTrigger: (value: string) => () => void;
 }
 
 const TabsContext = React.createContext<TabsContextValue>({
@@ -27,6 +31,9 @@ const TabsContext = React.createContext<TabsContextValue>({
   onValueChange: () => {},
   instanceId: '',
   variant: 'default',
+  hasActive: true,
+  firstValue: null,
+  registerTrigger: () => () => {},
 });
 
 export const Tabs = ({
@@ -39,6 +46,7 @@ export const Tabs = ({
   ...props
 }: TabsProps): React.JSX.Element => {
   const [internalValue, setInternalValue] = React.useState(defaultValue);
+  const [triggers, setTriggers] = React.useState<string[]>([]);
   const instanceId = React.useId();
   const value = controlledValue ?? internalValue;
 
@@ -47,8 +55,26 @@ export const Tabs = ({
     onValueChange?.(newValue);
   };
 
+  // Triggers self-register (in child order) so the list stays tabbable with nothing selected.
+  const registerTrigger = React.useCallback((triggerValue: string) => {
+    setTriggers((prev) => (prev.includes(triggerValue) ? prev : [...prev, triggerValue]));
+    return () => {
+      setTriggers((prev) => prev.filter((v) => v !== triggerValue));
+    };
+  }, []);
+
   return (
-    <TabsContext.Provider value={{ value, onValueChange: handleValueChange, instanceId, variant }}>
+    <TabsContext.Provider
+      value={{
+        value,
+        onValueChange: handleValueChange,
+        instanceId,
+        variant,
+        hasActive: triggers.includes(value),
+        firstValue: triggers[0] ?? null,
+        registerTrigger,
+      }}
+    >
       <div className={cn('flex flex-col', className)} data-slot="tabs" {...props}>
         {children}
       </div>
@@ -96,8 +122,14 @@ export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>
     { value: triggerValue, className, children, disabled = false, onKeyDown, onClick, ...props },
     ref
   ) => {
-    const { value, onValueChange, instanceId, variant } = React.useContext(TabsContext);
+    const { value, onValueChange, instanceId, variant, hasActive, firstValue, registerTrigger } =
+      React.useContext(TabsContext);
     const isActive = value === triggerValue;
+
+    React.useEffect(() => {
+      if (disabled) return;
+      return registerTrigger(triggerValue);
+    }, [disabled, registerTrigger, triggerValue]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
       onKeyDown?.(e);
@@ -127,7 +159,7 @@ export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>
         aria-controls={`${instanceId}-panel-${triggerValue}`}
         id={`${instanceId}-trigger-${triggerValue}`}
         data-value={triggerValue}
-        tabIndex={isActive ? 0 : -1}
+        tabIndex={isActive || (!hasActive && firstValue === triggerValue) ? 0 : -1}
         disabled={disabled}
         onClick={(e) => {
           onClick?.(e);

@@ -22,6 +22,8 @@ const SearchIcon = (): React.JSX.Element => (
     strokeLinecap="round"
     strokeLinejoin="round"
     aria-hidden="true"
+    data-slot="command-search-icon"
+    className="command-search-icon shrink-0 text-muted-foreground"
   >
     <circle cx="11" cy="11" r="8" />
     <path d="m21 21-4.3-4.3" />
@@ -37,6 +39,13 @@ export interface CommandProps extends React.HTMLAttributes<HTMLDivElement> {
   'aria-label'?: string;
   /** Accessible name for the palette dialog. */
   dialogLabel?: string;
+  /** Spread onto the search input — id, data-testid, autoComplete, etc. */
+  inputProps?: Omit<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    'value' | 'onChange' | 'type' | 'role'
+  >;
+  /** Ref to the search input. */
+  inputRef?: React.Ref<HTMLInputElement>;
 }
 
 export const Command = ({
@@ -47,13 +56,14 @@ export const Command = ({
   className,
   'aria-label': ariaLabel = 'Search',
   dialogLabel = 'Command palette',
+  inputProps,
+  inputRef: externalInputRef,
   ...props
 }: CommandProps): React.JSX.Element | null => {
   const [search, setSearch] = useState('');
   const [items, setItems] = useState<{ id: string; text: string }[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const mounted = useMounted();
   const listId = `${useId()}-list`;
@@ -149,7 +159,8 @@ export const Command = ({
           <div className="flex items-center gap-2 border-b border-border px-3">
             <SearchIcon />
             <input
-              ref={inputRef}
+              {...inputProps}
+              ref={externalInputRef}
               type="text"
               role="combobox"
               aria-label={ariaLabel}
@@ -159,9 +170,16 @@ export const Command = ({
               aria-activedescendant={activeId ?? undefined}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={placeholder}
-              className="flex-1 bg-transparent py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              onKeyDown={(e) => {
+                inputProps?.onKeyDown?.(e);
+                if (!e.defaultPrevented) handleKeyDown(e);
+              }}
+              placeholder={inputProps?.placeholder ?? placeholder}
+              data-slot="command-input"
+              className={cn(
+                'flex-1 bg-transparent py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground',
+                inputProps?.className
+              )}
             />
             <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-2xs font-medium text-muted-foreground">
               ESC

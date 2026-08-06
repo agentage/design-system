@@ -75,7 +75,7 @@ describe('tabs variants', () => {
   it('renders the exact class strings for the default variant', () => {
     renderVariant('default');
     expect(screen.getByRole('tablist').className).toBe(
-      'inline-flex items-center gap-1 rounded-lg bg-muted p-1'
+      'w-fit self-start inline-flex items-center gap-1 rounded-lg bg-muted p-1'
     );
     expect(screen.getByRole('tab', { name: 'One' }).className).toBe(
       `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all ${TRIGGER_STATE} bg-background text-foreground shadow-sm`
@@ -91,7 +91,7 @@ describe('tabs variants', () => {
   it('renders the exact class strings for the underline variant', () => {
     renderVariant('underline');
     expect(screen.getByRole('tablist').className).toBe(
-      'flex items-center gap-4 border-b border-border'
+      'w-fit self-start flex items-center gap-4 border-b border-border'
     );
     expect(screen.getByRole('tab', { name: 'One' }).className).toBe(
       `-mb-px inline-flex items-center justify-center gap-2 whitespace-nowrap border-b-2 px-1 pb-2.5 pt-1 text-sm font-medium transition-all ${TRIGGER_STATE} border-foreground text-foreground`
@@ -123,7 +123,9 @@ describe('tabs pass-through', () => {
     expect(root.dataset.x).toBe('r');
 
     const list = screen.getByRole('tablist');
-    expect(list.className).toBe('inline-flex items-center gap-1 rounded-lg bg-muted p-1 w-full');
+    expect(list.className).toBe(
+      'self-start inline-flex items-center gap-1 rounded-lg bg-muted p-1 w-full'
+    );
     expect(list.id).toBe('list');
     expect(list.dataset.x).toBe('l');
 
@@ -158,5 +160,43 @@ describe('tabs pass-through', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Two' }));
     expect(seen).toEqual(['click']);
     expect(screen.getByRole('tabpanel').textContent).toBe('Panel two');
+  });
+});
+
+describe('tabs keyboard reachability', () => {
+  it('makes the first trigger tabbable when nothing is selected', () => {
+    render(
+      <Tabs>
+        <TabsList aria-label="Sections">
+          <TabsTrigger value="one">One</TabsTrigger>
+          <TabsTrigger value="two">Two</TabsTrigger>
+        </TabsList>
+        <TabsContent value="one">P</TabsContent>
+      </Tabs>
+    );
+    expect(screen.getByRole('tab', { name: 'One' }).tabIndex).toBe(0);
+    expect(screen.getByRole('tab', { name: 'Two' }).tabIndex).toBe(-1);
+  });
+
+  it('skips a disabled first trigger when nothing is selected', () => {
+    render(
+      <Tabs>
+        <TabsList aria-label="Sections">
+          <TabsTrigger value="one" disabled>
+            One
+          </TabsTrigger>
+          <TabsTrigger value="two">Two</TabsTrigger>
+        </TabsList>
+        <TabsContent value="two">P</TabsContent>
+      </Tabs>
+    );
+    expect(screen.getByRole('tab', { name: 'One' }).tabIndex).toBe(-1);
+    expect(screen.getByRole('tab', { name: 'Two' }).tabIndex).toBe(0);
+  });
+
+  it('keeps only the selected trigger tabbable once a value matches', () => {
+    setup();
+    expect(screen.getByRole('tab', { name: 'One' }).tabIndex).toBe(0);
+    expect(screen.getByRole('tab', { name: 'Three' }).tabIndex).toBe(-1);
   });
 });

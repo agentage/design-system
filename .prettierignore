@@ -3,3 +3,5 @@ dist
 coverage
 package-lock.json
 *.snap
+dist-showcase
+e2e/**/*-snapshots

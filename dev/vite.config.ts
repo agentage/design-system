@@ -22,4 +22,10 @@ export default defineConfig({
     port: 5174,
     open: true,
   },
+  // Playwright serves the built SPA from here; never auto-open a browser.
+  preview: {
+    port: 4173,
+    strictPort: true,
+    open: false,
+  },
 });

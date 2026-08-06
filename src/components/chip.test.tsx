@@ -16,7 +16,9 @@ describe('Chip', () => {
     render(<Chip onClick={vi.fn()}>Draft</Chip>);
     const chip = screen.getByRole('button', { name: 'Draft' });
     expect(chip.getAttribute('tabindex')).toBe('0');
-    expect(chip.className).toContain('focus-visible:ring-2');
+    expect(chip.dataset.slot).toBe('chip-body');
+    const wrapper = chip.parentElement as HTMLElement;
+    expect(wrapper.className).toContain('has-[[data-slot=chip-body]:focus-visible]:ring-2');
   });
 
   it('activates on Enter', async () => {
@@ -96,5 +98,32 @@ describe('Chip', () => {
     const ref = createRef<HTMLSpanElement>();
     render(<Chip ref={ref}>Draft</Chip>);
     expect(ref.current?.getAttribute('data-slot')).toBe('chip');
+  });
+});
+
+describe('Chip remove-button nesting', () => {
+  it('keeps the remove button a sibling of the button-role body', () => {
+    render(
+      <Chip onClick={vi.fn()} onRemove={vi.fn()}>
+        Draft
+      </Chip>
+    );
+    const body = screen.getByRole('button', { name: 'Draft' });
+    const remove = screen.getByRole('button', { name: 'Remove' });
+    expect(body.contains(remove)).toBe(false);
+    expect(remove.parentElement).toBe(body.parentElement);
+  });
+
+  it('removes without also firing the chip click', async () => {
+    const onClick = vi.fn();
+    const onRemove = vi.fn();
+    render(
+      <Chip onClick={onClick} onRemove={onRemove}>
+        Draft
+      </Chip>
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Remove' }));
+    expect(onRemove).toHaveBeenCalledTimes(1);
+    expect(onClick).not.toHaveBeenCalled();
   });
 });

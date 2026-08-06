@@ -42,3 +42,24 @@ describe('navLinkVariants', () => {
     );
   });
 });
+
+describe('NavLink asChild', () => {
+  it('renders the child element instead of an anchor', () => {
+    const { container } = render(
+      <NavLink asChild active icon={<svg data-testid="icon" />}>
+        <button type="button">Machines</button>
+      </NavLink>
+    );
+    const el = container.querySelector('[data-slot="nav-link"]') as HTMLElement;
+    expect(el.tagName).toBe('BUTTON');
+    expect(el.getAttribute('aria-current')).toBe('page');
+    expect(el.className).toContain('border-l-primary');
+    expect(el.textContent).toContain('Machines');
+    expect(screen.getByTestId('icon')).toBeTruthy();
+  });
+
+  it('still renders an anchor by default', () => {
+    const { container } = render(<NavLink href="/runs">Runs</NavLink>);
+    expect((container.querySelector('[data-slot="nav-link"]') as HTMLElement).tagName).toBe('A');
+  });
+});

@@ -29,6 +29,8 @@ export interface SheetProps
   onOpenChange: (open: boolean) => void;
   title?: string;
   description?: string;
+  /** Extra content for the title bar, rendered between the title block and the close button. */
+  header?: ReactNode;
   children: ReactNode;
 }
 
@@ -54,6 +56,7 @@ export const Sheet = ({
   side,
   title,
   description,
+  header,
   children,
   className,
   ...props
@@ -98,18 +101,25 @@ export const Sheet = ({
         data-slot="sheet-content"
         {...props}
       >
-        {title != null && (
-          <div className="flex items-start justify-between border-b border-border p-4">
-            <div>
-              <h2 id={titleId} className="text-lg font-semibold text-foreground">
-                {title}
-              </h2>
+        {(title != null || header != null) && (
+          <div className="flex items-start justify-between gap-3 border-b border-border p-4">
+            <div className="min-w-0 flex-1">
+              {title != null && (
+                <h2 id={titleId} className="text-lg font-semibold text-foreground">
+                  {title}
+                </h2>
+              )}
               {description && (
                 <p id={descId} className="mt-1 text-sm text-muted-foreground">
                   {description}
                 </p>
               )}
             </div>
+            {header != null && (
+              <div className="flex min-w-0 items-center gap-2" data-slot="sheet-header">
+                {header}
+              </div>
+            )}
             <button
               onClick={() => onOpenChange(false)}
               className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"

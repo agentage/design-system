@@ -40,7 +40,7 @@ describe('Progress', () => {
 
 describe('progressVariants', () => {
   it('renders the exact indicator class string for every status', () => {
-    const base = 'h-full rounded-full transition-all duration-300';
+    const base = 'h-full rounded-full transition-all';
     const tokens = {
       default: 'bg-primary',
       success: 'bg-success',
@@ -63,7 +63,27 @@ describe('progressVariants', () => {
     render(<Progress indeterminate variant="success" label="p" />);
     const fill = screen.getByRole('progressbar').firstElementChild as HTMLElement;
     expect(fill.className).toBe(
-      'h-full rounded-full transition-all duration-300 bg-success w-full animate-pulse'
+      'h-full rounded-full transition-all bg-success w-full animate-pulse'
     );
+  });
+});
+
+describe('Progress duration', () => {
+  it('defaults the fill transition to 300ms', () => {
+    render(<Progress value={30} label="p" />);
+    const fill = screen.getByRole('progressbar').firstElementChild as HTMLElement;
+    expect(fill.style.transitionDuration).toBe('300ms');
+  });
+
+  it('honours a custom duration', () => {
+    render(<Progress value={30} duration={800} label="p" />);
+    const fill = screen.getByRole('progressbar').firstElementChild as HTMLElement;
+    expect(fill.style.transitionDuration).toBe('800ms');
+  });
+
+  it('disables the transition when duration is false', () => {
+    render(<Progress value={30} duration={false} label="p" />);
+    const fill = screen.getByRole('progressbar').firstElementChild as HTMLElement;
+    expect(fill.style.transitionDuration).toBe('0s');
   });
 });

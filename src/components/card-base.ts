@@ -1,21 +1,24 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 
 /**
- * Two card surfaces exist today and both ship as-is:
+ * Three card surfaces exist today and all ship as-is:
  *
  * - `panel` (CARD_BASE) — bg-sidebar, rounded-lg, p-4. The dense metric/chart
  *   cards (gauge, donut, score, heatmap, funnel, ranked-list, multi-stat).
  * - `card` — bg-card, rounded-xl, py-6 + shadow. The `Card` composition in
  *   card.tsx, with padding supplied per slot.
+ * - `flat` — bg-card, rounded-xl, p-5, no shadow, block layout. `Card
+ *   variant="flat"`, for content that supplies its own internal spacing.
  *
- * Converging them is a deliberate visual change, deferred to wave 3. Until
- * then this CVA is the single place both are declared.
+ * Converging them is a deliberate visual change, still deferred. Until then
+ * this CVA is the single place all three are declared.
  */
 export const cardSurface = cva('border border-border', {
   variants: {
     surface: {
       panel: 'rounded-lg bg-sidebar p-4',
       card: 'flex flex-col gap-6 rounded-xl bg-card py-6 text-card-foreground shadow-sm',
+      flat: 'block rounded-xl bg-card p-5 text-card-foreground',
     },
   },
   defaultVariants: {

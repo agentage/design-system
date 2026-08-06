@@ -25,3 +25,29 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run verify
+
+  e2e:
+    name: 🎭 Showcase e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Same image the baselines were rendered in - font metrics must match exactly.
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      options: --ipc=host
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build:showcase
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7

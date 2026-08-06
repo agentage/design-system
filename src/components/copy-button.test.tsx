@@ -47,3 +47,49 @@ describe('CopyButton', () => {
     expect(ref.current?.tagName).toBe('BUTTON');
   });
 });
+
+describe('CopyButton fallbacks', () => {
+  it('falls back to execCommand when the async clipboard rejects', async () => {
+    writeText.mockRejectedValueOnce(new Error('denied'));
+    const execCommand = vi.fn(() => true);
+    Object.defineProperty(document, 'execCommand', { value: execCommand, configurable: true });
+
+    render(<CopyButton text="npm i" />);
+    await userEvent.click(screen.getByRole('button'));
+    await waitFor(() => {
+      expect(screen.getByText('Copied')).toBeTruthy();
+    });
+    expect(execCommand).toHaveBeenCalledWith('copy');
+  });
+
+  it('shows an error state when both paths fail', async () => {
+    writeText.mockRejectedValueOnce(new Error('denied'));
+    Object.defineProperty(document, 'execCommand', {
+      value: vi.fn(() => false),
+      configurable: true,
+    });
+
+    render(<CopyButton text="npm i" />);
+    const button = screen.getByRole('button');
+    await userEvent.click(button);
+    await waitFor(() => {
+      expect(screen.getByText('Failed')).toBeTruthy();
+    });
+    expect(button.dataset.error).toBe('true');
+  });
+
+  it('does not leave the fallback textarea in the document', async () => {
+    writeText.mockRejectedValueOnce(new Error('denied'));
+    Object.defineProperty(document, 'execCommand', {
+      value: vi.fn(() => true),
+      configurable: true,
+    });
+
+    render(<CopyButton text="npm i" />);
+    await userEvent.click(screen.getByRole('button'));
+    await waitFor(() => {
+      expect(screen.getByText('Copied')).toBeTruthy();
+    });
+    expect(document.querySelectorAll('textarea').length).toBe(0);
+  });
+});
