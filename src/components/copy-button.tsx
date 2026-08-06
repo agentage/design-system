@@ -135,7 +135,29 @@ export const CopyButton = React.forwardRef<HTMLButtonElement, CopyButtonProps>(
         {...props}
       >
         {copied ? <CheckIcon /> : failed ? <ErrorIcon /> : <CopyIcon />}
-        {!iconOnly && <span aria-live="polite">{currentLabel}</span>}
+        {!iconOnly && (
+          // All labels share one grid cell so the button width never shifts on state change.
+          <span className="inline-grid" aria-live="polite">
+            <span
+              className={cn('col-start-1 row-start-1', state !== 'idle' && 'invisible')}
+              aria-hidden={state !== 'idle' || undefined}
+            >
+              {label}
+            </span>
+            <span
+              className={cn('col-start-1 row-start-1', !copied && 'invisible')}
+              aria-hidden={!copied || undefined}
+            >
+              {successLabel}
+            </span>
+            <span
+              className={cn('col-start-1 row-start-1', !failed && 'invisible')}
+              aria-hidden={!failed || undefined}
+            >
+              {errorLabel}
+            </span>
+          </span>
+        )}
       </button>
     );
   }
