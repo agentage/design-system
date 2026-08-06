@@ -1,10 +1,13 @@
 import * as React from 'react';
 import { cn } from '../lib/utils';
 
+export type TabsVariant = 'default' | 'underline';
+
 export interface TabsProps {
   defaultValue?: string;
   value?: string;
   onValueChange?: (value: string) => void;
+  variant?: TabsVariant;
   className?: string;
   children: React.ReactNode;
 }
@@ -13,18 +16,21 @@ interface TabsContextValue {
   value: string;
   onValueChange: (value: string) => void;
   instanceId: string;
+  variant: TabsVariant;
 }
 
 const TabsContext = React.createContext<TabsContextValue>({
   value: '',
   onValueChange: () => {},
   instanceId: '',
+  variant: 'default',
 });
 
 export const Tabs: React.FC<TabsProps> = ({
   defaultValue = '',
   value: controlledValue,
   onValueChange,
+  variant = 'default',
   className,
   children,
 }) => {
@@ -38,7 +44,7 @@ export const Tabs: React.FC<TabsProps> = ({
   };
 
   return (
-    <TabsContext.Provider value={{ value, onValueChange: handleValueChange, instanceId }}>
+    <TabsContext.Provider value={{ value, onValueChange: handleValueChange, instanceId, variant }}>
       <div className={cn('flex flex-col', className)} data-slot="tabs">
         {children}
       </div>
@@ -51,15 +57,24 @@ export interface TabsListProps {
   children: React.ReactNode;
 }
 
-export const TabsList: React.FC<TabsListProps> = ({ className, children }) => (
-  <div
-    className={cn('inline-flex items-center gap-1 rounded-lg bg-muted p-1', className)}
-    role="tablist"
-    data-slot="tabs-list"
-  >
-    {children}
-  </div>
-);
+export const TabsList: React.FC<TabsListProps> = ({ className, children }) => {
+  const { variant } = React.useContext(TabsContext);
+
+  return (
+    <div
+      className={cn(
+        variant === 'underline'
+          ? 'flex items-center gap-4 border-b border-border'
+          : 'inline-flex items-center gap-1 rounded-lg bg-muted p-1',
+        className
+      )}
+      role="tablist"
+      data-slot="tabs-list"
+    >
+      {children}
+    </div>
+  );
+};
 
 export interface TabsTriggerProps {
   value: string;
@@ -74,7 +89,7 @@ export const TabsTrigger: React.FC<TabsTriggerProps> = ({
   children,
   disabled = false,
 }) => {
-  const { value, onValueChange, instanceId } = React.useContext(TabsContext);
+  const { value, onValueChange, instanceId, variant } = React.useContext(TabsContext);
   const isActive = value === triggerValue;
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
@@ -122,12 +137,18 @@ export const TabsTrigger: React.FC<TabsTriggerProps> = ({
       onKeyDown={handleKeyDown}
       data-slot="tabs-trigger"
       className={cn(
-        'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all',
+        variant === 'underline'
+          ? '-mb-px inline-flex items-center justify-center gap-2 whitespace-nowrap border-b-2 px-1 pb-2.5 pt-1 text-sm font-medium transition-all'
+          : 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         'disabled:pointer-events-none disabled:opacity-50',
-        isActive
-          ? 'bg-background text-foreground shadow-sm'
-          : 'text-muted-foreground hover:text-foreground',
+        variant === 'underline'
+          ? isActive
+            ? 'border-foreground text-foreground'
+            : 'border-transparent text-muted-foreground hover:text-foreground'
+          : isActive
+            ? 'bg-background text-foreground shadow-sm'
+            : 'text-muted-foreground hover:text-foreground',
         className
       )}
     >

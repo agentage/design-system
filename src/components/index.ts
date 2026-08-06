@@ -96,6 +96,9 @@ export type {
 export { EmptyState } from './empty-state';
 export type { EmptyStateProps } from './empty-state';
 
+export { EntityList, ListRow } from './entity-list';
+export type { EntityListProps, ListRowProps } from './entity-list';
+
 export { FormField } from './form-field';
 export type { FormFieldProps } from './form-field';
 
@@ -213,7 +216,13 @@ export {
 } from './table';
 
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
-export type { TabsContentProps, TabsListProps, TabsProps, TabsTriggerProps } from './tabs';
+export type {
+  TabsContentProps,
+  TabsListProps,
+  TabsProps,
+  TabsTriggerProps,
+  TabsVariant,
+} from './tabs';
 
 export { ToastProvider, useToast } from './toast';
 
