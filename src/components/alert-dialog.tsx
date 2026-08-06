@@ -19,9 +19,11 @@ export const alertDialogConfirmVariants = cva(
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
         destructive: 'bg-destructive-solid text-on-solid hover:bg-destructive-solid/90',
       },
+      disabled: { true: 'pointer-events-none opacity-50', false: '' },
     },
     defaultVariants: {
       variant: 'default',
+      disabled: false,
     },
   }
 );
@@ -29,7 +31,7 @@ export const alertDialogConfirmVariants = cva(
 export interface AlertDialogProps
   extends
     Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>,
-    VariantProps<typeof alertDialogConfirmVariants> {
+    Omit<VariantProps<typeof alertDialogConfirmVariants>, 'disabled'> {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
@@ -37,6 +39,8 @@ export interface AlertDialogProps
   cancelLabel?: string;
   confirmLabel?: string;
   onConfirm: () => void;
+  /** Blocks the confirm action, e.g. until a confirmation phrase matches. */
+  confirmDisabled?: boolean;
   children?: ReactNode;
 }
 
@@ -48,6 +52,7 @@ export const AlertDialog = ({
   cancelLabel = 'Cancel',
   confirmLabel = 'Confirm',
   onConfirm,
+  confirmDisabled = false,
   variant,
   children,
   className,
@@ -128,11 +133,12 @@ export const AlertDialog = ({
           </button>
           <button
             type="button"
+            disabled={confirmDisabled}
             onClick={() => {
               onConfirm();
               onOpenChange(false);
             }}
-            className={cn(alertDialogConfirmVariants({ variant }))}
+            className={cn(alertDialogConfirmVariants({ variant, disabled: confirmDisabled }))}
           >
             {confirmLabel}
           </button>
