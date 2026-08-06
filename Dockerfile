@@ -15,5 +15,6 @@ EXPOSE 8080
 # Build provenance, baked late so a changing SHA only busts this layer.
 ARG COMMIT_SHA=""
 ENV COMMIT_SHA=$COMMIT_SHA
+# 127.0.0.1, not localhost: nginx binds IPv4 only; busybox wget picks ::1 and gets refused.
 HEALTHCHECK --interval=15s --timeout=5s --retries=3 \
-  CMD wget -q --spider http://localhost:8080/ || exit 1
+  CMD wget -q --spider http://127.0.0.1:8080/ || exit 1
