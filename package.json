@@ -110,6 +110,10 @@
       "types": "./dist/components/command.variants.d.ts",
       "import": "./dist/components/command.variants.js"
     },
+    "./confirm-by-typing": {
+      "types": "./dist/components/confirm-by-typing.d.ts",
+      "import": "./dist/components/confirm-by-typing.js"
+    },
     "./context-menu": {
       "types": "./dist/components/context-menu.d.ts",
       "import": "./dist/components/context-menu.js"
@@ -117,6 +121,10 @@
     "./copy-button": {
       "types": "./dist/components/copy-button.d.ts",
       "import": "./dist/components/copy-button.js"
+    },
+    "./danger-zone": {
+      "types": "./dist/components/danger-zone.d.ts",
+      "import": "./dist/components/danger-zone.js"
     },
     "./data-table": {
       "types": "./dist/components/data-table.d.ts",
@@ -258,6 +266,10 @@
       "types": "./dist/components/pagination.d.ts",
       "import": "./dist/components/pagination.js"
     },
+    "./panel-sizes": {
+      "types": "./dist/lib/panel-sizes.d.ts",
+      "import": "./dist/lib/panel-sizes.js"
+    },
     "./popover": {
       "types": "./dist/components/popover.d.ts",
       "import": "./dist/components/popover.js"
@@ -270,6 +282,10 @@
       "types": "./dist/components/prose.d.ts",
       "import": "./dist/components/prose.js"
     },
+    "./quota-banner": {
+      "types": "./dist/components/quota-banner.d.ts",
+      "import": "./dist/components/quota-banner.js"
+    },
     "./radio-group": {
       "types": "./dist/components/radio-group.d.ts",
       "import": "./dist/components/radio-group.js"
@@ -277,6 +293,18 @@
     "./ranked-list-card": {
       "types": "./dist/components/ranked-list-card.d.ts",
       "import": "./dist/components/ranked-list-card.js"
+    },
+    "./resizable": {
+      "types": "./dist/components/resizable.d.ts",
+      "import": "./dist/components/resizable.js"
+    },
+    "./resizable.parts": {
+      "types": "./dist/components/resizable.parts.d.ts",
+      "import": "./dist/components/resizable.parts.js"
+    },
+    "./resizable.variants": {
+      "types": "./dist/components/resizable.variants.d.ts",
+      "import": "./dist/components/resizable.variants.js"
     },
     "./score-card": {
       "types": "./dist/components/score-card.d.ts",
@@ -369,6 +397,14 @@
     "./top-bar": {
       "types": "./dist/components/top-bar.d.ts",
       "import": "./dist/components/top-bar.js"
+    },
+    "./usage-level": {
+      "types": "./dist/lib/usage-level.d.ts",
+      "import": "./dist/lib/usage-level.js"
+    },
+    "./usage-meter": {
+      "types": "./dist/components/usage-meter.d.ts",
+      "import": "./dist/components/usage-meter.js"
     },
     "./use-anchor-position": {
       "types": "./dist/lib/use-anchor-position.d.ts",

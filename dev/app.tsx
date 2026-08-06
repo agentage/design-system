@@ -29,6 +29,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
   Combobox,
+  ConfirmByTyping,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -38,6 +39,8 @@ import {
   ContextMenuItem,
   ContextMenuLabel,
   ContextMenuSeparator,
+  DangerZone,
+  DangerZoneAction,
   DataTable,
   DatePicker,
   DropdownMenu,
@@ -69,8 +72,12 @@ import {
   Popover,
   Progress,
   Prose,
+  QuotaBanner,
   RadioGroup,
   RadioGroupItem,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
   ScrollArea,
   Section,
   Select,
@@ -107,6 +114,7 @@ import {
   useToast,
   ToggleGroup,
   Tooltip,
+  UsageMeter,
   // Catalog & Site additions
   Chip,
   CopyButton,
@@ -335,6 +343,27 @@ const ToastDemo = () => {
     </div>
   );
 };
+
+const QUOTAS = [
+  {
+    label: 'Storage',
+    value: 17,
+    max: 100,
+    format: (v: number, m: number) => `${String(v)} MB / ${String(m)} MB`,
+  },
+  {
+    label: 'Memories',
+    value: 84,
+    max: 100,
+    format: (v: number, m: number) => `${String(v)} / ${String(m)} notes`,
+  },
+  {
+    label: 'API calls',
+    value: 9_800,
+    max: 10_000,
+    format: (v: number, m: number) => `${String(v / 1000)}k / ${String(m / 1000)}k`,
+  },
+];
 
 /* ── Sample Data ── */
 const MACHINES = [
@@ -1273,6 +1302,47 @@ const DataDisplayPage = () => {
           ))}
         </div>
       </S>
+
+      <S title="Usage Meter">
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="space-y-4 max-w-md">
+            {QUOTAS.map((q) => (
+              <UsageMeter
+                key={q.label}
+                label={q.label}
+                value={q.value}
+                max={q.max}
+                formatValue={q.format}
+              />
+            ))}
+            <UsageMeter label="Seats (sm)" value={4} max={5} size="sm" />
+          </div>
+          <div className="space-y-3 max-w-md">
+            <QuotaBanner
+              label="storage"
+              value={82}
+              max={100}
+              icon={<InfoIcon />}
+              action={
+                <Button size="sm" variant="outline">
+                  Upgrade
+                </Button>
+              }
+            />
+            <QuotaBanner
+              label="API calls"
+              value={9_800}
+              max={10_000}
+              action={
+                <Button size="sm" variant="outline">
+                  Buy credits
+                </Button>
+              }
+            />
+            <QuotaBanner label="memories" value={520} max={500} />
+          </div>
+        </div>
+      </S>
     </>
   );
 };
@@ -1446,6 +1516,7 @@ const FeedbackPage = () => {
   const [cmdOpen, setCmdOpen] = useState(false);
   const [nestedPopoverOpen, setNestedPopoverOpen] = useState(false);
   const [nestedModalOpen, setNestedModalOpen] = useState(false);
+  const [deleted, setDeleted] = useState(false);
 
   return (
     <>
@@ -1763,6 +1834,48 @@ const FeedbackPage = () => {
           </p>
         </Modal>
       </S>
+
+      <S title="Danger Zone">
+        <DangerZone
+          description="These actions are permanent. Nothing here can be undone."
+          className="max-w-2xl"
+        >
+          <DangerZoneAction
+            label="Delete memory"
+            description="Removes work-notes and every note it holds from all connected clients."
+            action={
+              <ConfirmByTyping
+                phrase="work-notes"
+                title="Delete work-notes?"
+                description="Every note in this memory is deleted on every connected client. This cannot be undone."
+                actionLabel="Delete memory"
+                onConfirm={() => {
+                  setDeleted(true);
+                }}
+                trigger={
+                  <Button variant="destructive" size="sm">
+                    Delete memory
+                  </Button>
+                }
+              />
+            }
+          />
+          <DangerZoneAction
+            label="Revoke all tokens"
+            description="Signs out every machine and invalidates every personal access token."
+            action={
+              <Button variant="outline" size="sm">
+                Revoke all
+              </Button>
+            }
+          />
+        </DangerZone>
+        {deleted && (
+          <Alert variant="success" className="max-w-2xl" onClose={() => setDeleted(false)}>
+            onConfirm fired - the phrase matched exactly.
+          </Alert>
+        )}
+      </S>
     </>
   );
 };
@@ -1950,6 +2063,49 @@ const LayoutPage = () => (
           </div>
         </div>
       </div>
+    </S>
+
+    <S title="Resizable Panels">
+      <p className="text-sm text-muted-foreground">
+        Drag the divider, or focus it and use Arrow keys (Shift for 10%), Home and End. Sizes
+        persist per browser under <code className="font-mono text-xs">ds-demo-browser</code>.
+      </p>
+      <ResizablePanelGroup
+        storageKey="ds-demo-browser"
+        className="h-64 rounded-lg border border-border"
+      >
+        <ResizablePanel defaultSize={32} minSize={18} maxSize={60} className="bg-sidebar p-3">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Memory tree</p>
+          <ul className="space-y-1 text-sm">
+            {['roadmap.md', 'architecture.md', 'meetings/2026-08-06.md', 'ideas.md'].map((f) => (
+              <li key={f} className="truncate rounded px-2 py-1 hover:bg-accent">
+                {f}
+              </li>
+            ))}
+          </ul>
+        </ResizablePanel>
+        <ResizableHandle withGrip />
+        <ResizablePanel minSize={30} className="p-4">
+          <p className="text-xs font-medium text-muted-foreground mb-2">roadmap.md</p>
+          <p className="text-sm text-muted-foreground">
+            One memory. Every AI. The tree on the left and this document share a single split
+            container - the divider only spends its delta on the two panels it sits between.
+          </p>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+      <ResizablePanelGroup direction="vertical" className="h-64 rounded-lg border border-border">
+        <ResizablePanel defaultSize={60} minSize={25} className="p-4">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Run output</p>
+          <p className="text-sm text-muted-foreground">
+            Vertical groups take the same API - the handle switches its orientation and cursor.
+          </p>
+        </ResizablePanel>
+        <ResizableHandle withGrip />
+        <ResizablePanel minSize={20} className="bg-sidebar p-4">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Logs</p>
+          <p className="font-mono text-xs text-muted-foreground">agent finished in 4.2s</p>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </S>
 
     <S title="Scroll Area">

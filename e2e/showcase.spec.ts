@@ -77,6 +77,24 @@ test.describe('showcase visuals', () => {
     await expect(menu).toHaveScreenshot('context-menu-open.png');
   });
 
+  test('usage meter', async ({ page }) => {
+    await gotoPage(page, 'Data Display');
+    await expect(section(page, 'Usage Meter')).toHaveScreenshot('usage-meter.png');
+  });
+
+  test('resizable panels', async ({ page }) => {
+    await gotoPage(page, 'Layout');
+    await expect(section(page, 'Resizable Panels')).toHaveScreenshot('resizable-panels.png');
+  });
+
+  test('confirm by typing dialog', async ({ page }) => {
+    await gotoPage(page, 'Feedback');
+    await section(page, 'Danger Zone').getByRole('button', { name: 'Delete memory' }).click();
+    const dialog = page.locator('[data-slot="alert-dialog-content"]');
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toHaveScreenshot('confirm-by-typing.png');
+  });
+
   test('command palette open', async ({ page }) => {
     await gotoPage(page, 'Feedback');
     await page.getByRole('button', { name: /Open Command/ }).click();

@@ -56,6 +56,9 @@ export type {
 export { Combobox } from './combobox';
 export type { ComboboxOption, ComboboxProps } from './combobox';
 
+export { ConfirmByTyping } from './confirm-by-typing';
+export type { ConfirmByTypingProps } from './confirm-by-typing';
+
 export { Command, CommandEmpty, CommandGroup, CommandItem, CommandSeparator } from './command';
 export type { CommandProps, CommandGroupProps, CommandItemProps } from './command';
 
@@ -73,6 +76,9 @@ export type {
   ContextMenuLabelProps,
   ContextMenuSeparatorProps,
 } from './context-menu';
+
+export { DangerZone, DangerZoneAction } from './danger-zone';
+export type { DangerZoneProps, DangerZoneActionProps } from './danger-zone';
 
 export { DataTable, dataTableCellVariants, dataTableHeadVariants } from './data-table';
 export type { DataTableColumn, DataTableProps, SortDirection, SortState } from './data-table';
@@ -182,8 +188,19 @@ export type { ProgressProps } from './progress';
 export { Prose } from './prose';
 export type { ProseProps } from './prose';
 
+export { QuotaBanner } from './quota-banner';
+export type { QuotaBannerProps } from './quota-banner';
+
 export { RadioGroup, RadioGroupItem } from './radio-group';
 export type { RadioGroupProps, RadioGroupItemProps } from './radio-group';
+
+export { ResizableHandle, ResizablePanel, ResizablePanelGroup } from './resizable';
+export type {
+  ResizableHandleProps,
+  ResizablePanelProps,
+  ResizablePanelGroupProps,
+  ResizeDirection,
+} from './resizable';
 
 export { ScrollArea } from './scroll-area';
 export type { ScrollAreaProps } from './scroll-area';
@@ -252,6 +269,17 @@ export type { ToggleButtonProps, ToggleGroupProps, ToggleOption } from './toggle
 
 export { Tooltip } from './tooltip';
 export type { TooltipProps } from './tooltip';
+
+export { UsageMeter } from './usage-meter';
+export type { UsageMeterProps } from './usage-meter';
+
+export {
+  DEFAULT_USAGE_THRESHOLDS,
+  formatUsagePercent,
+  resolveUsageLevel,
+  usageFraction,
+} from '../lib/usage-level';
+export type { UsageLevel, UsageThresholds } from '../lib/usage-level';
 
 // ─── Catalog & Site additions (mcpxhub merge gap-fill) ────────────────────────
 
@@ -355,6 +383,13 @@ export { pageHeaderActionVariants } from './page-header';
 export { paginationButtonVariants } from './pagination';
 export { progressVariants } from './progress';
 export { radioGroupIndicatorVariants, radioGroupItemVariants } from './radio-group';
+export {
+  resizableHandleGripVariants,
+  resizableHandleHitAreaVariants,
+  resizableHandleVariants,
+  resizablePanelGroupVariants,
+  resizablePanelVariants,
+} from './resizable.variants';
 export { scrollAreaVariants } from './scroll-area';
 export { selectTriggerVariants } from './select';
 export { separatorVariants } from './separator';
@@ -374,3 +409,8 @@ export { toastVariants } from './toast';
 export { toggleButtonVariants, toggleGroupVariants } from './toggle-group';
 export type { ToggleGroupColumns } from './toggle-group';
 export { topBarNavItemVariants, topBarVariants } from './top-bar';
+export {
+  usageMeterLabelVariants,
+  usageMeterTrackVariants,
+  usageMeterValueVariants,
+} from './usage-meter';
