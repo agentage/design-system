@@ -29,11 +29,13 @@ Single source of truth for the Agentage design system (OKLCH tokens + React comp
 
 ## Deploy (showcase → ds.agentage.io)
 
-- The `dev/` showcase deploys as its own Swarm stack (`agentage-ds`) behind Traefik, dev + prod, mirroring `agentage/landing`. Dockerfile builds the static SPA → nginx-unprivileged; `docker-compose.yml` carries the Traefik labels; `.github/workflows/deploy.yml` builds → smokes → deploys on push to master.
-- Gated on `vars.DEPLOY_ENABLED == 'true'` + the `development`/`production` environments. Each env sets `vars.SITE_FQDN` (`dev.ds.agentage.io` / `ds.agentage.io`); needs `SSH_PRIVATE_KEY` / `SSH_HOST` / `SSH_USER` secrets + DNS for the hosts.
+- LIVE at https://ds.agentage.io since 2026-08-06. The `dev/` showcase deploys as its own Swarm stack (`agentage-ds`) behind Traefik on the main prod box. Dockerfile builds the static SPA → nginx-unprivileged; `docker-compose.yml` carries the Traefik labels; `.github/workflows/deploy.yml` builds → smokes → deploys on push to master.
+- Production-only (the platform-wide dev env was removed 2026-07-30). Gated on `vars.DEPLOY_ENABLED == 'true'` + the `production` environment (`vars.SITE_FQDN`, `SSH_PRIVATE_KEY` / `SSH_HOST` / `SSH_USER`).
+- Container healthcheck must probe `127.0.0.1`, not `localhost` — nginx binds IPv4 only; busybox wget picks `::1`.
 
 ## Conventions
 
 - Node 22+, TS strict, ESM, React 19 peer. Prettier (single quotes, 100 cols). No `any`.
+- Tests: vitest + jsdom + Testing Library (`vitest.setup.ts`); add a test file when fixing/adding interactive behavior.
 - Never edit on master — feature branch + PR.
 - Keep component files small; barrel-export new components from `src/index.ts`.
