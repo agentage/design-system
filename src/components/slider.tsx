@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { cn } from '../lib/utils';
 
 export interface SliderProps {
@@ -29,8 +29,17 @@ export const Slider = ({
   const [internalValue, setInternalValue] = useState(defaultValue);
   const value = controlledValue ?? internalValue;
   const trackRef = useRef<HTMLDivElement>(null);
+  const draggingRef = useRef(false);
 
   const percentage = ((value - min) / (max - min)) * 100;
+
+  const commit = useCallback(
+    (next: number) => {
+      setInternalValue(next);
+      onValueChange?.(next);
+    },
+    [onValueChange]
+  );
 
   const computeValue = useCallback(
     (clientX: number) => {
@@ -39,25 +48,41 @@ export const Slider = ({
       const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
       const raw = min + ratio * (max - min);
       const stepped = Math.round(raw / step) * step;
-      const clamped = Math.min(max, Math.max(min, stepped));
-      setInternalValue(clamped);
-      onValueChange?.(clamped);
+      commit(Math.min(max, Math.max(min, stepped)));
     },
-    [min, max, step, disabled, onValueChange]
+    [min, max, step, disabled, commit]
   );
 
-  const handleMouseDown = (e: React.MouseEvent): void => {
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>): void => {
     if (disabled) return;
     e.preventDefault();
+    e.currentTarget.focus();
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    draggingRef.current = true;
     computeValue(e.clientX);
+  };
 
-    const handleMove = (ev: MouseEvent): void => computeValue(ev.clientX);
-    const handleUp = (): void => {
-      document.removeEventListener('mousemove', handleMove);
-      document.removeEventListener('mouseup', handleUp);
-    };
-    document.addEventListener('mousemove', handleMove);
-    document.addEventListener('mouseup', handleUp);
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>): void => {
+    if (!draggingRef.current) return;
+    computeValue(e.clientX);
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>): void => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>): void => {
+    if (disabled) return;
+    let next = value;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') next = Math.min(max, value + step);
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') next = Math.max(min, value - step);
+    else if (e.key === 'Home') next = min;
+    else if (e.key === 'End') next = max;
+    else return;
+    e.preventDefault();
+    commit(next);
   };
 
   return (
@@ -69,25 +94,19 @@ export const Slider = ({
       aria-valuenow={value}
       aria-label={ariaLabel}
       aria-disabled={disabled}
+      aria-orientation="horizontal"
       tabIndex={disabled ? -1 : 0}
       className={cn(
-        'relative flex h-5 w-full touch-none select-none items-center cursor-pointer',
+        'group relative flex h-5 w-full touch-none select-none items-center cursor-pointer',
+        'outline-none',
         disabled && 'opacity-50 cursor-not-allowed',
         className
       )}
-      onMouseDown={handleMouseDown}
-      onKeyDown={(e) => {
-        if (disabled) return;
-        let next = value;
-        if (e.key === 'ArrowRight' || e.key === 'ArrowUp') next = Math.min(max, value + step);
-        else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') next = Math.max(min, value - step);
-        else if (e.key === 'Home') next = min;
-        else if (e.key === 'End') next = max;
-        else return;
-        e.preventDefault();
-        setInternalValue(next);
-        onValueChange?.(next);
-      }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      onKeyDown={handleKeyDown}
       data-slot="slider"
     >
       <div className="relative h-1.5 w-full rounded-full bg-muted">
@@ -97,10 +116,12 @@ export const Slider = ({
         />
       </div>
       <div
+        aria-hidden="true"
+        data-slot="slider-thumb"
         className={cn(
-          'absolute size-4 rounded-full border-2 border-primary bg-foreground shadow-sm cursor-grab active:cursor-grabbing',
-          'focus-visible:ring-2 focus-visible:ring-ring/50',
-          !disabled && 'hover:scale-110'
+          'pointer-events-none absolute size-4 rounded-full border-2 border-primary bg-foreground shadow-sm',
+          'group-focus-visible:ring-2 group-focus-visible:ring-ring/50 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background',
+          !disabled && 'group-hover:scale-110'
         )}
         style={{ left: `calc(${String(percentage)}% - 8px)` }}
       />

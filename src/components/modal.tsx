@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { useFocusTrap } from '../lib/use-focus-trap';
 import { cn } from '../lib/utils';
 
 export interface ModalProps {
@@ -83,42 +84,7 @@ export const Modal = ({
     };
   }, [isOpen]);
 
-  // Focus trap: Tab/Shift+Tab cycles within modal
-  useEffect(() => {
-    if (!isOpen || !modalRef.current) return;
-
-    const modal = modalRef.current;
-    const focusableSelector =
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-    const focusableElements = modal.querySelectorAll<HTMLElement>(focusableSelector);
-
-    if (focusableElements.length > 0) {
-      focusableElements[0].focus();
-    }
-
-    const handleTab = (e: KeyboardEvent): void => {
-      if (e.key !== 'Tab') return;
-
-      const elements = modal.querySelectorAll<HTMLElement>(focusableSelector);
-      if (elements.length === 0) return;
-
-      const first = elements[0];
-      const last = elements[elements.length - 1];
-
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener('keydown', handleTab);
-    return (): void => {
-      document.removeEventListener('keydown', handleTab);
-    };
-  }, [isOpen]);
+  useFocusTrap(modalRef, isOpen);
 
   const handleOverlayClick = (event: React.MouseEvent): void => {
     if (closeOnOverlayClick && event.target === event.currentTarget) {
@@ -142,8 +108,9 @@ export const Modal = ({
 
       <div
         ref={modalRef}
+        tabIndex={-1}
         className={cn(
-          'relative z-10 w-full rounded-lg border border-border bg-background shadow-lg',
+          'relative z-10 w-full rounded-lg border border-border bg-background shadow-lg outline-none',
           sizeClasses[size]
         )}
       >
