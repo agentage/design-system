@@ -449,7 +449,7 @@
     "dev": "vite --config dev/vite.config.ts",
     "dev:build": "vite build --watch",
     "build": "tsc --noEmit && vite build",
-    "build:showcase": "vite build --config dev/vite.config.ts",
+    "build:showcase": "npm run props:generate && vite build --config dev/vite.config.ts",
     "type-check": "tsc --noEmit",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
@@ -459,10 +459,12 @@
     "clean": "rm -rf dist",
     "exports:generate": "node scripts/generate-exports.mjs",
     "exports:check": "node scripts/generate-exports.mjs --check",
-    "verify": "npm run type-check && npm run type-check:e2e && npm run lint && npm run format:check && npm run exports:check && npm run test:coverage && npm run build",
+    "verify": "npm run type-check && npm run type-check:dev && npm run type-check:e2e && npm run lint && npm run format:check && npm run exports:check && npm run test:coverage && npm run build",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "type-check:e2e": "tsc --noEmit -p tsconfig.e2e.json"
+    "type-check:e2e": "tsc --noEmit -p tsconfig.e2e.json",
+    "props:generate": "node scripts/generate-props.mjs && prettier --write dev/generated/props.ts",
+    "type-check:dev": "tsc --noEmit -p tsconfig.dev.json"
   },
   "dependencies": {
     "@radix-ui/react-select": "^2.3.1",
