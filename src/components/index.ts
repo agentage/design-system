@@ -59,6 +59,27 @@ export type { ComboboxOption, ComboboxProps } from './combobox';
 export { Command, CommandEmpty, CommandGroup, CommandItem, CommandSeparator } from './command';
 export type { CommandProps, CommandGroupProps, CommandItemProps } from './command';
 
+export {
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuLabel,
+  ContextMenuSeparator,
+  contextMenuContentVariants,
+  contextMenuItemVariants,
+} from './context-menu';
+export type {
+  ContextMenuProps,
+  ContextMenuItemProps,
+  ContextMenuLabelProps,
+  ContextMenuSeparatorProps,
+} from './context-menu';
+
+export { DataTable, dataTableCellVariants, dataTableHeadVariants } from './data-table';
+export type { DataTableColumn, DataTableProps, SortDirection, SortState } from './data-table';
+
+export { compareValues, nextSortState } from '../lib/table-sort';
+export type { SortableValue } from '../lib/table-sort';
+
 export { DatePicker } from './date-picker';
 export type { DatePickerProps } from './date-picker';
 
