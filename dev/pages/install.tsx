@@ -1,4 +1,5 @@
-import { Alert, Badge, CodeBlock, Heading, InlineCode, Prose } from '../../src';
+import { Alert, Badge, Heading, InlineCode, Prose } from '../../src';
+import { Code } from '../components/code';
 
 const INSTALL = `npm install @agentage/design-system`;
 
@@ -37,7 +38,7 @@ export const InstallPage = () => (
 
     <section className="space-y-3" data-section="Install">
       <h2 className="border-b border-border pb-2 text-lg font-semibold text-foreground">Install</h2>
-      <CodeBlock language="bash" code={INSTALL} />
+      <Code language="bash" code={INSTALL} />
       <p className="text-sm text-muted-foreground">
         Peers: React 19+, React DOM 19+. Tailwind CSS 4+ is an optional peer - the components carry
         Tailwind utility classes, so you need it unless you ship your own compiled CSS.
@@ -48,7 +49,7 @@ export const InstallPage = () => (
       <h2 className="border-b border-border pb-2 text-lg font-semibold text-foreground">
         Load the theme
       </h2>
-      <CodeBlock language="typescript" code={THEME_IMPORT} />
+      <Code language="typescript" code={THEME_IMPORT} />
       <p className="text-sm text-muted-foreground">
         <InlineCode>theme.css</InlineCode> composes the OKLCH primitives, the semantic tokens and
         the base resets. Import it once, at the root.
@@ -59,7 +60,7 @@ export const InstallPage = () => (
       <h2 className="border-b border-border pb-2 text-lg font-semibold text-foreground">
         Tailwind @source
       </h2>
-      <CodeBlock language="css" code={TAILWIND_SOURCE} />
+      <Code language="css" code={TAILWIND_SOURCE} />
       <Alert variant="warning">
         The glob must resolve to where npm actually hoisted the package. In a workspace that is the
         repo-root <InlineCode>node_modules</InlineCode>, not the package-local one - the most common
@@ -71,7 +72,7 @@ export const InstallPage = () => (
       <h2 className="border-b border-border pb-2 text-lg font-semibold text-foreground">
         Server components
       </h2>
-      <CodeBlock language="typescript" code={RSC} />
+      <Code language="typescript" code={RSC} />
       <Prose className="max-w-none text-sm">
         <ul>
           <li>

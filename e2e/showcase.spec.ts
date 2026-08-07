@@ -84,11 +84,61 @@ test.describe('docs a11y', () => {
   }
 });
 
+/** The left rail: one scroll container, groups collapsed unless the route needs them. */
+const rail = (page: Page) => page.locator('.docs-rail');
+const group = (page: Page, label: string) =>
+  rail(page).getByRole('button', { name: label, exact: true });
+
+test.describe('docs navigation', () => {
+  test('only the current route group is expanded on a deep link', async ({ page }) => {
+    await open(page, '/components/forms/slider');
+    await expect(group(page, 'Forms')).toHaveAttribute('aria-expanded', 'true');
+    for (const other of ['Foundations', 'Cards', 'Layout', 'Site & Docs']) {
+      await expect(group(page, other)).toHaveAttribute('aria-expanded', 'false');
+    }
+    await expect(rail(page).getByRole('link', { name: 'Slider', exact: true })).toBeInViewport();
+  });
+
+  test('a group toggles from the keyboard and persists for the session', async ({ page }) => {
+    await open(page, '/install');
+    await group(page, 'Cards').focus();
+    await page.keyboard.press('Enter');
+    await expect(group(page, 'Cards')).toHaveAttribute('aria-expanded', 'true');
+    await expect(rail(page).getByRole('link', { name: 'GaugeCard', exact: true })).toBeVisible();
+
+    await page.reload();
+    await expect(group(page, 'Cards')).toHaveAttribute('aria-expanded', 'true');
+
+    await group(page, 'Cards').click();
+    await expect(group(page, 'Cards')).toHaveAttribute('aria-expanded', 'false');
+    await expect(rail(page).getByRole('link', { name: 'GaugeCard', exact: true })).toBeHidden();
+  });
+
+  test('the rail is the only scroller in the aside', async ({ page }) => {
+    await open(page, '/components/forms/slider');
+    const nested = await rail(page).evaluate(
+      (el) =>
+        [...el.querySelectorAll('*')].filter(
+          (n) =>
+            n.scrollHeight > n.clientHeight + 1 &&
+            ['auto', 'scroll'].includes(getComputedStyle(n).overflowY)
+        ).length
+    );
+    expect(nested).toBe(0);
+    // Transparent thumb: the rail may scroll, but never paints a second bar.
+    await expect(rail(page)).toHaveCSS('scrollbar-color', 'rgba(0, 0, 0, 0) rgba(0, 0, 0, 0)');
+  });
+});
+
 test.describe('routing', () => {
   test('a component URL deep-links on a cold load', async ({ page }) => {
     await open(page, '/components/foundations/button');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Button');
-    await expect(page.getByText("from '@agentage/design-system/button'")).toBeVisible();
+    await expect(
+      section(page, 'Import').locator('.hljs-string', {
+        hasText: '@agentage/design-system/button',
+      })
+    ).toBeVisible();
   });
 
   test('back and forward restore the previous route', async ({ page }) => {
@@ -115,6 +165,26 @@ test.describe('routing', () => {
     await page.getByRole('option', { name: 'FunnelCard' }).click();
     await expect(page).toHaveURL('/components/cards/funnel-card');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('FunnelCard');
+  });
+});
+
+test.describe('syntax highlighting', () => {
+  test('import snippets tokenize into distinct token colours', async ({ page }) => {
+    await open(page, '/components/foundations/button');
+    const code = section(page, 'Import').locator('.hljs');
+    await expect(code.locator('.hljs-keyword').first()).toHaveText('import');
+    await expect(code.locator('.hljs-string')).toBeVisible();
+
+    const colours = await code.evaluate(
+      (el) => new Set([...el.querySelectorAll('span')].map((s) => getComputedStyle(s).color)).size
+    );
+    expect(colours).toBeGreaterThan(1);
+  });
+
+  test('the getting-started snippets highlight in the light theme too', async ({ page }) => {
+    await open(page, '/install', 'light');
+    await expect(section(page, 'Theme').locator('.hljs-comment')).toBeVisible();
+    await expect(section(page, 'Tailwind').locator('.hljs-string').first()).toBeVisible();
   });
 });
 

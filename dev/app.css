@@ -4,3 +4,104 @@
 @source "./**/*.{ts,tsx}";
 @source "../src/components/**/*.{ts,tsx}";
 @source "../src/lib/**/*.ts";
+
+/* ── Docs rail ────────────────────────────────────────────────────────────
+ * DocSidebar ships its own max-h-screen scroller; nested inside the rail's
+ * scroller that rendered a second bar right next to the page one. Flatten the
+ * inner one and keep the rail's overlay-thin. */
+.docs-rail [data-slot='doc-sidebar'] > div {
+  position: static;
+  max-height: none;
+  overflow: visible;
+}
+
+.rail-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.rail-scroll:hover,
+.rail-scroll:focus-within {
+  scrollbar-color: var(--color-border) transparent;
+}
+
+/* base.css styles ::-webkit-scrollbar globally, and Chromium prefers the
+ * pseudo-elements over scrollbar-color once they exist — so override both. */
+.rail-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rail-scroll::-webkit-scrollbar-track,
+.rail-scroll::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+.rail-scroll:hover::-webkit-scrollbar-thumb,
+.rail-scroll:focus-within::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+}
+
+/* ── highlight.js theme ───────────────────────────────────────────────────
+ * Semantic DS tokens only; every one clears 4.5:1 on --color-card (the
+ * CodeBlock surface) in both themes, which the axe sweep gates. */
+.hljs {
+  color: var(--color-foreground);
+  background: transparent;
+}
+
+.hljs-comment,
+.hljs-quote,
+.hljs-meta {
+  color: var(--color-muted-foreground);
+}
+
+.hljs-keyword,
+.hljs-built_in,
+.hljs-literal,
+.hljs-type,
+.hljs-meta .hljs-keyword {
+  color: var(--color-primary-emphasis);
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-char.escape_,
+.hljs-meta .hljs-string {
+  color: var(--color-success);
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: var(--color-warning);
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-name,
+.hljs-property,
+.hljs-section,
+.hljs-selector-class,
+.hljs-selector-id,
+.hljs-selector-tag,
+.hljs-tag,
+.hljs-title {
+  color: var(--color-info);
+}
+
+.hljs-deletion,
+.hljs-template-variable,
+.hljs-variable {
+  color: var(--color-destructive);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 600;
+}

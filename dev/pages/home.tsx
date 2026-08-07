@@ -1,4 +1,5 @@
-import { Badge, Button, CodeBlock, Heading, Kbd, StatCard } from '../../src';
+import { Badge, Button, Heading, Kbd, StatCard } from '../../src';
+import { Code } from '../components/code';
 import { Link } from '../lib/router';
 import { ALL_COMPONENTS, CATEGORIES } from '../registry';
 import { COMPONENT_PROPS } from '../generated/props';
@@ -43,7 +44,7 @@ export const HomePage = () => (
       </span>
     </div>
 
-    <CodeBlock language="bash" code="npm install @agentage/design-system" />
+    <Code language="bash" code="npm install @agentage/design-system" />
 
     <section className="space-y-4" data-section="Categories">
       <h2 className="border-b border-border pb-2 text-lg font-semibold text-foreground">

@@ -1,14 +1,7 @@
 'use client';
 import { useState } from 'react';
-import {
-  DocSidebar,
-  DocSidebarGroup,
-  DocSidebarItem,
-  EmptyState,
-  Heading,
-  ToastProvider,
-  ToggleGroup,
-} from '../src';
+import { EmptyState, Heading, ToastProvider, ToggleGroup } from '../src';
+import { DocsNav } from './components/docs-nav';
 import { Search } from './components/search';
 import { BrandedLogo } from './lib/icons';
 import { Link, RouterProvider, useRoute } from './lib/router';
@@ -17,7 +10,7 @@ import { ComponentPage } from './pages/component-page';
 import { HomePage } from './pages/home';
 import { InstallPage } from './pages/install';
 import { ThemingPage } from './pages/theming';
-import { CATEGORIES, componentPath, findComponent } from './registry';
+import { CATEGORIES, findComponent } from './registry';
 
 const TOP_NAV = [
   { to: '/components', label: 'Components' },
@@ -59,32 +52,6 @@ const Routed = () => {
     return resolved ? <ComponentPage {...resolved} /> : <NotFound path={path} />;
   }
   return <NotFound path={path} />;
-};
-
-const Nav = () => {
-  const { path } = useRoute();
-  return (
-    <DocSidebar className="h-full border-r-0" width="w-64">
-      {CATEGORIES.map((category) => (
-        <DocSidebarGroup key={category.slug} title={category.label}>
-          <DocSidebarItem
-            href={`/components/${category.slug}`}
-            active={path === `/components/${category.slug}`}
-          >
-            Overview
-          </DocSidebarItem>
-          {category.components.map((component) => {
-            const to = componentPath(category.slug, component.slug);
-            return (
-              <DocSidebarItem key={component.slug} href={to} active={path === to} depth={1}>
-                {component.name}
-              </DocSidebarItem>
-            );
-          })}
-        </DocSidebarGroup>
-      ))}
-    </DocSidebar>
-  );
 };
 
 const Shell = () => {
@@ -141,9 +108,7 @@ const Shell = () => {
       </header>
 
       <div className="mx-auto flex max-w-7xl gap-8 px-6">
-        <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] shrink-0 overflow-y-auto py-6 lg:block">
-          <Nav />
-        </aside>
+        <DocsNav />
         <main className="min-w-0 flex-1 py-8">
           <Routed />
         </main>
