@@ -1,6 +1,5 @@
 import {
   Alert,
-  CodeBlock,
   Heading,
   InlineCode,
   Table,
@@ -10,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '../../src';
+import { Code } from '../components/code';
 import { Demo as ColorPrimitivesDemo } from '../demos/color-primitives';
 import { Demo as SemanticColorsDemo } from '../demos/semantic-colors';
 import { Demo as TypographyDemo } from '../demos/typography';
@@ -89,8 +89,8 @@ export const ThemingPage = () => (
       <h2 className="border-b border-border pb-2 text-lg font-semibold text-foreground">
         The data-theme contract
       </h2>
-      <CodeBlock language="html" code={THEME_CONTRACT} />
-      <CodeBlock language="typescript" code={TOGGLE} />
+      <Code language="html" code={THEME_CONTRACT} />
+      <Code language="typescript" code={TOGGLE} />
       <Alert variant="info">
         <InlineCode>system</InlineCode> is a real third value, not an absence: it maps to a{' '}
         <InlineCode>prefers-color-scheme</InlineCode> media query, so the same attribute drives all

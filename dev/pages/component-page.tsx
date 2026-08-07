@@ -1,4 +1,5 @@
-import { CodeBlock, Heading, InlineCode } from '../../src';
+import { Heading, InlineCode } from '../../src';
+import { Code } from '../components/code';
 import { PropsTable } from '../components/props-table';
 import { EXPORT_SUBPATH } from '../generated/props';
 import { Link } from '../lib/router';
@@ -40,7 +41,7 @@ export const ComponentPage = ({ category, component }: ResolvedComponent) => (
 
     <section className="space-y-3" data-section="Import">
       <h2 className="text-sm font-semibold text-foreground">Import</h2>
-      <CodeBlock language="typescript" code={importSnippet(component.exports)} />
+      <Code language="typescript" code={importSnippet(component.exports)} />
       <p className="text-xs text-muted-foreground">
         The barrel <InlineCode>@agentage/design-system</InlineCode> re-exports everything; the
         subpaths above keep client boundaries and tree-shaking intact.
