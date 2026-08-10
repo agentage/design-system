@@ -1,14 +1,36 @@
 {
   "name": "@agentage/design-system",
   "version": "0.12.0",
-  "description": "Agentage design system — OKLCH design tokens + React component library.",
-  "type": "module",
-  "license": "UNLICENSED",
+  "description": "Agentage Design System - OKLCH design tokens and 60+ accessible React 19 components. RSC-safe (per-module \"use client\"), Tailwind CSS v4, tree-shakeable ESM with per-component subpath exports.",
+  "keywords": [
+    "design-system",
+    "react",
+    "react-19",
+    "component-library",
+    "ui-components",
+    "tailwindcss",
+    "tailwind-v4",
+    "oklch",
+    "design-tokens",
+    "rsc",
+    "react-server-components",
+    "accessibility",
+    "wcag",
+    "radix-ui",
+    "typescript",
+    "agentage"
+  ],
+  "license": "MIT",
   "author": "Volodymyr Vreshch <vreshch@gmail.com>",
+  "homepage": "https://ds.agentage.io",
   "repository": {
     "type": "git",
-    "url": "https://github.com/agentage/design-system.git"
+    "url": "git+https://github.com/agentage/design-system.git"
   },
+  "bugs": {
+    "url": "https://github.com/agentage/design-system/issues"
+  },
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
