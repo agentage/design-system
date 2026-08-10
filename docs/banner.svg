@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 420" width="1400" height="420" font-family="Segoe UI, Ubuntu, Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b0f19"/>
+      <stop offset="1" stop-color="#0d1220"/>
+    </linearGradient>
+    <linearGradient id="goldFade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#F3A52B" stop-opacity="0"/>
+      <stop offset="1" stop-color="#F3A52B" stop-opacity="0.55"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1400" height="420" fill="url(#bg)"/>
+  <rect x="0" y="416" width="1400" height="4" fill="url(#goldFade)"/>
+
+  <!-- wordmark -->
+  <g transform="translate(80, 74)">
+    <text x="0" y="0" font-size="19" font-weight="600" fill="#e6edf3" letter-spacing="0.3">Agent</text>
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="#F3A52B" transform="translate(54,-15) scale(0.75)"/>
+    <text x="72" y="0" font-size="19" font-weight="600" fill="#e6edf3" letter-spacing="0.3">Age</text>
+  </g>
+
+  <!-- headline -->
+  <text x="80" y="176" font-size="62" font-weight="700" fill="#ffffff" letter-spacing="-1.2">Design System</text>
+  <text x="80" y="228" font-size="26" fill="#8b949e">OKLCH tokens + 60+ React components, ready to install.</text>
+
+  <!-- feature chips -->
+  <g font-size="17" fill="#c9d1d9">
+    <g transform="translate(80, 268)">
+      <rect x="0" y="0" width="152" height="38" rx="19" fill="#161b26" stroke="#2b3245"/>
+      <text x="76" y="24" text-anchor="middle">React 19</text>
+    </g>
+    <g transform="translate(244, 268)">
+      <rect x="0" y="0" width="186" height="38" rx="19" fill="#161b26" stroke="#2b3245"/>
+      <text x="93" y="24" text-anchor="middle">Tailwind v4</text>
+    </g>
+    <g transform="translate(442, 268)">
+      <rect x="0" y="0" width="152" height="38" rx="19" fill="#161b26" stroke="#2b3245"/>
+      <text x="76" y="24" text-anchor="middle">RSC-safe</text>
+    </g>
+    <g transform="translate(606, 268)">
+      <rect x="0" y="0" width="168" height="38" rx="19" fill="#161b26" stroke="#2b3245"/>
+      <text x="84" y="24" text-anchor="middle">WCAG AA</text>
+    </g>
+  </g>
+
+  <!-- install line -->
+  <g transform="translate(80, 336)">
+    <rect x="0" y="0" width="480" height="46" rx="8" fill="#0a0e17" stroke="#2b3245"/>
+    <text x="18" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="17" fill="#8b949e">$</text>
+    <text x="40" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="17" fill="#e6edf3">npm install @agentage/design-system</text>
+  </g>
+
+  <!-- right: OKLCH gold ramp -->
+  <g transform="translate(880, 96)">
+    <text x="0" y="-14" font-size="13" fill="#6e7681" letter-spacing="1.6">OKLCH GOLD SCALE</text>
+    <rect x="0"   y="0" width="38" height="52" rx="4" fill="#FFF8EA"/>
+    <rect x="42"  y="0" width="38" height="52" rx="4" fill="#FFECC9"/>
+    <rect x="84"  y="0" width="38" height="52" rx="4" fill="#F8D193"/>
+    <rect x="126" y="0" width="38" height="52" rx="4" fill="#F9BA5F"/>
+    <rect x="168" y="0" width="38" height="52" rx="4" fill="#F3A52B"/>
+    <rect x="210" y="0" width="38" height="52" rx="4" fill="#E79422"/>
+    <rect x="252" y="0" width="38" height="52" rx="4" fill="#C97A18"/>
+    <rect x="294" y="0" width="38" height="52" rx="4" fill="#A45D1A"/>
+    <rect x="336" y="0" width="38" height="52" rx="4" fill="#804318"/>
+    <rect x="378" y="0" width="38" height="52" rx="4" fill="#5B2B12"/>
+  </g>
+
+  <!-- right: a card built from the tokens -->
+  <g transform="translate(880, 204)">
+    <rect x="0" y="0" width="416" height="140" rx="12" fill="#0f1420" stroke="#1C1E27"/>
+    <text x="24" y="38" font-size="18" font-weight="600" fill="#e6edf3">Memories</text>
+    <text x="24" y="66" font-size="30" font-weight="700" fill="#ffffff">12,480</text>
+
+    <rect x="24" y="86" width="240" height="8" rx="4" fill="#1C1E27"/>
+    <rect x="24" y="86" width="164" height="8" rx="4" fill="#F3A52B"/>
+
+    <g transform="translate(300, 78)">
+      <rect x="0" y="0" width="92" height="32" rx="6" fill="#F3A52B"/>
+      <text x="46" y="21" text-anchor="middle" font-size="14" font-weight="600" fill="#0b0f19">Open</text>
+    </g>
+
+    <g transform="translate(24, 108)">
+      <circle cx="6" cy="6" r="5" fill="#24C55F"/>
+      <text x="20" y="11" font-size="14" fill="#8b949e">All systems nominal</text>
+    </g>
+  </g>
+</svg>

@@ -1,9 +1,9 @@
 'use client';
 import { useState } from 'react';
-import { EmptyState, Heading, ToastProvider, ToggleGroup } from '../src';
+import { CopyButton, EmptyState, Heading, ToastProvider, ToggleGroup } from '../src';
 import { DocsNav } from './components/docs-nav';
 import { Search } from './components/search';
-import { BrandedLogo } from './lib/icons';
+import { BrandedLogo, GitHubIcon, NpmIcon } from './lib/icons';
 import { Link, RouterProvider, useRoute } from './lib/router';
 import { CategoryPage } from './pages/category-page';
 import { ComponentPage } from './pages/component-page';
@@ -16,6 +16,13 @@ const TOP_NAV = [
   { to: '/components', label: 'Components' },
   { to: '/install', label: 'Getting started' },
   { to: '/theming', label: 'Theming' },
+];
+
+const INSTALL_CMD = 'npm i @agentage/design-system';
+
+const EXTERNAL_LINKS = [
+  { href: 'https://www.npmjs.com/package/@agentage/design-system', label: 'npm', Icon: NpmIcon },
+  { href: 'https://github.com/agentage/design-system', label: 'GitHub', Icon: GitHubIcon },
 ];
 
 const AllCategories = () => (
@@ -80,7 +87,7 @@ const Shell = () => {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                  className={`whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
                     path.startsWith(item.to)
                       ? 'bg-primary text-primary-foreground'
                       : 'text-muted-foreground hover:bg-accent hover:text-foreground'
@@ -92,6 +99,31 @@ const Shell = () => {
             </nav>
           </div>
           <div className="flex items-center gap-3">
+            <div className="hidden items-center gap-1 rounded-md border border-border bg-sidebar py-1 pl-3 pr-1 xl:flex">
+              <code className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+                {INSTALL_CMD}
+              </code>
+              <CopyButton
+                text={INSTALL_CMD}
+                iconOnly
+                size="icon-sm"
+                variant="ghost"
+                label="Copy install command"
+              />
+            </div>
+            {EXTERNAL_LINKS.map(({ href, label, Icon }) => (
+              <a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={label}
+                title={label}
+                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <Icon />
+              </a>
+            ))}
             <Search />
             <ToggleGroup
               value={theme}
