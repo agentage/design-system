@@ -36,6 +36,7 @@ Single source of truth for the Agentage design system (OKLCH tokens + React comp
 - LIVE at https://ds.agentage.io since 2026-08-06. The `dev/` showcase deploys as its own Swarm stack (`agentage-ds`) behind Traefik on the main prod box. Dockerfile builds the static SPA → nginx-unprivileged; `docker-compose.yml` carries the Traefik labels; `.github/workflows/deploy.yml` builds → smokes → deploys on push to master.
 - Production-only (the platform-wide dev env was removed 2026-07-30). Gated on `vars.DEPLOY_ENABLED == 'true'` + the `production` environment (`vars.SITE_FQDN`, `SSH_PRIVATE_KEY` / `SSH_HOST` / `SSH_USER`).
 - Container healthcheck must probe `127.0.0.1`, not `localhost` — nginx binds IPv4 only; busybox wget picks `::1`.
+- Post-deploy verification lives in `scripts/verify-deploy.sh` (estate standard, same shape as auth/dashboard): it asserts `https://${SITE_FQDN}/health` reports **this** commit before checking that the page renders. A content grep alone is fail-open — on a failed rollout Swarm keeps the old task serving and the grep still matches.
 
 ## Conventions
 

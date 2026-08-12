@@ -69,6 +69,12 @@ jobs:
           done
           curl -fsS http://localhost:8080/ | grep -q "Agentage Design System" \
             || { echo "::error::showcase did not render"; docker logs ds; exit 1; }
+          # Assert provenance here too, so a build that failed to bake COMMIT_SHA
+          # fails before prod rather than as an unexplained post-deploy timeout.
+          got="$(curl -fsS http://localhost:8080/health | grep -o '"commit":"[0-9a-f]\{7,40\}"' | cut -d'"' -f4)"
+          [ "$got" = "$GITHUB_SHA" ] \
+            || { echo "::error::/health commit '$got' != '$GITHUB_SHA'"; exit 1; }
+          echo "PASS image /health reports $got"
         env:
           GITHUB_SHA: ${{ github.sha }}
 
@@ -107,13 +113,8 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "docker login ghcr.io -u ${{ github.actor }} --password-stdin"
       - name: Deploy stack
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /opt/agentage/ds && docker stack deploy -c docker-compose.yml agentage-ds --with-registry-auth"
-      - name: Wait + live smoke
+      - name: Verify deploy
         env:
           SITE_FQDN: ${{ vars.SITE_FQDN }}
-        run: |
-          for i in $(seq 1 40); do
-            curl -fsS "https://${SITE_FQDN}/" 2>/dev/null | grep -q "Agentage Design System" && { ok=1; break; }
-            sleep 5
-          done
-          echo "Smoke: https://${SITE_FQDN}/"
-          [ -n "${ok:-}" ] || { echo "::error::${SITE_FQDN} never served the showcase"; exit 1; }
+          COMMIT_SHA: ${{ github.sha }}
+        run: bash scripts/verify-deploy.sh
