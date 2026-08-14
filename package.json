@@ -1,6 +1,6 @@
 {
   "name": "@agentage/design-system",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Agentage Design System - OKLCH design tokens and 60+ accessible React 19 components. RSC-safe (per-module \"use client\"), Tailwind CSS v4, tree-shakeable ESM with per-component subpath exports.",
   "keywords": [
     "design-system",
