@@ -10,10 +10,14 @@ set -euo pipefail
 SITE_FQDN="${SITE_FQDN:-ds.agentage.io}"
 want="${COMMIT_SHA:?COMMIT_SHA required}"
 
+# Synthetic deploy probes are service traffic: the edge classifier tags them
+# user_type=service instead of guessing 'user'/'bot' from the user agent.
+svc_hdr=(-H 'X-Client-Type: service')
+
 # grep, not jq/python: the payload is a flat static file and the runner is
 # guaranteed nothing beyond coreutils + curl.
 read_commit() {
-  curl -sf "https://${SITE_FQDN}/health" 2>/dev/null |
+  curl -sf "${svc_hdr[@]}" "https://${SITE_FQDN}/health" 2>/dev/null |
     grep -o '"commit":"[0-9a-f]\{7,40\}"' | cut -d'"' -f4 || true
 }
 
@@ -37,7 +41,7 @@ done
 }
 
 echo "-- renders --"
-curl -fsS "https://${SITE_FQDN}/" | grep -q "Agentage Design System" || {
+curl -fsS "${svc_hdr[@]}" "https://${SITE_FQDN}/" | grep -q "Agentage Design System" || {
   echo "::error::${SITE_FQDN} answered /health but did not render the showcase"
   exit 1
 }
