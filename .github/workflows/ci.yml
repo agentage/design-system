@@ -32,7 +32,7 @@ jobs:
     timeout-minutes: 15
     # Same image the baselines were rendered in - font metrics must match exactly.
     container:
-      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
       options: --ipc=host
     steps:
       - uses: actions/checkout@v7
@@ -41,6 +41,7 @@ jobs:
           node-version: '22'
           cache: 'npm'
       - run: npm ci
+      - run: npx playwright install --with-deps chromium
       - run: npm run build:showcase
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v7
