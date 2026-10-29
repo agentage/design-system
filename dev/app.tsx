@@ -77,7 +77,7 @@ const Shell = () => {
           <div className="flex items-center gap-6">
             <Link
               to="/"
-              aria-label="Home"
+              aria-label="AgentAge home"
               className="rounded-md transition-opacity hover:opacity-80"
             >
               <BrandedLogo />

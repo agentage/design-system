@@ -160,7 +160,7 @@ test.describe('routing', () => {
 
   test('the command palette jumps to a component', async ({ page }) => {
     await open(page, '/');
-    await page.getByRole('button', { name: 'Search components' }).click();
+    await page.getByRole('button', { name: 'Search' }).click();
     await page.getByRole('combobox').fill('conversion funnel');
     await page.getByRole('option', { name: 'FunnelCard' }).click();
     await expect(page).toHaveURL('/components/cards/funnel-card');

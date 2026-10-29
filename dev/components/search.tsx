@@ -40,7 +40,6 @@ export const Search = () => {
         onClick={() => {
           setOpen(true);
         }}
-        aria-label="Search components"
         className="flex cursor-pointer items-center gap-2 rounded-md border border-border bg-muted/30 px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
       >
         Search
