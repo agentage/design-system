@@ -91,7 +91,7 @@ describe('ToggleGroup', () => {
     const { container } = render(<ToggleGroup options={many} value="v0" onChange={vi.fn()} />);
     const group = container.firstElementChild as HTMLElement;
     expect(group.className).not.toContain('grid-cols-');
-    expect(group.style.gridTemplateColumns).toBe('repeat(7, minmax(0, 1fr))');
+    expect(group.style.gridTemplateColumns).toBe('repeat(7, minmax(0px, 1fr))');
   });
 });
 
@@ -111,7 +111,7 @@ describe('ToggleGroup class strings', () => {
     render(<ToggleGroup value="a" onChange={() => {}} options={many} />);
     const root = screen.getByRole('radiogroup');
     expect(root.className).toBe('grid gap-2');
-    expect(root.style.gridTemplateColumns).toBe('repeat(7, minmax(0, 1fr))');
+    expect(root.style.gridTemplateColumns).toBe('repeat(7, minmax(0px, 1fr))');
   });
 
   it('keeps the selected and unselected button strings byte-identical', () => {
