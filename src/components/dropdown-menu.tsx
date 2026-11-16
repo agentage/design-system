@@ -94,6 +94,7 @@ export const DropdownMenu = ({
       else openMenu(true);
     } else if (e.key === 'Escape' && open) {
       e.preventDefault();
+      e.stopPropagation();
       closeMenu();
     }
   };

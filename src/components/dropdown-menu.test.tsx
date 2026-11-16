@@ -82,6 +82,23 @@ describe('DropdownMenu', () => {
     expect(document.activeElement).toBe(trigger);
   });
 
+  it('consumes the Escape that closes it', () => {
+    const outer = vi.fn();
+    const listen = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') outer();
+    };
+    document.addEventListener('keydown', listen);
+    const { trigger } = setup();
+    trigger.focus();
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' });
+    expect(outer).not.toHaveBeenCalled();
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+    fireEvent.keyDown(trigger, { key: 'Escape' });
+    expect(outer).not.toHaveBeenCalled();
+    document.removeEventListener('keydown', listen);
+  });
+
   it('runs the item handler and closes', () => {
     const { trigger, onPick } = setup();
     fireEvent.keyDown(trigger, { key: 'ArrowDown' });

@@ -25,7 +25,12 @@ export const handleMenuKeyDown = (e: React.KeyboardEvent<HTMLElement>, close: ()
   const items = menuItems(e.currentTarget);
   const current = items.indexOf(document.activeElement as HTMLElement);
 
-  if (e.key === 'Escape' || e.key === 'Tab') {
+  if (e.key === 'Escape') {
+    // The menu consumes the Escape that closes it, so an outer Escape handler does not also fire.
+    e.preventDefault();
+    e.stopPropagation();
+    close();
+  } else if (e.key === 'Tab') {
     close();
   } else {
     const next = nextListIndex(e.key, current, items.length, false);
