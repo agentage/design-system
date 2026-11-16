@@ -320,6 +320,18 @@
       "types": "./dist/components/resizable.d.ts",
       "import": "./dist/components/resizable.js"
     },
+    "./resizable-split": {
+      "types": "./dist/components/resizable-split.d.ts",
+      "import": "./dist/components/resizable-split.js"
+    },
+    "./resizable-split-prepaint": {
+      "types": "./dist/components/resizable-split-prepaint.d.ts",
+      "import": "./dist/components/resizable-split-prepaint.js"
+    },
+    "./resizable-split.context": {
+      "types": "./dist/components/resizable-split.context.d.ts",
+      "import": "./dist/components/resizable-split.context.js"
+    },
     "./resizable.parts": {
       "types": "./dist/components/resizable.parts.d.ts",
       "import": "./dist/components/resizable.parts.js"
@@ -367,6 +379,10 @@
     "./spinner": {
       "types": "./dist/components/spinner.d.ts",
       "import": "./dist/components/spinner.js"
+    },
+    "./split-px": {
+      "types": "./dist/lib/split-px.d.ts",
+      "import": "./dist/lib/split-px.js"
     },
     "./stat-card": {
       "types": "./dist/components/stat-card.d.ts",
@@ -447,6 +463,10 @@
     "./use-scroll-lock": {
       "types": "./dist/lib/use-scroll-lock.d.ts",
       "import": "./dist/lib/use-scroll-lock.js"
+    },
+    "./use-split-state": {
+      "types": "./dist/components/use-split-state.d.ts",
+      "import": "./dist/components/use-split-state.js"
     },
     "./utils": {
       "types": "./dist/lib/utils.d.ts",

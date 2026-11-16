@@ -512,8 +512,16 @@ export const CATEGORIES: CategoryEntry[] = [
       {
         slug: 'resizable',
         name: 'Resizable panels',
-        description: 'Draggable and keyboard-resizable split panes that persist their sizes.',
-        exports: ['ResizablePanelGroup', 'ResizablePanel', 'ResizableHandle'],
+        description:
+          'Draggable and keyboard-resizable split panes that persist their sizes, in percent or in px with no layout shift.',
+        exports: [
+          'ResizablePanelGroup',
+          'ResizablePanel',
+          'ResizableHandle',
+          'ResizableSplit',
+          'ResizableSplitPrepaint',
+          'useResizableSplit',
+        ],
         demos: [{ Component: ResizableDemo }],
       },
       {

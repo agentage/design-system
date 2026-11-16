@@ -19,6 +19,16 @@ const setup = (onPick = vi.fn()) => {
 };
 
 describe('DropdownMenu', () => {
+  it('forwards className to the menu content', () => {
+    render(
+      <DropdownMenu trigger={<span>Actions</span>} className="w-64">
+        <DropdownMenuItem>View</DropdownMenuItem>
+      </DropdownMenu>
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Actions' }));
+    expect(screen.getByRole('menu').className).toContain('w-64');
+  });
+
   it('renders the trigger as a button announcing a menu', () => {
     const { trigger } = setup();
     expect(trigger.tagName).toBe('BUTTON');
