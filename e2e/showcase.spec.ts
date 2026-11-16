@@ -84,6 +84,24 @@ test.describe('docs a11y', () => {
   }
 });
 
+test.describe('toast contrast', () => {
+  for (const theme of THEMES) {
+    test(`${theme} / every toast variant passes WCAG AA with a description`, async ({ page }) => {
+      await open(page, '/components/feedback/toast', theme);
+      const buttons = section(page, 'Toast').getByRole('button');
+      for (const name of ['Default', 'Success', 'Error', 'Warning', 'Info']) {
+        await buttons.filter({ hasText: new RegExp(`^${name}$`) }).click();
+      }
+      await expect(page.locator('[data-slot="toast"]')).toHaveCount(5);
+      const results = await new AxeBuilder({ page })
+        .withTags(WCAG_TAGS)
+        .include('[data-slot="toast-container"]')
+        .analyze();
+      expect(results.violations.map((v) => v.id)).toEqual([]);
+    });
+  }
+});
+
 /** The left rail: one scroll container, groups collapsed unless the route needs them. */
 const rail = (page: Page) => page.locator('.docs-rail');
 const group = (page: Page, label: string) =>

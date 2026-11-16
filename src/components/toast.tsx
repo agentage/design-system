@@ -12,10 +12,11 @@ export const toastVariants = cva(
     variants: {
       variant: {
         default: 'border-border bg-card text-card-foreground',
-        success: 'border-success/30 bg-success/10 text-success',
-        destructive: 'border-destructive/30 bg-destructive/10 text-destructive',
-        warning: 'border-warning/30 bg-warning/10 text-warning',
-        info: 'border-info/30 bg-info/10 text-info',
+        // Status hues stay on border and tint only: they miss 4.5:1 as text on the dark tint.
+        success: 'border-success/50 bg-success/10 text-card-foreground',
+        destructive: 'border-destructive/50 bg-destructive/10 text-card-foreground',
+        warning: 'border-warning/50 bg-warning/10 text-card-foreground',
+        info: 'border-info/50 bg-info/10 text-card-foreground',
       },
     },
     defaultVariants: { variant: 'default' },
@@ -81,7 +82,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }): React.JSX.
               >
                 <div className="flex-1">
                   <p className="text-sm font-medium">{t.title}</p>
-                  {t.description && <p className="mt-0.5 text-xs opacity-80">{t.description}</p>}
+                  {t.description && <p className="mt-0.5 text-xs">{t.description}</p>}
                 </div>
                 <button
                   type="button"
