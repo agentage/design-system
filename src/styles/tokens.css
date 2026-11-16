@@ -26,6 +26,8 @@
   /* Primary as a *foreground* (link/label/icon). Identical to --color-primary here;
    * the light theme forks it because amber-on-white only reaches 2.4:1. */
   --color-primary-emphasis: oklch(0.78 0.155 72);
+  /* Hover fill of a primary surface (button): one step lighter on dark. */
+  --color-primary-hover: oklch(0.83 0.15 72);
   /* Soft amber wash — the reserved background for active/selected/pinned state. */
   --color-primary-soft: oklch(0.78 0.155 72 / 0.12);
 
@@ -165,6 +167,8 @@ html[data-theme='light'] {
   --color-primary-foreground: oklch(0.18 0.032 277);
   /* Lightest amber that still clears 4.5:1 as text on bg-primary/10 over the sidebar — 4.61:1. */
   --color-primary-emphasis: oklch(0.505 0.11 68);
+  /* Hover fill of a primary surface: one step darker on light; ink stays 6.5:1+. */
+  --color-primary-hover: oklch(0.69 0.15 68);
   --color-primary-soft: oklch(0.735 0.152 68 / 0.14);
 
   --color-secondary: oklch(0.955 0.005 277);
@@ -232,6 +236,7 @@ html[data-theme='light'] {
     /* Mirrors the html[data-theme='light'] values — see the notes there. */
     --color-primary-foreground: oklch(0.18 0.032 277);
     --color-primary-emphasis: oklch(0.505 0.11 68);
+    --color-primary-hover: oklch(0.69 0.15 68);
 
     --color-secondary: oklch(0.955 0.005 277);
     --color-secondary-foreground: oklch(0.18 0.032 277);

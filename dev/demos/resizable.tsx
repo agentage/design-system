@@ -1,5 +1,5 @@
 'use client';
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '../../src';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup, ResizableSplit } from '../../src';
 
 export const Demo = () => (
   <>
@@ -43,5 +43,27 @@ export const Demo = () => (
         <p className="font-mono text-xs text-muted-foreground">agent finished in 4.2s</p>
       </ResizablePanel>
     </ResizablePanelGroup>
+    <p className="text-sm text-muted-foreground">
+      Pixel mode: <code className="font-mono text-xs">ResizableSplit</code> sizes the first pane in
+      px with min and max. The width is stored under{' '}
+      <code className="font-mono text-xs">storageKey</code> and applied before first paint by
+      putting{' '}
+      <code className="font-mono text-xs">{'<ResizableSplitPrepaint storageKeys={[key]} />'}</code>{' '}
+      in the document head (or calling{' '}
+      <code className="font-mono text-xs">resizableSplitPrepaint</code> for the inline script), so a
+      reload does not shift the layout. Arrow keys move 16px, Shift 64px, Home and End jump to the
+      bounds.
+    </p>
+    <ResizableSplit
+      storageKey="ds-demo-split-px"
+      init={220}
+      min={140}
+      max={420}
+      label="Resize sidebar"
+      className="h-48 rounded-lg border border-border"
+    >
+      <div className="bg-sidebar p-3 text-sm">Sidebar, 140-420px</div>
+      <div className="p-3 text-sm text-muted-foreground">Content fills the rest.</div>
+    </ResizableSplit>
   </>
 );

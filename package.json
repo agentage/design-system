@@ -320,6 +320,10 @@
       "types": "./dist/components/resizable.d.ts",
       "import": "./dist/components/resizable.js"
     },
+    "./resizable-split": {
+      "types": "./dist/components/resizable-split.d.ts",
+      "import": "./dist/components/resizable-split.js"
+    },
     "./resizable.parts": {
       "types": "./dist/components/resizable.parts.d.ts",
       "import": "./dist/components/resizable.parts.js"
@@ -367,6 +371,10 @@
     "./spinner": {
       "types": "./dist/components/spinner.d.ts",
       "import": "./dist/components/spinner.js"
+    },
+    "./split-px": {
+      "types": "./dist/lib/split-px.d.ts",
+      "import": "./dist/lib/split-px.js"
     },
     "./stat-card": {
       "types": "./dist/components/stat-card.d.ts",
