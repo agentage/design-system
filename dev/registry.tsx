@@ -520,6 +520,7 @@ export const CATEGORIES: CategoryEntry[] = [
           'ResizableHandle',
           'ResizableSplit',
           'ResizableSplitPrepaint',
+          'useResizableSplit',
         ],
         demos: [{ Component: ResizableDemo }],
       },

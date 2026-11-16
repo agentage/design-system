@@ -1734,7 +1734,7 @@ export const COMPONENT_PROPS: Record<string, PropDoc[]> = {
       type: 'number',
       required: true,
       defaultValue: null,
-      description: 'First pane width in px before any stored value exists.',
+      description: 'Sized pane size in px before any stored value exists.',
     },
     { name: 'max', type: 'number', required: true, defaultValue: null, description: '' },
     { name: 'min', type: 'number', required: true, defaultValue: null, description: '' },
@@ -1743,7 +1743,23 @@ export const COMPONENT_PROPS: Record<string, PropDoc[]> = {
       type: 'string',
       required: true,
       defaultValue: null,
-      description: '`localStorage` key for the first pane width; also names the CSS variable.',
+      description:
+        '`localStorage` key of the sized pane; also names the CSS variables. `[A-Za-z0-9._:-]`, max 64.',
+    },
+    {
+      name: 'apiRef',
+      type: 'Ref<ResizableSplitApi> | undefined',
+      required: false,
+      defaultValue: null,
+      description: 'Imperative toggle for a control outside the split.',
+    },
+    {
+      name: 'collapsible',
+      type: 'boolean | undefined',
+      required: false,
+      defaultValue: 'false',
+      description:
+        'Lets the sized pane collapse to 0px; the state is stored under `<storageKey>.collapsed`.',
     },
     {
       name: 'label',
@@ -1753,11 +1769,26 @@ export const COMPONENT_PROPS: Record<string, PropDoc[]> = {
       description: 'Accessible name of the separator.',
     },
     {
+      name: 'onCollapsedChange',
+      type: '((collapsed: boolean) => void) | undefined',
+      required: false,
+      defaultValue: null,
+      description: '',
+    },
+    {
       name: 'onWidthChange',
       type: '((px: number) => void) | undefined',
       required: false,
       defaultValue: null,
       description: '',
+    },
+    {
+      name: 'orientation',
+      type: 'SplitOrientation | undefined',
+      required: false,
+      defaultValue: "'horizontal'",
+      description:
+        '`horizontal`: first pane is sized, left to right. `vertical`: last pane (bottom) is sized.',
     },
   ],
   ResizableSplitPrepaint: [
@@ -2628,8 +2659,9 @@ export const EXPORT_SUBPATH: Record<string, string> = {
   ResizablePanelGroupProps: './resizable',
   ResizablePanelProps: './resizable.parts',
   ResizableSplit: './resizable-split',
-  ResizableSplitPrepaint: './resizable-split',
-  ResizableSplitPrepaintProps: './resizable-split',
+  ResizableSplitApi: './resizable-split.context',
+  ResizableSplitPrepaint: './resizable-split-prepaint',
+  ResizableSplitPrepaintProps: './resizable-split-prepaint',
   ResizableSplitProps: './resizable-split',
   ResizeDirection: './resizable.parts',
   ScoreBand: './score-card',
@@ -2774,6 +2806,7 @@ export const EXPORT_SUBPATH: Record<string, string> = {
   resizableHandleVariants: './resizable.variants',
   resizablePanelGroupVariants: './resizable.variants',
   resizablePanelVariants: './resizable.variants',
+  resizableSplitCollapsedVar: './split-px',
   resizableSplitPrepaint: './split-px',
   resizableSplitVar: './split-px',
   resolveUsageLevel: './usage-level',
@@ -2805,5 +2838,6 @@ export const EXPORT_SUBPATH: Record<string, string> = {
   usageMeterLabelVariants: './usage-meter',
   usageMeterTrackVariants: './usage-meter',
   usageMeterValueVariants: './usage-meter',
+  useResizableSplit: './resizable-split.context',
   useToast: './toast',
 };

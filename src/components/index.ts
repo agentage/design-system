@@ -197,11 +197,13 @@ export type { RadioGroupProps, RadioGroupItemProps } from './radio-group';
 export { ResizableHandle, ResizablePanel, ResizablePanelGroup } from './resizable';
 export {
   ResizableSplit,
-  ResizableSplitPrepaint,
-  resizableSplitPrepaint,
+  resizableSplitCollapsedVar,
   resizableSplitVar,
+  useResizableSplit,
 } from './resizable-split';
-export type { ResizableSplitProps, ResizableSplitPrepaintProps } from './resizable-split';
+export { ResizableSplitPrepaint, resizableSplitPrepaint } from './resizable-split-prepaint';
+export type { ResizableSplitApi, ResizableSplitProps } from './resizable-split';
+export type { ResizableSplitPrepaintProps } from './resizable-split-prepaint';
 export type {
   ResizableHandleProps,
   ResizablePanelProps,
