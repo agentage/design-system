@@ -157,7 +157,7 @@ must match:
 
 ```bash
 docker run --rm --ipc=host -v "$PWD":/work -w /work -u "$(id -u):$(id -g)" -e HOME=/tmp \
-  mcr.microsoft.com/playwright:v1.62.1-noble npx playwright test --update-snapshots
+  mcr.microsoft.com/playwright:v1.65.1-noble npx playwright test --update-snapshots
 ```
 
 ## Release
